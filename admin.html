@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Anurag Apparel Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#171717",
+            paper: "#fbfaf7",
+            linen: "#f3eee5",
+            line: "#e7e1d8",
+            brass: "#b7872d",
+            leaf: "#2d6a4f",
+            wine: "#7f1d1d",
+            clay: "#a85f3d"
+          },
+          boxShadow: {
+            soft: "0 18px 60px rgba(23, 23, 23, 0.14)",
+            crisp: "0 10px 30px rgba(23, 23, 23, 0.08)"
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-browser-config.js"></script>
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, #fbfaf7 0%, #f3eee5 48%, #fbfaf7 100%);
+    }
+
+    .field {
+      border: 1px solid #e7e1d8;
+      border-radius: 0.5rem;
+      background: #fffdf9;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+      width: 100%;
+    }
+
+    .field:focus {
+      border-color: #b7872d;
+      box-shadow: 0 0 0 3px rgba(183, 135, 45, 0.18);
+    }
+
+    .auth-backdrop {
+      background:
+        linear-gradient(90deg, rgba(12, 12, 12, 0.88), rgba(12, 12, 12, 0.54)),
+        url("https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1800&q=82") center/cover;
+    }
+  </style>
+</head>
+<body class="bg-paper text-ink antialiased">
+  <section id="authGate" class="auth-backdrop fixed inset-0 z-50 flex items-center justify-center px-4">
+    <form id="loginForm" class="w-full max-w-md rounded-lg border border-white/20 bg-paper/95 p-6 shadow-soft backdrop-blur sm:p-8">
+      <a href="index.html" class="mb-8 inline-flex items-center gap-3 text-sm font-semibold text-ink transition hover:text-leaf">
+        <span class="grid h-9 w-9 place-items-center rounded-md bg-ink text-xs text-white">AA</span>
+        Anurag Apparel
+      </a>
+      <p class="text-sm font-semibold uppercase text-brass">Admin access</p>
+      <h1 class="mt-2 text-3xl font-semibold">Inventory Dashboard</h1>
+      <p class="mt-3 text-sm leading-6 text-ink/62">Manage product details, active stock, and gallery images for the live storefront.</p>
+      <div class="mt-7 space-y-4">
+        <label class="block">
+          <span class="text-sm font-medium text-ink/70">Username</span>
+          <input id="username" class="field mt-2 px-4 py-3" type="text" autocomplete="username" required>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium text-ink/70">Password</span>
+          <input id="password" class="field mt-2 px-4 py-3" type="password" autocomplete="current-password" required>
+        </label>
+      </div>
+      <p id="authError" class="mt-4 hidden rounded-md border border-wine/30 bg-wine/5 px-3 py-2 text-sm text-wine"></p>
+      <button type="submit" class="mt-6 w-full rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Unlock Dashboard</button>
+    </form>
+  </section>
+
+  <div id="dashboard" class="hidden min-h-screen">
+    <header class="sticky top-0 z-30 border-b border-line bg-paper/88 shadow-crisp backdrop-blur-xl">
+      <nav class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div>
+          <a href="index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-ink/62 transition hover:text-ink">
+            <span class="grid h-7 w-7 place-items-center rounded-md bg-ink text-[10px] text-white">AA</span>
+            Anurag Apparel
+          </a>
+          <h1 class="mt-2 text-2xl font-semibold">Admin Portal</h1>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button id="refreshProducts" type="button" class="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold transition hover:border-ink">Refresh</button>
+          <button id="logout" type="button" class="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-black">Lock</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[390px_1fr] lg:px-8">
+      <aside class="lg:sticky lg:top-28 lg:self-start">
+        <form id="productForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase text-brass">Inventory</p>
+              <h2 id="formTitle" class="mt-1 text-2xl font-semibold">Add Product</h2>
+            </div>
+            <button id="cancelEdit" type="button" class="hidden rounded-md border border-line px-3 py-2 text-xs font-semibold transition hover:border-ink">Cancel</button>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Title</span>
+              <input id="productTitle" class="field mt-2 px-4 py-3" type="text" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Price</span>
+              <input id="productPrice" class="field mt-2 px-4 py-3" type="number" min="0" step="1" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Description</span>
+              <textarea id="productDescription" class="field mt-2 min-h-32 px-4 py-3" required></textarea>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Gallery Images</span>
+              <input id="imageInput" class="field mt-2 cursor-pointer bg-paper px-4 py-3 file:mr-4 file:rounded-md file:border-0 file:bg-ink file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white" type="file" accept="image/*" multiple>
+            </label>
+
+            <div id="galleryEditor" class="grid grid-cols-3 gap-3"></div>
+
+            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
+              <span>
+                <span class="block text-sm font-semibold">Active</span>
+                <span class="block text-xs text-ink/54">Visible on storefront</span>
+              </span>
+              <input id="productActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
+            </label>
+          </div>
+
+          <button id="saveProduct" type="submit" class="mt-6 w-full rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-ink/45">Save Product</button>
+        </form>
+      </aside>
+
+      <section>
+        <div id="statusMessage" class="mb-5 rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink/68 shadow-crisp" role="status">Unlock complete. Loading dashboard...</div>
+
+        <div class="rounded-lg border border-line bg-white/94 shadow-crisp backdrop-blur">
+          <div class="flex flex-col gap-2 border-b border-line bg-paper/52 p-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-sm font-semibold uppercase text-leaf">Products</p>
+              <h2 class="mt-1 text-2xl font-semibold">Live Inventory</h2>
+            </div>
+            <p id="productCount" class="text-sm text-ink/56">0 products</p>
+          </div>
+
+          <div id="productsList" class="divide-y divide-line"></div>
+          <div id="adminEmptyState" class="hidden px-6 py-14 text-center">
+            <p class="text-lg font-semibold">No products yet.</p>
+            <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Add the first apparel item and upload gallery images to publish it on the storefront.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    const ADMIN_USERNAME = "anurag";
+    const ADMIN_PASSWORD = "Anurag@2026";
+    const AUTH_SESSION_KEY = "anurag-apparel-admin-unlocked";
+    const STORAGE_BUCKET = "product-images";
+    const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
+    const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
+
+    const state = {
+      client: null,
+      configured: false,
+      products: [],
+      editingId: null,
+      originalGallery: [],
+      currentGallery: [],
+      pendingFiles: [],
+      objectUrls: []
+    };
+
+    const dom = {};
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      cacheDom();
+      bindAuth();
+      bindDashboard();
+
+      if (sessionStorage.getItem(AUTH_SESSION_KEY) === "true") {
+        unlockDashboard();
+      }
+    }
+
+    function cacheDom() {
+      dom.authGate = document.querySelector("#authGate");
+      dom.loginForm = document.querySelector("#loginForm");
+      dom.username = document.querySelector("#username");
+      dom.password = document.querySelector("#password");
+      dom.authError = document.querySelector("#authError");
+      dom.dashboard = document.querySelector("#dashboard");
+      dom.logout = document.querySelector("#logout");
+      dom.refreshProducts = document.querySelector("#refreshProducts");
+      dom.productForm = document.querySelector("#productForm");
+      dom.formTitle = document.querySelector("#formTitle");
+      dom.cancelEdit = document.querySelector("#cancelEdit");
+      dom.productTitle = document.querySelector("#productTitle");
+      dom.productPrice = document.querySelector("#productPrice");
+      dom.productDescription = document.querySelector("#productDescription");
+      dom.imageInput = document.querySelector("#imageInput");
+      dom.galleryEditor = document.querySelector("#galleryEditor");
+      dom.productActive = document.querySelector("#productActive");
+      dom.saveProduct = document.querySelector("#saveProduct");
+      dom.statusMessage = document.querySelector("#statusMessage");
+      dom.productCount = document.querySelector("#productCount");
+      dom.productsList = document.querySelector("#productsList");
+      dom.adminEmptyState = document.querySelector("#adminEmptyState");
+    }
+
+    function bindAuth() {
+      dom.loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = dom.username.value.trim();
+        const password = dom.password.value;
+
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+          sessionStorage.setItem(AUTH_SESSION_KEY, "true");
+          dom.authError.classList.add("hidden");
+          unlockDashboard();
+          return;
+        }
+
+        dom.authError.textContent = "Invalid username or password.";
+        dom.authError.classList.remove("hidden");
+      });
+    }
+
+    function bindDashboard() {
+      dom.logout.addEventListener("click", lockDashboard);
+      dom.refreshProducts.addEventListener("click", loadProducts);
+      dom.productForm.addEventListener("submit", saveProduct);
+      dom.cancelEdit.addEventListener("click", resetForm);
+      dom.imageInput.addEventListener("change", handleImageSelection);
+    }
+
+    async function unlockDashboard() {
+      dom.authGate.classList.add("hidden");
+      dom.dashboard.classList.remove("hidden");
+      setAdminControlsEnabled(false);
+      state.client = await createSupabaseClient();
+
+      if (!state.client) {
+        setStatus("Supabase credentials are missing. Add them to supabase-browser-config.js, .env, or set the window config globals.", "error");
+        return;
+      }
+
+      setAdminControlsEnabled(true);
+      await loadProducts();
+    }
+
+    function lockDashboard() {
+      sessionStorage.removeItem(AUTH_SESSION_KEY);
+      resetForm();
+      dom.dashboard.classList.add("hidden");
+      dom.authGate.classList.remove("hidden");
+      dom.password.value = "";
+      state.client = null;
+      state.products = [];
+      renderProducts();
+    }
+
+    async function createSupabaseClient() {
+      const config = await loadSupabaseConfig();
+      state.configured = isConfigured(config);
+
+      if (!state.configured || !window.supabase?.createClient) {
+        return null;
+      }
+
+      return window.supabase.createClient(config.url, config.anonKey);
+    }
+
+    async function loadSupabaseConfig() {
+      const inlineConfig = {
+        url: window.ANURAG_SUPABASE_URL,
+        anonKey: window.ANURAG_SUPABASE_ANON_KEY
+      };
+
+      if (isConfigured(inlineConfig)) {
+        return inlineConfig;
+      }
+
+      try {
+        const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
+        const response = await fetch(envPath, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("No env file");
+        }
+        const env = parseEnv(await response.text());
+        return {
+          url: env.SUPABASE_URL || "your_supabase_project_url",
+          anonKey: env.SUPABASE_ANON_KEY || "your_supabase_anon_key"
+        };
+      } catch (error) {
+        return {
+          url: "your_supabase_project_url",
+          anonKey: "your_supabase_anon_key"
+        };
+      }
+    }
+
+    function parseEnv(text) {
+      return text.split(/\r?\n/).reduce((values, line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) {
+          return values;
+        }
+        const separatorIndex = trimmed.indexOf("=");
+        if (separatorIndex === -1) {
+          return values;
+        }
+        const key = trimmed.slice(0, separatorIndex).trim();
+        const value = trimmed.slice(separatorIndex + 1).trim().replace(/^["']|["']$/g, "");
+        values[key] = value;
+        return values;
+      }, {});
+    }
+
+    function isConfigured(config) {
+      return Boolean(
+        config.url &&
+        config.anonKey &&
+        !config.url.includes("your_supabase") &&
+        !config.anonKey.includes("your_supabase")
+      );
+    }
+
+    async function loadProducts() {
+      if (!state.client) {
+        return;
+      }
+
+      setStatus("Loading inventory...", "info");
+      dom.refreshProducts.disabled = true;
+
+      try {
+        const { data, error } = await state.client
+          .from("products")
+          .select("id,title,description,price,gallery_images,is_active,created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        state.products = data || [];
+        renderProducts();
+        setStatus(`Inventory loaded. ${state.products.length} item${state.products.length === 1 ? "" : "s"} found.`, "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to load inventory.", "error");
+      } finally {
+        dom.refreshProducts.disabled = false;
+      }
+    }
+
+    async function saveProduct(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const payload = readProductPayload();
+      if (!payload) {
+        return;
+      }
+
+      setSaving(true);
+      setStatus(state.editingId ? "Saving product changes..." : "Creating product...", "info");
+
+      let uploadedUrls = [];
+
+      try {
+        uploadedUrls = await uploadPendingImages((url) => uploadedUrls.push(url));
+        payload.gallery_images = [...state.currentGallery, ...uploadedUrls];
+
+        if (state.editingId) {
+          const { error } = await state.client
+            .from("products")
+            .update(payload)
+            .eq("id", state.editingId);
+
+          if (error) {
+            throw error;
+          }
+
+          const removedUrls = state.originalGallery.filter((url) => !payload.gallery_images.includes(url));
+          await removeStorageObjects(removedUrls);
+          setStatus("Product updated.", "success");
+        } else {
+          const { error } = await state.client
+            .from("products")
+            .insert(payload);
+
+          if (error) {
+            throw error;
+          }
+
+          setStatus("Product created.", "success");
+        }
+
+        resetForm();
+        await loadProducts();
+      } catch (error) {
+        if (uploadedUrls.length) {
+          await removeStorageObjects(uploadedUrls);
+        }
+        console.error(error);
+        setStatus(error.message || "Unable to save product.", "error");
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    function readProductPayload() {
+      const title = dom.productTitle.value.trim();
+      const description = dom.productDescription.value.trim();
+      const price = Number(dom.productPrice.value);
+
+      if (!title || !description || Number.isNaN(price) || price < 0) {
+        setStatus("Please enter a valid title, price, and description.", "error");
+        return null;
+      }
+
+      return {
+        title,
+        description,
+        price,
+        is_active: dom.productActive.checked,
+        gallery_images: []
+      };
+    }
+
+    function handleImageSelection(event) {
+      const selectedFiles = Array.from(event.target.files || []);
+      const validFiles = [];
+
+      for (const file of selectedFiles) {
+        if (!file.type.startsWith("image/")) {
+          setStatus(`${file.name} is not an image file.`, "error");
+          continue;
+        }
+
+        if (file.size > MAX_IMAGE_SIZE) {
+          setStatus(`${file.name} is larger than 8 MB.`, "error");
+          continue;
+        }
+
+        validFiles.push(file);
+      }
+
+      state.pendingFiles.push(...validFiles);
+      dom.imageInput.value = "";
+      renderGalleryEditor();
+    }
+
+    async function uploadPendingImages(onUploaded) {
+      const uploadedUrls = [];
+
+      for (const file of state.pendingFiles) {
+        const path = `products/${createFileToken()}-${sanitizeFileName(file.name)}`;
+        const { error } = await state.client.storage
+          .from(STORAGE_BUCKET)
+          .upload(path, file, {
+            cacheControl: "3600",
+            upsert: false
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        const { data } = state.client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        uploadedUrls.push(data.publicUrl);
+        onUploaded?.(data.publicUrl);
+      }
+
+      return uploadedUrls;
+    }
+
+    function renderProducts() {
+      dom.productsList.replaceChildren();
+      dom.adminEmptyState.classList.toggle("hidden", state.products.length > 0);
+      dom.productCount.textContent = `${state.products.length} product${state.products.length === 1 ? "" : "s"}`;
+
+      state.products.forEach((product) => {
+        dom.productsList.appendChild(createProductRow(product));
+      });
+    }
+
+    function createProductRow(product) {
+      const row = document.createElement("article");
+      row.className = "grid gap-4 p-5 transition hover:bg-linen/45 sm:grid-cols-[96px_1fr_auto] sm:items-center";
+
+      const image = document.createElement("img");
+      image.className = "h-28 w-full rounded-lg object-cover sm:h-24 sm:w-24";
+      image.src = getGalleryImages(product)[0];
+      image.alt = product.title || "Product image";
+      image.loading = "lazy";
+
+      const details = document.createElement("div");
+      const titleLine = document.createElement("div");
+      titleLine.className = "flex flex-wrap items-center gap-2";
+
+      const title = document.createElement("h3");
+      title.className = "text-lg font-semibold";
+      title.textContent = product.title || "Untitled product";
+
+      const status = document.createElement("span");
+      status.className = product.is_active
+        ? "rounded-md bg-leaf/10 px-2 py-1 text-xs font-semibold text-leaf"
+        : "rounded-md bg-wine/10 px-2 py-1 text-xs font-semibold text-wine";
+      status.textContent = product.is_active ? "Active" : "Archived";
+
+      titleLine.append(title, status);
+
+      const meta = document.createElement("p");
+      meta.className = "mt-2 text-sm text-ink/58";
+      const imageCount = getStoredGallery(product).length;
+      meta.textContent = `${formatCurrency(product.price)} | ${formatDate(product.created_at)} | ${imageCount} image${imageCount === 1 ? "" : "s"}`;
+
+      const description = document.createElement("p");
+      description.className = "mt-2 text-sm leading-6 text-ink/62";
+      description.textContent = compactText(product.description || "", 140);
+
+      details.append(titleLine, meta, description);
+
+      const actions = document.createElement("div");
+      actions.className = "flex flex-wrap gap-2 sm:justify-end";
+
+      const editButton = createActionButton("Edit", () => startEdit(product.id));
+      const activeButton = createActionButton(product.is_active ? "Archive" : "Restore", () => toggleActive(product.id));
+      const deleteButton = createActionButton("Delete", () => deleteProduct(product.id), true);
+
+      actions.append(editButton, activeButton, deleteButton);
+      row.append(image, details, actions);
+      return row;
+    }
+
+    function createActionButton(label, handler, danger = false) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = danger
+        ? "rounded-md border border-wine/25 px-3 py-2 text-sm font-semibold text-wine transition hover:bg-wine hover:text-white"
+        : "rounded-md border border-line px-3 py-2 text-sm font-semibold transition hover:border-ink hover:bg-ink hover:text-white";
+      button.textContent = label;
+      button.addEventListener("click", handler);
+      return button;
+    }
+
+    function startEdit(productId) {
+      const product = state.products.find((item) => item.id === productId);
+      if (!product) {
+        return;
+      }
+
+      state.editingId = product.id;
+      state.originalGallery = getStoredGallery(product);
+      state.currentGallery = [...state.originalGallery];
+      clearPendingFiles();
+
+      dom.formTitle.textContent = "Edit Product";
+      dom.saveProduct.textContent = "Save Changes";
+      dom.cancelEdit.classList.remove("hidden");
+      dom.productTitle.value = product.title || "";
+      dom.productPrice.value = Number(product.price || 0);
+      dom.productDescription.value = product.description || "";
+      dom.productActive.checked = Boolean(product.is_active);
+
+      renderGalleryEditor();
+      dom.productTitle.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function toggleActive(productId) {
+      const product = state.products.find((item) => item.id === productId);
+      if (!product) {
+        return;
+      }
+
+      setStatus(product.is_active ? "Archiving product..." : "Restoring product...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("products")
+          .update({ is_active: !product.is_active })
+          .eq("id", product.id);
+
+        if (error) {
+          throw error;
+        }
+
+        await loadProducts();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to update product status.", "error");
+      }
+    }
+
+    async function deleteProduct(productId) {
+      const product = state.products.find((item) => item.id === productId);
+      if (!product || !confirm(`Delete "${product.title}" from inventory?`)) {
+        return;
+      }
+
+      setStatus("Deleting product...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("products")
+          .delete()
+          .eq("id", product.id);
+
+        if (error) {
+          throw error;
+        }
+
+        await removeStorageObjects(getStoredGallery(product));
+
+        if (state.editingId === product.id) {
+          resetForm();
+        }
+
+        await loadProducts();
+        setStatus("Product deleted.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to delete product.", "error");
+      }
+    }
+
+    function renderGalleryEditor() {
+      revokeObjectUrls();
+      dom.galleryEditor.replaceChildren();
+
+      state.currentGallery.forEach((url, index) => {
+        dom.galleryEditor.appendChild(createGalleryTile(url, "Saved image", () => {
+          state.currentGallery.splice(index, 1);
+          renderGalleryEditor();
+        }));
+      });
+
+      state.pendingFiles.forEach((file, index) => {
+        const objectUrl = URL.createObjectURL(file);
+        state.objectUrls.push(objectUrl);
+        dom.galleryEditor.appendChild(createGalleryTile(objectUrl, file.name, () => {
+          state.pendingFiles.splice(index, 1);
+          renderGalleryEditor();
+        }));
+      });
+    }
+
+    function createGalleryTile(src, label, onRemove) {
+      const tile = document.createElement("div");
+      tile.className = "relative aspect-square overflow-hidden rounded-lg border border-line bg-paper";
+
+      const image = document.createElement("img");
+      image.className = "h-full w-full object-cover";
+      image.src = src;
+      image.alt = label;
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "absolute right-1 top-1 rounded-md bg-ink/82 px-2 py-1 text-xs font-semibold text-white backdrop-blur transition hover:bg-wine";
+      removeButton.textContent = "Remove";
+      removeButton.addEventListener("click", onRemove);
+
+      tile.append(image, removeButton);
+      return tile;
+    }
+
+    async function removeStorageObjects(urls) {
+      const paths = urls.map(getStoragePathFromPublicUrl).filter(Boolean);
+      if (!paths.length || !state.client) {
+        return;
+      }
+
+      const { error } = await state.client.storage.from(STORAGE_BUCKET).remove(paths);
+      if (error) {
+        console.warn("Storage cleanup failed:", error.message);
+      }
+    }
+
+    function getStoragePathFromPublicUrl(url) {
+      if (!url || url.includes("images.unsplash.com")) {
+        return null;
+      }
+
+      const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+      const markerIndex = url.indexOf(marker);
+      if (markerIndex === -1) {
+        return null;
+      }
+
+      return decodeURIComponent(url.slice(markerIndex + marker.length));
+    }
+
+    function resetForm() {
+      dom.productForm.reset();
+      dom.productActive.checked = true;
+      dom.formTitle.textContent = "Add Product";
+      dom.saveProduct.textContent = "Save Product";
+      dom.cancelEdit.classList.add("hidden");
+      state.editingId = null;
+      state.originalGallery = [];
+      state.currentGallery = [];
+      clearPendingFiles();
+      renderGalleryEditor();
+    }
+
+    function clearPendingFiles() {
+      revokeObjectUrls();
+      state.pendingFiles = [];
+      dom.imageInput.value = "";
+    }
+
+    function revokeObjectUrls() {
+      state.objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      state.objectUrls = [];
+    }
+
+    function setSaving(isSaving) {
+      dom.saveProduct.disabled = isSaving;
+      dom.saveProduct.textContent = isSaving ? "Saving..." : state.editingId ? "Save Changes" : "Save Product";
+    }
+
+    function setAdminControlsEnabled(enabled) {
+      const controls = dom.dashboard.querySelectorAll("input, textarea, button");
+      controls.forEach((control) => {
+        if (control.id === "logout") {
+          return;
+        }
+        control.disabled = !enabled;
+      });
+    }
+
+    function setStatus(message, type = "info") {
+      const classes = {
+        info: "mb-5 rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink/68 shadow-crisp",
+        success: "mb-5 rounded-lg border border-leaf/25 bg-leaf/5 px-4 py-3 text-sm text-leaf shadow-crisp",
+        error: "mb-5 rounded-lg border border-wine/25 bg-wine/5 px-4 py-3 text-sm text-wine shadow-crisp"
+      };
+      dom.statusMessage.className = classes[type] || classes.info;
+      dom.statusMessage.textContent = message;
+    }
+
+    function getGalleryImages(product) {
+      const storedGallery = getStoredGallery(product);
+      return storedGallery.length ? storedGallery : [placeholderImage()];
+    }
+
+    function getStoredGallery(product) {
+      const rawImages = product?.gallery_images;
+      if (Array.isArray(rawImages)) {
+        return rawImages.filter(Boolean);
+      }
+
+      if (typeof rawImages === "string" && rawImages.trim()) {
+        try {
+          const parsed = JSON.parse(rawImages);
+          if (Array.isArray(parsed) && parsed.length) {
+            return parsed.filter(Boolean);
+          }
+        } catch (error) {
+          return rawImages.split(",").map((item) => item.trim()).filter(Boolean);
+        }
+      }
+
+      return [];
+    }
+
+    function placeholderImage() {
+      return PLACEHOLDER_IMAGE;
+    }
+
+    function sanitizeFileName(name) {
+      return name
+        .toLowerCase()
+        .replace(/[^a-z0-9.]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80) || "product-image";
+    }
+
+    function createFileToken() {
+      if (window.crypto?.randomUUID) {
+        return window.crypto.randomUUID();
+      }
+      return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function compactText(text, maxLength) {
+      if (text.length <= maxLength) {
+        return text;
+      }
+      return `${text.slice(0, maxLength - 1).trim()}...`;
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0
+      }).format(Number(value || 0));
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "No date";
+      }
+      return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(new Date(value));
+    }
+  </script>
+</body>
+</html>

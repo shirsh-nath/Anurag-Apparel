@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Anurag Apparel is a premium clothing store in Hazaribagh, Jharkhand. Explore new arrivals and visit the store.">
+  <title>Anurag Apparel | Premium Clothing in Hazaribagh</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#171717",
+            paper: "#fbfaf7",
+            linen: "#f3eee5",
+            line: "#e7e1d8",
+            brass: "#b7872d",
+            leaf: "#2d6a4f",
+            wine: "#7f1d1d",
+            clay: "#a85f3d"
+          },
+          boxShadow: {
+            soft: "0 18px 60px rgba(23, 23, 23, 0.14)",
+            crisp: "0 10px 30px rgba(23, 23, 23, 0.08)"
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-browser-config.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, #fbfaf7 0%, #f3eee5 52%, #fbfaf7 100%);
+    }
+
+    .hero-overlay {
+      background:
+        linear-gradient(90deg, rgba(10, 10, 10, 0.86), rgba(10, 10, 10, 0.48), rgba(10, 10, 10, 0.18)),
+        linear-gradient(0deg, rgba(10, 10, 10, 0.56), rgba(10, 10, 10, 0.02));
+    }
+
+    .glass {
+      background: rgba(251, 250, 247, 0.88);
+      backdrop-filter: blur(22px);
+    }
+
+    .map-frame::after {
+      background:
+        linear-gradient(180deg, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.32)),
+        radial-gradient(circle at 50% 44%, rgba(183, 135, 45, 0.24), transparent 34%);
+      content: "";
+      inset: 0;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .modal-panel {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .modal-backdrop {
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    #productModal.is-open {
+      pointer-events: auto;
+    }
+
+    #productModal.is-open .modal-panel,
+    #productModal.is-open .modal-backdrop {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  </style>
+</head>
+<body class="bg-paper text-ink antialiased">
+  <header class="fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink/78 text-white shadow-crisp backdrop-blur-xl">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <a href="#home" class="flex items-center gap-3" aria-label="Anurag Apparel home">
+        <span class="grid h-10 w-10 place-items-center rounded-md border border-white/20 bg-white text-sm font-semibold text-ink">AA</span>
+        <span>
+          <span class="block text-base font-semibold">Anurag Apparel</span>
+          <span class="block text-xs text-white/66">Hazaribagh, Jharkhand</span>
+        </span>
+      </a>
+      <div class="hidden items-center gap-7 text-sm text-white/78 md:flex">
+        <a class="transition hover:text-white" href="#products">Collection</a>
+        <a class="transition hover:text-white" href="#visit">Visit</a>
+        <a class="transition hover:text-white" href="admin.html">Admin</a>
+      </div>
+      <a href="#products" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-linen">Shop</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="relative min-h-[92vh] overflow-hidden pt-20 text-white">
+      <img
+        class="absolute inset-0 h-full w-full object-cover"
+        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1800&q=82"
+        alt="Premium apparel displayed inside a modern clothing store"
+      >
+      <div class="hero-overlay absolute inset-0"></div>
+
+      <div class="relative z-10 mx-auto flex min-h-[calc(92vh-5rem)] max-w-7xl flex-col justify-end px-4 pb-8 pt-12 sm:px-6 lg:px-8">
+        <div class="mx-auto w-full max-w-5xl">
+          <div class="mx-auto max-w-3xl text-center">
+            <p class="mb-4 inline-flex rounded-md border border-white/20 bg-white/12 px-3 py-1 text-sm text-white/82 backdrop-blur">Premium clothing in the heart of Hazaribagh</p>
+            <h1 class="mx-auto max-w-3xl text-5xl font-semibold leading-none sm:text-6xl lg:text-7xl">Anurag Apparel</h1>
+            <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">A refined edit of everyday essentials, festive pieces, and sharp apparel selected for modern wardrobes in Jharkhand.</p>
+            <div class="mt-8 flex flex-wrap justify-center gap-3">
+              <a href="#products" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:bg-linen">Explore Collection</a>
+              <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="rounded-md border border-white/28 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/10">Open Directions</a>
+            </div>
+            <div class="mx-auto mt-10 grid max-w-xl grid-cols-3 border-y border-white/18 py-4 text-sm text-white/72">
+              <div>
+                <span class="block text-lg font-semibold text-white">Curated</span>
+                Apparel
+              </div>
+              <div class="border-x border-white/18 px-4">
+                <span class="block text-lg font-semibold text-white">Local</span>
+                Hazaribagh
+              </div>
+              <div class="pl-4">
+                <span class="block text-lg font-semibold text-white">Fresh</span>
+                Arrivals
+              </div>
+            </div>
+          </div>
+
+          <div class="glass map-frame relative mt-8 overflow-hidden rounded-lg border border-white/35 shadow-soft">
+            <iframe
+              title="Anurag Apparel store location on Google Maps"
+              src="https://www.google.com/maps?q=23.9932317,85.3593459&z=17&output=embed"
+              class="h-64 w-full border-0 sm:h-72 lg:h-80"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+            <a
+              id="mapOverlay"
+              href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open Anurag Apparel on Google Maps"
+              class="absolute inset-0 z-10"
+            ></a>
+            <div class="pointer-events-none absolute inset-x-4 bottom-4 z-20 rounded-md bg-ink/84 p-4 text-white shadow-soft backdrop-blur">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm font-semibold">Visit Anurag Apparel</p>
+                  <p class="mt-1 text-xs text-white/70">Tap the map for directions in Google Maps.</p>
+                </div>
+                <span class="text-xs font-semibold text-brass">Hazaribagh, Jharkhand</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="border-b border-line bg-linen px-4 py-16 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase text-brass">Fresh inventory</p>
+            <h2 class="mt-2 text-3xl font-semibold sm:text-4xl">Current Collection</h2>
+          </div>
+          <p class="max-w-xl text-sm leading-6 text-ink/62">New arrivals are pulled from Supabase in real time, including multi-angle product galleries and current pricing.</p>
+        </div>
+
+        <div id="configNotice" class="mt-8 hidden rounded-lg border border-brass/35 bg-white px-4 py-3 text-sm text-ink/72 shadow-crisp"></div>
+
+        <div id="loadingState" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-live="polite">
+          <div class="h-96 animate-pulse rounded-lg bg-white/80"></div>
+          <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 sm:block"></div>
+          <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 lg:block"></div>
+          <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 lg:block"></div>
+        </div>
+
+        <div id="productGrid" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"></div>
+
+        <div id="emptyState" class="mt-10 hidden rounded-lg border border-line bg-white px-6 py-12 text-center shadow-crisp">
+          <p class="text-lg font-semibold">The live rack is being arranged.</p>
+          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/62">Add products from the admin portal and they will appear here automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="visit" class="bg-paper px-4 py-16 sm:px-6 lg:px-8">
+      <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div>
+          <p class="text-sm font-semibold uppercase text-leaf">Store visit</p>
+          <h2 class="mt-2 text-3xl font-semibold sm:text-4xl">Find your next fit in person.</h2>
+          <p class="mt-4 text-sm leading-6 text-ink/62">Stop by the store in Hazaribagh to explore fabric, fit, color, and seasonal arrivals up close.</p>
+          <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-7 inline-flex rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Get Directions</a>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <img class="h-64 w-full rounded-lg object-cover shadow-crisp sm:col-span-2" src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1200&q=82" alt="Clothing rack with premium apparel">
+          <img class="h-64 w-full rounded-lg object-cover shadow-crisp" src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82" alt="Folded apparel displayed in a store">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line bg-ink px-4 py-8 text-white sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-7xl flex-col gap-4 text-sm text-white/62 sm:flex-row sm:items-center sm:justify-between">
+      <p>&copy; <span id="year"></span> Anurag Apparel. All rights reserved.</p>
+      <div class="flex gap-5">
+        <a class="transition hover:text-white" href="#products">Collection</a>
+        <a class="transition hover:text-white" href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer">Directions</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="productModal" class="pointer-events-none fixed inset-0 z-50" aria-hidden="true">
+    <div class="modal-backdrop absolute inset-0 bg-ink/72"></div>
+    <div class="relative z-10 flex min-h-full items-center justify-center p-4">
+      <article class="modal-panel max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-lg bg-paper shadow-soft">
+        <div class="grid lg:grid-cols-[1.08fr_0.92fr]">
+          <div class="bg-white p-4 sm:p-6">
+            <div class="aspect-[4/5] overflow-hidden rounded-lg bg-line">
+              <img id="modalMainImage" class="h-full w-full object-cover" src="" alt="">
+            </div>
+            <div id="modalThumbs" class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5"></div>
+          </div>
+          <div class="flex flex-col p-6 sm:p-8">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-sm font-semibold uppercase text-brass">Product details</p>
+                <h3 id="modalTitle" class="mt-2 text-3xl font-semibold"></h3>
+              </div>
+              <button id="closeModal" type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-line bg-white text-xl leading-none transition hover:bg-ink hover:text-white" aria-label="Close product details">&times;</button>
+            </div>
+            <p id="modalPrice" class="mt-5 text-2xl font-semibold text-leaf"></p>
+            <p id="modalDescription" class="mt-5 whitespace-pre-line text-sm leading-7 text-ink/68"></p>
+            <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-8 inline-flex w-fit rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Visit Store</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <script type="module">
+    const MAP_URL = "https://maps.app.goo.gl/ZsyAXskboHbKB6RA6";
+    const PLACEHOLDER_URL = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
+
+    const sampleProducts = [
+      {
+        id: "sample-1",
+        title: "Tailored Linen Shirt",
+        description: "A breathable linen shirt with a crisp collar and clean drape, selected for warm days and polished evenings.",
+        price: 1899,
+        gallery_images: [
+          "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1200&q=82",
+          "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=1200&q=82"
+        ]
+      },
+      {
+        id: "sample-2",
+        title: "Structured Occasion Jacket",
+        description: "A modern jacket with a refined profile, easy layering, and a premium finish for celebrations and formal plans.",
+        price: 4299,
+        gallery_images: [
+          "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?auto=format&fit=crop&w=1200&q=82",
+          "https://images.unsplash.com/photo-1506629905607-d9e297d0b78d?auto=format&fit=crop&w=1200&q=82"
+        ]
+      },
+      {
+        id: "sample-3",
+        title: "Everyday Cotton Tee",
+        description: "A soft cotton staple with a dependable fit, made for repeat wear across weekdays, travel, and casual plans.",
+        price: 799,
+        gallery_images: [
+          "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1200&q=82",
+          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1200&q=82"
+        ]
+      },
+      {
+        id: "sample-4",
+        title: "Festive Embroidered Kurta",
+        description: "A graceful festive piece with detailed embroidery and comfortable movement for family gatherings and occasions.",
+        price: 2499,
+        gallery_images: [
+          "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=1200&q=82",
+          "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=1200&q=82"
+        ]
+      }
+    ];
+
+    const state = {
+      client: null,
+      configured: false,
+      products: [],
+      activeProduct: null,
+      activeImageIndex: 0
+    };
+
+    const dom = {};
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    async function init() {
+      cacheDom();
+      bindEvents();
+      dom.year.textContent = new Date().getFullYear();
+      state.client = await createSupabaseClient();
+      await loadProducts();
+    }
+
+    function cacheDom() {
+      dom.configNotice = document.querySelector("#configNotice");
+      dom.loadingState = document.querySelector("#loadingState");
+      dom.productGrid = document.querySelector("#productGrid");
+      dom.emptyState = document.querySelector("#emptyState");
+      dom.productModal = document.querySelector("#productModal");
+      dom.modalMainImage = document.querySelector("#modalMainImage");
+      dom.modalThumbs = document.querySelector("#modalThumbs");
+      dom.modalTitle = document.querySelector("#modalTitle");
+      dom.modalPrice = document.querySelector("#modalPrice");
+      dom.modalDescription = document.querySelector("#modalDescription");
+      dom.closeModal = document.querySelector("#closeModal");
+      dom.year = document.querySelector("#year");
+    }
+
+    function bindEvents() {
+      dom.closeModal.addEventListener("click", closeProductModal);
+      dom.productModal.addEventListener("click", (event) => {
+        if (event.target === dom.productModal || event.target.classList.contains("modal-backdrop")) {
+          closeProductModal();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && dom.productModal.classList.contains("is-open")) {
+          closeProductModal();
+        }
+      });
+    }
+
+    async function createSupabaseClient() {
+      const config = await loadSupabaseConfig();
+      state.configured = isConfigured(config);
+
+      if (!state.configured) {
+        showNotice("Supabase credentials are not configured yet, so sample products are shown for preview.");
+        return null;
+      }
+
+      if (!window.supabase?.createClient) {
+        showNotice("Supabase SDK could not be loaded. Sample products are shown for preview.");
+        return null;
+      }
+
+      return window.supabase.createClient(config.url, config.anonKey);
+    }
+
+    async function loadSupabaseConfig() {
+      const inlineConfig = {
+        url: window.ANURAG_SUPABASE_URL,
+        anonKey: window.ANURAG_SUPABASE_ANON_KEY
+      };
+
+      if (isConfigured(inlineConfig)) {
+        return inlineConfig;
+      }
+
+      try {
+        const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
+        const response = await fetch(envPath, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("No env file");
+        }
+        const env = parseEnv(await response.text());
+        return {
+          url: env.SUPABASE_URL || "your_supabase_project_url",
+          anonKey: env.SUPABASE_ANON_KEY || "your_supabase_anon_key"
+        };
+      } catch (error) {
+        return {
+          url: "your_supabase_project_url",
+          anonKey: "your_supabase_anon_key"
+        };
+      }
+    }
+
+    function parseEnv(text) {
+      return text.split(/\r?\n/).reduce((values, line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) {
+          return values;
+        }
+        const separatorIndex = trimmed.indexOf("=");
+        if (separatorIndex === -1) {
+          return values;
+        }
+        const key = trimmed.slice(0, separatorIndex).trim();
+        const value = trimmed.slice(separatorIndex + 1).trim().replace(/^["']|["']$/g, "");
+        values[key] = value;
+        return values;
+      }, {});
+    }
+
+    function isConfigured(config) {
+      return Boolean(
+        config.url &&
+        config.anonKey &&
+        !config.url.includes("your_supabase") &&
+        !config.anonKey.includes("your_supabase")
+      );
+    }
+
+    async function loadProducts() {
+      setLoading(true);
+      try {
+        if (!state.client) {
+          state.products = sampleProducts;
+          renderProducts(state.products);
+          return;
+        }
+
+        const { data, error } = await state.client
+          .from("products")
+          .select("id,title,description,price,gallery_images,created_at,is_active")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        state.products = data || [];
+        renderProducts(state.products);
+      } catch (error) {
+        console.error(error);
+        showNotice("Live inventory could not be loaded, so sample products are shown for preview.");
+        state.products = sampleProducts;
+        renderProducts(state.products);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setLoading(isLoading) {
+      dom.loadingState.classList.toggle("hidden", !isLoading);
+    }
+
+    function showNotice(message) {
+      dom.configNotice.textContent = message;
+      dom.configNotice.classList.remove("hidden");
+    }
+
+    function renderProducts(products) {
+      dom.productGrid.replaceChildren();
+      dom.emptyState.classList.toggle("hidden", products.length > 0);
+
+      products.forEach((product) => {
+        dom.productGrid.appendChild(createProductCard(product));
+      });
+    }
+
+    function createProductCard(product) {
+      const images = getGalleryImages(product);
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "group overflow-hidden rounded-lg border border-line bg-white text-left shadow-crisp transition duration-300 hover:-translate-y-1 hover:border-brass/50 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-brass";
+      card.addEventListener("click", () => openProductModal(product));
+
+      const imageWrap = document.createElement("div");
+      imageWrap.className = "aspect-[4/5] overflow-hidden bg-line";
+
+      const image = document.createElement("img");
+      image.className = "h-full w-full object-cover transition duration-500 group-hover:scale-105";
+      image.src = images[0];
+      image.alt = product.title || "Anurag Apparel product";
+      image.loading = "lazy";
+      imageWrap.appendChild(image);
+
+      const content = document.createElement("div");
+      content.className = "p-4";
+
+      const title = document.createElement("h3");
+      title.className = "text-base font-semibold text-ink";
+      title.textContent = product.title || "Untitled product";
+
+      const description = document.createElement("p");
+      description.className = "mt-2 min-h-[3rem] text-sm leading-6 text-ink/60";
+      description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 92);
+
+      const footer = document.createElement("div");
+      footer.className = "mt-5 flex items-center justify-between gap-3 border-t border-line pt-4";
+
+      const price = document.createElement("p");
+      price.className = "font-semibold text-leaf";
+      price.textContent = formatCurrency(product.price);
+
+      const action = document.createElement("span");
+      action.className = "rounded-md border border-line px-3 py-2 text-xs font-semibold transition group-hover:border-ink group-hover:bg-ink group-hover:text-white";
+      action.textContent = "View";
+
+      footer.append(price, action);
+      content.append(title, description, footer);
+      card.append(imageWrap, content);
+      return card;
+    }
+
+    function openProductModal(product) {
+      state.activeProduct = product;
+      state.activeImageIndex = 0;
+      renderModal();
+      dom.productModal.classList.add("is-open");
+      dom.productModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeProductModal() {
+      dom.productModal.classList.remove("is-open");
+      dom.productModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    function renderModal() {
+      const product = state.activeProduct;
+      const images = getGalleryImages(product);
+      const activeImage = images[state.activeImageIndex] || images[0];
+
+      dom.modalMainImage.src = activeImage;
+      dom.modalMainImage.alt = product.title || "Anurag Apparel product";
+      dom.modalTitle.textContent = product.title || "Untitled product";
+      dom.modalPrice.textContent = formatCurrency(product.price);
+      dom.modalDescription.textContent = product.description || "Visit Anurag Apparel to explore this item in store.";
+      dom.modalThumbs.replaceChildren();
+
+      images.forEach((imageUrl, index) => {
+        const thumb = document.createElement("button");
+        thumb.type = "button";
+        thumb.className = [
+          "aspect-square overflow-hidden rounded-md border bg-line transition focus:outline-none focus:ring-2 focus:ring-brass",
+          index === state.activeImageIndex ? "border-ink" : "border-line hover:border-brass"
+        ].join(" ");
+        thumb.setAttribute("aria-label", `Show image ${index + 1}`);
+        thumb.addEventListener("click", () => {
+          state.activeImageIndex = index;
+          renderModal();
+        });
+
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = "";
+        image.className = "h-full w-full object-cover";
+        thumb.appendChild(image);
+        dom.modalThumbs.appendChild(thumb);
+      });
+    }
+
+    function getGalleryImages(product) {
+      const rawImages = product?.gallery_images;
+      if (Array.isArray(rawImages)) {
+        return rawImages.filter(Boolean).length ? rawImages.filter(Boolean) : [PLACEHOLDER_URL];
+      }
+
+      if (typeof rawImages === "string" && rawImages.trim()) {
+        try {
+          const parsed = JSON.parse(rawImages);
+          if (Array.isArray(parsed) && parsed.length) {
+            return parsed.filter(Boolean);
+          }
+        } catch (error) {
+          return rawImages.split(",").map((item) => item.trim()).filter(Boolean);
+        }
+      }
+
+      return [PLACEHOLDER_URL];
+    }
+
+    function compactText(text, maxLength) {
+      if (text.length <= maxLength) {
+        return text;
+      }
+      return `${text.slice(0, maxLength - 1).trim()}...`;
+    }
+
+    function formatCurrency(value) {
+      const amount = Number(value || 0);
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+  </script>
+</body>
+</html>
