@@ -12,6 +12,8 @@ create table if not exists public.products (
   title text not null,
   description text not null default '',
   price numeric(10, 2) not null check (price >= 0),
+  -- Stores public Supabase Storage URLs for product media.
+  -- The existing column name is kept for compatibility; it can contain image and video URLs.
   gallery_images text[] not null default '{}',
   is_active boolean not null default true,
   created_at timestamptz not null default now()
@@ -55,6 +57,7 @@ create policy "Anon can delete products for static admin"
   to anon
   using (true);
 
+-- The existing bucket is named product-images for compatibility, but it may store videos too.
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
 on conflict (id) do update set public = true;

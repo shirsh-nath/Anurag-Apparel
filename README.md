@@ -2,6 +2,8 @@
 
 Static storefront and admin portal for Anurag Apparel, built with HTML5, Tailwind CSS CDN, Vanilla JavaScript, and the Supabase JS SDK.
 
+Product media is stored as public Supabase Storage URLs in the existing `products.gallery_images` array. The column name is kept for compatibility, but the UI supports both images and videos.
+
 ## Setup
 
 1. Run `supabase-schema.sql` in the Supabase SQL editor.
