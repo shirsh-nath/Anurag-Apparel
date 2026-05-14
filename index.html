@@ -128,6 +128,46 @@
       position: absolute;
     }
 
+    .visit-address-card {
+      background:
+        radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(243, 238, 229, 0.9));
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 1rem;
+      box-shadow: 0 22px 55px rgba(23, 23, 23, 0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .visit-address-card::after {
+      background: radial-gradient(circle, rgba(183, 135, 45, 0.18), transparent 70%);
+      content: "";
+      height: 10rem;
+      pointer-events: none;
+      position: absolute;
+      right: -2.5rem;
+      top: -4.5rem;
+      width: 10rem;
+    }
+
+    .visit-address-body {
+      position: relative;
+    }
+
+    .visit-address-pin {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 999px;
+      box-shadow: 0 12px 24px rgba(23, 23, 23, 0.06);
+      color: #a85f3d;
+      display: inline-flex;
+      flex: 0 0 auto;
+      height: 3rem;
+      justify-content: center;
+      width: 3rem;
+    }
+
     @media (min-width: 1024px) {
       .collection-status {
         border-left: 1px solid rgba(231, 225, 216, 0.95);
@@ -295,14 +335,21 @@
         <div>
           <p class="text-sm font-semibold uppercase text-leaf">Visit us</p>
           <h2 class="mt-2 text-3xl font-semibold sm:text-4xl">Find your next fit in person.</h2>
-          <div class="mt-5">
-            <address class="not-italic text-left">
-              <p class="text-xl font-semibold leading-tight text-ink sm:text-2xl">Anurag Apparel</p>
-              <p class="mt-1 text-base leading-7 text-ink/68 sm:text-lg">
-                Malviya Marg<br>
-                Hazaribagh, Jharkhand
-              </p>
-            </address>
+          <div class="visit-address-card mt-6 w-full max-w-md sm:w-fit">
+            <div class="visit-address-body flex items-start gap-4 px-5 py-5 sm:px-6 sm:py-6 sm:pr-8">
+              <span class="visit-address-pin" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                  <path fill-rule="evenodd" d="M12 2.25a6.75 6.75 0 00-6.75 6.75c0 4.91 5.31 10.945 6.192 11.916a.75.75 0 001.116 0C13.44 19.945 18.75 13.91 18.75 9A6.75 6.75 0 0012 2.25zm0 9a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd"/>
+                </svg>
+              </span>
+              <address class="not-italic text-left">
+                <p class="text-xl font-semibold leading-tight text-ink sm:text-2xl">Anurag Apparel</p>
+                <p class="mt-1 text-base leading-7 text-ink/68 sm:text-lg">
+                  Malviya Marg<br>
+                  Hazaribagh, Jharkhand
+                </p>
+              </address>
+            </div>
           </div>
           <p class="mt-4 text-sm leading-6 text-ink/62">Stop by our store to explore fabric, fit, color, and seasonal arrivals up close.
           </p>
