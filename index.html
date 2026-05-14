@@ -71,42 +71,52 @@
 
     .collection-masthead {
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(251, 250, 247, 0.72)),
-        linear-gradient(90deg, rgba(45, 106, 79, 0.08), rgba(183, 135, 45, 0.08));
-      border: 1px solid rgba(231, 225, 216, 0.95);
-      border-radius: 0.5rem;
-      box-shadow: 0 20px 55px rgba(23, 23, 23, 0.08);
+        linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.58)),
+        radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 32%),
+        radial-gradient(circle at bottom left, rgba(168, 95, 61, 0.12), transparent 44%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(243, 238, 229, 0.34));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 1rem;
+      box-shadow: 0 26px 65px rgba(144, 106, 54, 0.1), 0 10px 26px rgba(23, 23, 23, 0.04);
+      isolation: isolate;
       overflow: hidden;
       position: relative;
     }
 
-    .collection-masthead::before {
-      background: linear-gradient(90deg, #2d6a4f, #b7872d, #a85f3d);
+    .collection-masthead > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .collection-masthead::after {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.92), transparent 34%),
+        radial-gradient(circle at 82% 48%, rgba(183, 135, 45, 0.14), transparent 30%),
+        radial-gradient(circle at 68% 100%, rgba(168, 95, 61, 0.1), transparent 36%);
       content: "";
-      height: 4px;
-      inset: 0 0 auto 0;
+      filter: blur(24px);
+      inset: 0;
+      pointer-events: none;
       position: absolute;
+      z-index: 0;
     }
 
     .collection-kicker {
-      align-items: center;
       color: #b7872d;
-      display: inline-flex;
+      display: block;
       font-size: 0.78rem;
       font-weight: 700;
-      gap: 0.6rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .collection-kicker::before {
-      background: #2d6a4f;
-      content: "";
-      height: 1px;
-      width: 2.25rem;
-    }
-
     .collection-status {
-      border-top: 1px solid rgba(231, 225, 216, 0.95);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(251, 250, 247, 0.18));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(231, 225, 216, 0.82);
     }
 
     .announcement-board {
@@ -118,14 +128,6 @@
       box-shadow: 0 18px 60px rgba(23, 23, 23, 0.16);
       overflow: hidden;
       position: relative;
-    }
-
-    .announcement-board::before {
-      background: linear-gradient(90deg, #b7872d, #f3eee5, #2d6a4f);
-      content: "";
-      height: 4px;
-      inset: 0 0 auto 0;
-      position: absolute;
     }
 
     .visit-address-card {
@@ -170,7 +172,7 @@
 
     @media (min-width: 1024px) {
       .collection-status {
-        border-left: 1px solid rgba(231, 225, 216, 0.95);
+        border-left: 1px solid rgba(231, 225, 216, 0.82);
         border-top: 0;
       }
     }
@@ -306,9 +308,9 @@
             <h2 class="mt-4 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Current Collection</h2>
             <p class="mt-4 max-w-2xl text-sm leading-6 text-ink/62">New arrivals from Anurag Apparel, refreshed with product galleries, video previews, and current pricing.</p>
           </div>
-          <div class="collection-status flex flex-col justify-center bg-paper/58 px-5 py-6 text-left sm:px-7 lg:px-8 lg:text-right">
+          <div class="collection-status flex flex-col justify-center gap-2 px-5 py-6 text-left sm:px-7 lg:px-8 lg:text-right">
             <span class="block text-base font-semibold text-ink">Try on new fits!</span>
-            <span class="mt-2 block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
+            <span class="block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
           </div>
         </div>
 
