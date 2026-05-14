@@ -52,6 +52,13 @@
       backdrop-filter: blur(22px);
     }
 
+    .site-header {
+      background: rgba(251, 250, 247, 0.96);
+      border-bottom: 1px solid rgba(231, 225, 216, 0.96);
+      box-shadow: 0 10px 30px rgba(23, 23, 23, 0.08);
+      color: #171717;
+    }
+
     .map-frame::after {
       background:
         linear-gradient(180deg, rgba(23, 23, 23, 0), rgba(23, 23, 23, 0.32)),
@@ -151,20 +158,20 @@
   </style>
 </head>
 <body class="bg-paper text-ink antialiased">
-  <header class="fixed inset-x-0 top-0 z-40 border-b border-white/20 bg-ink/78 text-white shadow-crisp backdrop-blur-xl">
+  <header class="site-header fixed inset-x-0 top-0 z-40 backdrop-blur-xl">
     <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       <a href="#home" class="flex items-center gap-3" aria-label="Anurag Apparel home">
-        <span class="grid h-10 w-10 place-items-center rounded-md border border-white/20 bg-white text-sm font-semibold text-ink">AA</span>
+        <span class="grid h-10 w-10 place-items-center rounded-md border border-line bg-white text-sm font-semibold text-ink shadow-crisp">AA</span>
         <span>
           <span class="block text-base font-semibold">Anurag Apparel</span>
-          <span class="block text-xs text-white/66">Hazaribagh, Jharkhand</span>
+          <span class="block text-xs font-medium text-ink/62">Hazaribagh, Jharkhand</span>
         </span>
       </a>
-      <div class="hidden items-center gap-7 text-sm text-white/78 md:flex">
-        <a class="transition hover:text-white" href="#products">Collection</a>
-        <a class="transition hover:text-white" href="#visit">Visit</a>
+      <div class="hidden items-center gap-7 text-sm font-medium text-ink/68 md:flex">
+        <a class="transition hover:text-ink" href="#products">Collection</a>
+        <a class="transition hover:text-ink" href="#visit">Visit</a>
       </div>
-      <a href="#products" class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-linen">Shop</a>
+      <a href="#products" class="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white shadow-crisp transition hover:bg-black">Shop</a>
     </nav>
   </header>
 
@@ -172,7 +179,7 @@
     <section id="home" class="relative min-h-[92vh] overflow-hidden pt-20 text-white">
       <img
         class="absolute inset-0 h-full w-full object-cover"
-        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1800&q=82"
+        src="Images/Background.jpeg"
         alt="Premium apparel displayed inside a modern clothing store"
       >
       <div class="hero-overlay absolute inset-0"></div>
@@ -193,7 +200,7 @@
                 Apparel
               </div>
               <div class="border-x border-white/18 px-4">
-                <span class="block text-lg font-semibold text-white">Local</span>
+                <span class="block text-lg font-semibold text-white">City</span>
                 Hazaribagh
               </div>
               <div class="pl-4">
@@ -245,7 +252,6 @@
             <div class="border-t border-white/14 pt-5 lg:w-80 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
               <p class="text-xs font-semibold uppercase text-white/48">Offer board</p>
               <p id="announcementOffer" class="mt-2 text-sm leading-6 text-white/82">Ask in store for current festive and seasonal offers.</p>
-              <a id="announcementCta" href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-5 inline-flex rounded-md bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-linen">Get Directions</a>
             </div>
           </div>
         </article>
@@ -260,18 +266,9 @@
             <h2 class="mt-4 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Current Collection</h2>
             <p class="mt-4 max-w-2xl text-sm leading-6 text-ink/62">New arrivals from Anurag Apparel, refreshed with product galleries, video previews, and current pricing.</p>
           </div>
-          <div class="collection-status flex flex-col justify-center bg-paper/58 px-5 py-6 sm:px-7 lg:px-8">
-            <div class="flex items-center justify-between gap-5">
-              <div>
-                <span id="inventoryCount" class="block text-4xl font-semibold leading-none text-leaf">0</span>
-                <span class="mt-2 block text-xs font-semibold uppercase text-ink/50">Items live</span>
-              </div>
-              <div class="h-12 w-px bg-line"></div>
-              <div class="text-right">
-                <span class="block text-base font-semibold text-ink">Hazaribagh edit</span>
-                <span class="mt-2 block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
-              </div>
-            </div>
+          <div class="collection-status flex flex-col justify-center bg-paper/58 px-5 py-6 text-left sm:px-7 lg:px-8 lg:text-right">
+            <span class="block text-base font-semibold text-ink">Try on new fits!</span>
+            <span class="mt-2 block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
           </div>
         </div>
 
@@ -296,9 +293,17 @@
     <section id="visit" class="bg-paper px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <p class="text-sm font-semibold uppercase text-leaf">Store visit</p>
+          <p class="text-sm font-semibold uppercase text-leaf">Visit us</p>
           <h2 class="mt-2 text-3xl font-semibold sm:text-4xl">Find your next fit in person.</h2>
-          <p class="mt-4 text-sm leading-6 text-ink/62">Stop by the store in Hazaribagh to explore fabric, fit, color, and seasonal arrivals up close.</p>
+          <address class="mt-5 not-italic">
+            <p class="text-2xl font-semibold leading-tight text-ink sm:text-3xl">Anurag Apparel</p>
+            <p class="mt-2 text-lg leading-8 text-ink/72 sm:text-xl">
+              Malviya Marg<br>
+              Hazaribagh, Jharkhand
+            </p>
+          </address>
+          <p class="mt-4 text-sm leading-6 text-ink/62">Stop by our store to explore fabric, fit, color, and seasonal arrivals up close.
+          </p>
           <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-7 inline-flex rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Get Directions</a>
         </div>
         <div class="grid gap-4 sm:grid-cols-3">
@@ -310,12 +315,8 @@
   </main>
 
   <footer class="border-t border-line bg-ink px-4 py-8 text-white sm:px-6 lg:px-8">
-    <div class="mx-auto flex max-w-7xl flex-col gap-4 text-sm text-white/62 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mx-auto max-w-7xl text-sm text-white/62">
       <p>&copy; <span id="year"></span> Anurag Apparel. All rights reserved.</p>
-      <div class="flex gap-5">
-        <a class="transition hover:text-white" href="#products">Collection</a>
-        <a class="transition hover:text-white" href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer">Directions</a>
-      </div>
     </div>
   </footer>
 
@@ -428,14 +429,12 @@
       dom.configNotice = document.querySelector("#configNotice");
       dom.loadingState = document.querySelector("#loadingState");
       dom.productGrid = document.querySelector("#productGrid");
-      dom.inventoryCount = document.querySelector("#inventoryCount");
       dom.emptyState = document.querySelector("#emptyState");
       dom.announcementBoard = document.querySelector("#announcementBoard");
       dom.announcementEyebrow = document.querySelector("#announcementEyebrow");
       dom.announcementTitle = document.querySelector("#announcementTitle");
       dom.announcementMessage = document.querySelector("#announcementMessage");
       dom.announcementOffer = document.querySelector("#announcementOffer");
-      dom.announcementCta = document.querySelector("#announcementCta");
       dom.productModal = document.querySelector("#productModal");
       dom.modalMediaFrame = document.querySelector("#modalMediaFrame");
       dom.modalThumbs = document.querySelector("#modalThumbs");
@@ -569,11 +568,6 @@
       dom.announcementMessage.textContent = board.message || DEFAULT_ANNOUNCEMENT.message;
       dom.announcementOffer.textContent = board.offer_text || DEFAULT_ANNOUNCEMENT.offer_text;
 
-      const ctaLabel = board.cta_label || DEFAULT_ANNOUNCEMENT.cta_label;
-      const ctaUrl = board.cta_url || DEFAULT_ANNOUNCEMENT.cta_url;
-      dom.announcementCta.textContent = ctaLabel;
-      dom.announcementCta.href = ctaUrl;
-      dom.announcementCta.classList.toggle("hidden", !ctaLabel || !ctaUrl);
     }
 
     async function loadProducts() {
@@ -620,8 +614,6 @@
       dom.productGrid.replaceChildren();
       dom.emptyState.classList.toggle("hidden", products.length > 0);
       dom.productGrid.className = getProductGridClass(products.length);
-      dom.inventoryCount.textContent = products.length;
-
       products.forEach((product) => {
         dom.productGrid.appendChild(createProductCard(product));
       });

@@ -29,6 +29,7 @@
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4/dist/tus.min.js"></script>
   <script src="supabase-browser-config.js"></script>
   <style>
     body {
@@ -55,6 +56,50 @@
       background:
         linear-gradient(90deg, rgba(12, 12, 12, 0.88), rgba(12, 12, 12, 0.54)),
         url("https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1800&q=82") center/cover;
+    }
+    /* Password toggle styles */
+    .pw-field-wrap {
+      position: relative;
+      display: block;
+    }
+
+    .pw-field-wrap .field {
+      padding-right: 3.75rem;
+    }
+
+    .pw-toggle {
+      position: absolute;
+      right: 0.625rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0;
+      border-radius: 0.5rem;
+      transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .pw-toggle:hover {
+      background: rgba(23, 23, 23, 0.05);
+      color: #171717;
+    }
+
+    .pw-toggle:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(183, 135, 45, 0.18);
+    }
+
+    .pw-toggle svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -130,17 +175,7 @@
               <textarea id="boardOffer" class="field mt-2 min-h-24 px-4 py-3" required></textarea>
             </label>
 
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-              <label class="block">
-                <span class="text-sm font-medium text-ink/70">CTA Label</span>
-                <input id="boardCtaLabel" class="field mt-2 px-4 py-3" type="text">
-              </label>
-
-              <label class="block">
-                <span class="text-sm font-medium text-ink/70">CTA URL</span>
-                <input id="boardCtaUrl" class="field mt-2 px-4 py-3" type="url">
-              </label>
-            </div>
+            <!-- CTA is intentionally hardcoded in the storefront; inputs removed to keep it fixed -->
 
             <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
               <span>
@@ -152,6 +187,32 @@
           </div>
 
           <button id="saveBoard" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Board</button>
+        </form>
+
+        <form id="passwordForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div>
+            <p class="text-sm font-semibold uppercase text-clay">Security</p>
+            <h2 class="mt-1 text-2xl font-semibold">Admin Password</h2>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Current Password</span>
+              <input id="currentAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="current-password" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">New Password</span>
+              <input id="newAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Confirm Password</span>
+              <input id="confirmAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="8" required>
+            </label>
+          </div>
+
+          <button id="savePassword" type="submit" class="mt-6 w-full rounded-md bg-clay px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Update Password</button>
         </form>
 
         <form id="productForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
@@ -221,13 +282,63 @@
     </main>
   </div>
 
+  <script>
+    // Inject show/hide toggle buttons for all password inputs
+    (function () {
+      const icons = {
+        show: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.98 12s3.6-6 9.02-6 9.02 6 9.02 6-3.6 6-9.02 6S2.98 12 2.98 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+        hide: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3l18 18M10.47 10.47a3 3 0 004.24 4.24M9.88 5.88C11.4 5.3 13.13 5 15 5c5.4 0 9.02 6 9.02 6s-1.5 2.5-4.5 4.24"/></svg>'
+      };
+
+      function addToggles() {
+        document.querySelectorAll('input[type="password"]').forEach(function (input) {
+          // avoid adding multiple toggles
+          if (input.dataset.pwToggleAttached === 'true') return;
+          const parent = input.parentElement;
+          if (!parent) return;
+
+          const wrapper = document.createElement('span');
+          wrapper.className = 'pw-field-wrap';
+          wrapper.style.marginTop = window.getComputedStyle(input).marginTop;
+          input.style.marginTop = '0';
+          parent.insertBefore(wrapper, input);
+          wrapper.appendChild(input);
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'pw-toggle';
+          btn.setAttribute('aria-label', 'Show password');
+          btn.innerHTML = icons.show;
+          btn.addEventListener('click', function () {
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            btn.innerHTML = isHidden ? icons.hide : icons.show;
+            btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            input.focus({ preventScroll: true });
+          });
+          wrapper.appendChild(btn);
+          input.dataset.pwToggleAttached = 'true';
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', addToggles);
+      } else {
+        addToggles();
+      }
+    })();
+  </script>
+
   <script type="module">
     const ADMIN_USERNAME = "anurag";
-    const ADMIN_PASSWORD = "Anurag@2026";
     const AUTH_SESSION_KEY = "anurag-apparel-admin-unlocked";
     const STORAGE_BUCKET = "product-images";
-    const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
-    const MAX_VIDEO_SIZE = 80 * 1024 * 1024;
+    const BYTES_IN_MB = 1024 * 1024;
+    const DEFAULT_MAX_VIDEO_MB = 50;
+    const MAX_IMAGE_SIZE = 8 * BYTES_IN_MB;
+    const MAX_VIDEO_SIZE = (Number(window.ANURAG_MAX_VIDEO_MB) || DEFAULT_MAX_VIDEO_MB) * BYTES_IN_MB;
+    const RESUMABLE_UPLOAD_THRESHOLD = 6 * BYTES_IN_MB;
+    const TUS_CHUNK_SIZE = 6 * BYTES_IN_MB;
     const MAP_URL = "https://maps.app.goo.gl/ZsyAXskboHbKB6RA6";
     const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
     const DEFAULT_BOARD = {
@@ -243,6 +354,7 @@
 
     const state = {
       client: null,
+      supabaseConfig: null,
       configured: false,
       products: [],
       board: DEFAULT_BOARD,
@@ -276,13 +388,16 @@
       dom.dashboard = document.querySelector("#dashboard");
       dom.logout = document.querySelector("#logout");
       dom.refreshProducts = document.querySelector("#refreshProducts");
+      dom.passwordForm = document.querySelector("#passwordForm");
+      dom.currentAdminPassword = document.querySelector("#currentAdminPassword");
+      dom.newAdminPassword = document.querySelector("#newAdminPassword");
+      dom.confirmAdminPassword = document.querySelector("#confirmAdminPassword");
+      dom.savePassword = document.querySelector("#savePassword");
       dom.boardForm = document.querySelector("#boardForm");
       dom.boardEyebrow = document.querySelector("#boardEyebrow");
       dom.boardTitle = document.querySelector("#boardTitle");
       dom.boardMessage = document.querySelector("#boardMessage");
       dom.boardOffer = document.querySelector("#boardOffer");
-      dom.boardCtaLabel = document.querySelector("#boardCtaLabel");
-      dom.boardCtaUrl = document.querySelector("#boardCtaUrl");
       dom.boardActive = document.querySelector("#boardActive");
       dom.saveBoard = document.querySelector("#saveBoard");
       dom.productForm = document.querySelector("#productForm");
@@ -302,37 +417,58 @@
     }
 
     function bindAuth() {
-      dom.loginForm.addEventListener("submit", (event) => {
+      dom.loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const username = dom.username.value.trim();
         const password = dom.password.value;
+        const submitButton = dom.loginForm.querySelector("button[type='submit']");
 
-        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Checking...";
+        dom.authError.classList.add("hidden");
+
+        try {
+          const client = await createSupabaseClient();
+          if (!client) {
+            throw new Error("Supabase credentials are missing.");
+          }
+
+          const isAuthorized = await verifyAdminLogin(client, username, password);
+          if (!isAuthorized) {
+            dom.authError.textContent = "Invalid username or password.";
+            dom.authError.classList.remove("hidden");
+            return;
+          }
+
+          state.client = client;
           sessionStorage.setItem(AUTH_SESSION_KEY, "true");
-          dom.authError.classList.add("hidden");
-          unlockDashboard();
-          return;
+          await unlockDashboard(client);
+        } catch (error) {
+          console.error(error);
+          dom.authError.textContent = error.message || "Unable to verify admin access.";
+          dom.authError.classList.remove("hidden");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Unlock Dashboard";
         }
-
-        dom.authError.textContent = "Invalid username or password.";
-        dom.authError.classList.remove("hidden");
       });
     }
 
     function bindDashboard() {
       dom.logout.addEventListener("click", lockDashboard);
       dom.refreshProducts.addEventListener("click", refreshDashboard);
+      dom.passwordForm.addEventListener("submit", changeAdminPassword);
       dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
       dom.productForm.addEventListener("submit", saveProduct);
       dom.cancelEdit.addEventListener("click", resetForm);
       dom.imageInput.addEventListener("change", handleImageSelection);
     }
 
-    async function unlockDashboard() {
+    async function unlockDashboard(existingClient = null) {
       dom.authGate.classList.add("hidden");
       dom.dashboard.classList.remove("hidden");
       setAdminControlsEnabled(false);
-      state.client = await createSupabaseClient();
+      state.client = existingClient || await createSupabaseClient();
 
       if (!state.client) {
         setStatus("Supabase credentials are missing. Add them to supabase-browser-config.js, .env, or set the window config globals.", "error");
@@ -351,6 +487,7 @@
       dom.authGate.classList.remove("hidden");
       dom.password.value = "";
       state.client = null;
+      state.supabaseConfig = null;
       state.products = [];
       state.board = DEFAULT_BOARD;
       renderProducts();
@@ -359,12 +496,26 @@
     async function createSupabaseClient() {
       const config = await loadSupabaseConfig();
       state.configured = isConfigured(config);
+      state.supabaseConfig = state.configured ? config : null;
 
       if (!state.configured || !window.supabase?.createClient) {
         return null;
       }
 
       return window.supabase.createClient(config.url, config.anonKey);
+    }
+
+    async function verifyAdminLogin(client, username, password) {
+      const { data, error } = await client.rpc("verify_admin_login", {
+        input_username: username,
+        input_password: password
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return data === true;
     }
 
     async function loadSupabaseConfig() {
@@ -427,6 +578,57 @@
       await loadProducts();
     }
 
+    async function changeAdminPassword(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const currentPassword = dom.currentAdminPassword.value;
+      const newPassword = dom.newAdminPassword.value;
+      const confirmedPassword = dom.confirmAdminPassword.value;
+
+      if (newPassword.length < 8) {
+        setStatus("New password must be at least 8 characters.", "error");
+        return;
+      }
+
+      if (newPassword !== confirmedPassword) {
+        setStatus("New password and confirmation do not match.", "error");
+        return;
+      }
+
+      setPasswordSaving(true);
+      setStatus("Updating admin password...", "info");
+
+      try {
+        const { data, error } = await state.client.rpc("change_admin_password", {
+          input_username: ADMIN_USERNAME,
+          current_password: currentPassword,
+          new_password: newPassword
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data !== true) {
+          setStatus("Current admin password is incorrect.", "error");
+          return;
+        }
+
+        dom.passwordForm.reset();
+        setStatus("Admin password updated.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to update admin password.", "error");
+      } finally {
+        setPasswordSaving(false);
+      }
+    }
+
     async function loadAnnouncementBoard() {
       if (!state.client) {
         populateBoardForm(DEFAULT_BOARD);
@@ -458,8 +660,6 @@
       dom.boardTitle.value = board.title || DEFAULT_BOARD.title;
       dom.boardMessage.value = board.message || DEFAULT_BOARD.message;
       dom.boardOffer.value = board.offer_text || DEFAULT_BOARD.offer_text;
-      dom.boardCtaLabel.value = board.cta_label || "";
-      dom.boardCtaUrl.value = board.cta_url || "";
       dom.boardActive.checked = board.is_active !== false;
     }
 
@@ -503,8 +703,9 @@
       const title = dom.boardTitle.value.trim();
       const message = dom.boardMessage.value.trim();
       const offerText = dom.boardOffer.value.trim();
-      const ctaLabel = dom.boardCtaLabel.value.trim();
-      const ctaUrl = dom.boardCtaUrl.value.trim();
+      // CTA is hardcoded for the storefront; use defaults rather than editable inputs
+      const ctaLabel = DEFAULT_BOARD.cta_label;
+      const ctaUrl = DEFAULT_BOARD.cta_url;
 
       if (!eyebrow || !title || !message || !offerText) {
         setStatus("Please enter an eyebrow, title, announcement, and offer text.", "error");
@@ -645,12 +846,12 @@
         }
 
         if (isImage && file.size > MAX_IMAGE_SIZE) {
-          setStatus(`${file.name} is larger than 8 MB.`, "error");
+          setStatus(`${file.name} is larger than ${formatFileSize(MAX_IMAGE_SIZE)}.`, "error");
           continue;
         }
 
         if (isVideo && file.size > MAX_VIDEO_SIZE) {
-          setStatus(`${file.name} is larger than 80 MB.`, "error");
+          setStatus(`${file.name} is larger than ${formatFileSize(MAX_VIDEO_SIZE)}.`, "error");
           continue;
         }
 
@@ -668,16 +869,8 @@
       for (const file of state.pendingFiles) {
         const folder = file.type.startsWith("video/") ? "product-videos" : "products";
         const path = `${folder}/${createFileToken()}-${sanitizeFileName(file.name)}`;
-        const { error } = await state.client.storage
-          .from(STORAGE_BUCKET)
-          .upload(path, file, {
-            cacheControl: "3600",
-            upsert: false
-          });
-
-        if (error) {
-          throw error;
-        }
+        setStatus(`Uploading ${file.name} (${formatFileSize(file.size)})...`, "info");
+        await uploadStorageFile(file, path);
 
         const { data } = state.client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
         uploadedUrls.push(data.publicUrl);
@@ -685,6 +878,77 @@
       }
 
       return uploadedUrls;
+    }
+
+    async function uploadStorageFile(file, path) {
+      if (file.size > RESUMABLE_UPLOAD_THRESHOLD) {
+        await uploadResumableFile(file, path);
+        return;
+      }
+
+      const { error } = await state.client.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, file, {
+          cacheControl: "3600",
+          contentType: file.type || "application/octet-stream",
+          upsert: false
+        });
+
+      if (error) {
+        throw error;
+      }
+    }
+
+    async function uploadResumableFile(file, path) {
+      if (!window.tus?.Upload) {
+        throw new Error("Large-file upload support did not load. Refresh the page and try again.");
+      }
+
+      const projectRef = getSupabaseProjectRef();
+      const anonKey = state.supabaseConfig?.anonKey;
+
+      if (!projectRef || !anonKey) {
+        throw new Error("Supabase upload configuration is missing.");
+      }
+
+      return new Promise((resolve, reject) => {
+        const upload = new window.tus.Upload(file, {
+          endpoint: `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`,
+          retryDelays: [0, 3000, 5000, 10000, 20000],
+          headers: {
+            authorization: `Bearer ${anonKey}`,
+            apikey: anonKey
+          },
+          uploadDataDuringCreation: true,
+          removeFingerprintOnSuccess: true,
+          metadata: {
+            bucketName: STORAGE_BUCKET,
+            objectName: path,
+            contentType: file.type || "application/octet-stream",
+            cacheControl: "3600"
+          },
+          chunkSize: TUS_CHUNK_SIZE,
+          onError(error) {
+            reject(error);
+          },
+          onProgress(bytesUploaded, bytesTotal) {
+            const percent = bytesTotal ? Math.floor((bytesUploaded / bytesTotal) * 100) : 0;
+            setStatus(`Uploading ${file.name}... ${percent}%`, "info");
+          },
+          onSuccess() {
+            resolve();
+          }
+        });
+
+        upload.findPreviousUploads()
+          .then((previousUploads) => {
+            if (previousUploads.length) {
+              upload.resumeFromPreviousUpload(previousUploads[0]);
+            }
+            upload.start();
+          })
+          .catch(reject);
+      });
     }
 
     function renderProducts() {
@@ -960,6 +1224,11 @@
       dom.saveBoard.textContent = isSaving ? "Saving..." : "Save Board";
     }
 
+    function setPasswordSaving(isSaving) {
+      dom.savePassword.disabled = isSaving;
+      dom.savePassword.textContent = isSaving ? "Updating..." : "Update Password";
+    }
+
     function setAdminControlsEnabled(enabled) {
       const controls = dom.dashboard.querySelectorAll("input, textarea, button");
       controls.forEach((control) => {
@@ -1020,6 +1289,19 @@
         .replace(/[^a-z0-9.]+/g, "-")
         .replace(/^-+|-+$/g, "")
         .slice(0, 80) || "product-image";
+    }
+
+    function getSupabaseProjectRef() {
+      try {
+        return new URL(state.supabaseConfig?.url || "").hostname.split(".")[0];
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function formatFileSize(bytes) {
+      const mb = bytes / BYTES_IN_MB;
+      return `${Number.isInteger(mb) ? mb : mb.toFixed(1)} MB`;
     }
 
     function createFileToken() {
