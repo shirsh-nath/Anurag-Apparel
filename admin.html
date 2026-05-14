@@ -101,7 +101,59 @@
     </header>
 
     <main class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[390px_1fr] lg:px-8">
-      <aside class="lg:sticky lg:top-28 lg:self-start">
+      <aside class="space-y-6 lg:sticky lg:top-28 lg:self-start">
+        <form id="boardForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div>
+            <p class="text-sm font-semibold uppercase text-leaf">Homepage</p>
+            <h2 class="mt-1 text-2xl font-semibold">Announcement Board</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/58">Update the offers board shown on the home page.</p>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Eyebrow</span>
+              <input id="boardEyebrow" class="field mt-2 px-4 py-3" type="text" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Title</span>
+              <input id="boardTitle" class="field mt-2 px-4 py-3" type="text" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Announcement</span>
+              <textarea id="boardMessage" class="field mt-2 min-h-24 px-4 py-3" required></textarea>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Offer Text</span>
+              <textarea id="boardOffer" class="field mt-2 min-h-24 px-4 py-3" required></textarea>
+            </label>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <label class="block">
+                <span class="text-sm font-medium text-ink/70">CTA Label</span>
+                <input id="boardCtaLabel" class="field mt-2 px-4 py-3" type="text">
+              </label>
+
+              <label class="block">
+                <span class="text-sm font-medium text-ink/70">CTA URL</span>
+                <input id="boardCtaUrl" class="field mt-2 px-4 py-3" type="url">
+              </label>
+            </div>
+
+            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
+              <span>
+                <span class="block text-sm font-semibold">Show Board</span>
+                <span class="block text-xs text-ink/54">Visible on homepage</span>
+              </span>
+              <input id="boardActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
+            </label>
+          </div>
+
+          <button id="saveBoard" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Board</button>
+        </form>
+
         <form id="productForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div class="flex items-start justify-between gap-4">
             <div>
@@ -176,12 +228,24 @@
     const STORAGE_BUCKET = "product-images";
     const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
     const MAX_VIDEO_SIZE = 80 * 1024 * 1024;
+    const MAP_URL = "https://maps.app.goo.gl/ZsyAXskboHbKB6RA6";
     const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
+    const DEFAULT_BOARD = {
+      id: "homepage",
+      eyebrow: "Store update",
+      title: "New Arrivals Are Live",
+      message: "Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.",
+      offer_text: "Ask in store for current festive and seasonal offers.",
+      cta_label: "Get Directions",
+      cta_url: MAP_URL,
+      is_active: true
+    };
 
     const state = {
       client: null,
       configured: false,
       products: [],
+      board: DEFAULT_BOARD,
       editingId: null,
       originalGallery: [],
       currentGallery: [],
@@ -212,6 +276,15 @@
       dom.dashboard = document.querySelector("#dashboard");
       dom.logout = document.querySelector("#logout");
       dom.refreshProducts = document.querySelector("#refreshProducts");
+      dom.boardForm = document.querySelector("#boardForm");
+      dom.boardEyebrow = document.querySelector("#boardEyebrow");
+      dom.boardTitle = document.querySelector("#boardTitle");
+      dom.boardMessage = document.querySelector("#boardMessage");
+      dom.boardOffer = document.querySelector("#boardOffer");
+      dom.boardCtaLabel = document.querySelector("#boardCtaLabel");
+      dom.boardCtaUrl = document.querySelector("#boardCtaUrl");
+      dom.boardActive = document.querySelector("#boardActive");
+      dom.saveBoard = document.querySelector("#saveBoard");
       dom.productForm = document.querySelector("#productForm");
       dom.formTitle = document.querySelector("#formTitle");
       dom.cancelEdit = document.querySelector("#cancelEdit");
@@ -248,7 +321,8 @@
 
     function bindDashboard() {
       dom.logout.addEventListener("click", lockDashboard);
-      dom.refreshProducts.addEventListener("click", loadProducts);
+      dom.refreshProducts.addEventListener("click", refreshDashboard);
+      dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
       dom.productForm.addEventListener("submit", saveProduct);
       dom.cancelEdit.addEventListener("click", resetForm);
       dom.imageInput.addEventListener("change", handleImageSelection);
@@ -266,6 +340,7 @@
       }
 
       setAdminControlsEnabled(true);
+      await loadAnnouncementBoard();
       await loadProducts();
     }
 
@@ -277,6 +352,7 @@
       dom.password.value = "";
       state.client = null;
       state.products = [];
+      state.board = DEFAULT_BOARD;
       renderProducts();
     }
 
@@ -344,6 +420,107 @@
         !config.url.includes("your_supabase") &&
         !config.anonKey.includes("your_supabase")
       );
+    }
+
+    async function refreshDashboard() {
+      await loadAnnouncementBoard();
+      await loadProducts();
+    }
+
+    async function loadAnnouncementBoard() {
+      if (!state.client) {
+        populateBoardForm(DEFAULT_BOARD);
+        return;
+      }
+
+      try {
+        const { data, error } = await state.client
+          .from("site_announcements")
+          .select("id,eyebrow,title,message,offer_text,cta_label,cta_url,is_active,updated_at")
+          .eq("id", "homepage")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        state.board = data || DEFAULT_BOARD;
+        populateBoardForm(state.board);
+      } catch (error) {
+        console.error(error);
+        populateBoardForm(DEFAULT_BOARD);
+        setStatus(error.message || "Unable to load announcement board.", "error");
+      }
+    }
+
+    function populateBoardForm(board) {
+      dom.boardEyebrow.value = board.eyebrow || DEFAULT_BOARD.eyebrow;
+      dom.boardTitle.value = board.title || DEFAULT_BOARD.title;
+      dom.boardMessage.value = board.message || DEFAULT_BOARD.message;
+      dom.boardOffer.value = board.offer_text || DEFAULT_BOARD.offer_text;
+      dom.boardCtaLabel.value = board.cta_label || "";
+      dom.boardCtaUrl.value = board.cta_url || "";
+      dom.boardActive.checked = board.is_active !== false;
+    }
+
+    async function saveAnnouncementBoard(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const payload = readBoardPayload();
+      if (!payload) {
+        return;
+      }
+
+      setBoardSaving(true);
+      setStatus("Saving homepage announcement board...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("site_announcements")
+          .upsert(payload, { onConflict: "id" });
+
+        if (error) {
+          throw error;
+        }
+
+        state.board = payload;
+        setStatus("Homepage announcement board updated.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to save announcement board.", "error");
+      } finally {
+        setBoardSaving(false);
+      }
+    }
+
+    function readBoardPayload() {
+      const eyebrow = dom.boardEyebrow.value.trim();
+      const title = dom.boardTitle.value.trim();
+      const message = dom.boardMessage.value.trim();
+      const offerText = dom.boardOffer.value.trim();
+      const ctaLabel = dom.boardCtaLabel.value.trim();
+      const ctaUrl = dom.boardCtaUrl.value.trim();
+
+      if (!eyebrow || !title || !message || !offerText) {
+        setStatus("Please enter an eyebrow, title, announcement, and offer text.", "error");
+        return null;
+      }
+
+      return {
+        id: "homepage",
+        eyebrow,
+        title,
+        message,
+        offer_text: offerText,
+        cta_label: ctaLabel,
+        cta_url: ctaUrl,
+        is_active: dom.boardActive.checked
+      };
     }
 
     async function loadProducts() {
@@ -776,6 +953,11 @@
     function setSaving(isSaving) {
       dom.saveProduct.disabled = isSaving;
       dom.saveProduct.textContent = isSaving ? "Saving..." : state.editingId ? "Save Changes" : "Save Product";
+    }
+
+    function setBoardSaving(isSaving) {
+      dom.saveBoard.disabled = isSaving;
+      dom.saveBoard.textContent = isSaving ? "Saving..." : "Save Board";
     }
 
     function setAdminControlsEnabled(enabled) {

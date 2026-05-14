@@ -25,7 +25,36 @@ create index if not exists products_created_at_idx
 create index if not exists products_is_active_idx
   on public.products (is_active);
 
+create table if not exists public.site_announcements (
+  id text primary key default 'homepage',
+  eyebrow text not null default 'Store update',
+  title text not null default 'Announcements and Offers',
+  message text not null default 'Explore fresh arrivals and in-store offers at Anurag Apparel.',
+  offer_text text not null default 'Visit the store for the latest seasonal deals.',
+  cta_label text not null default 'Get Directions',
+  cta_url text not null default 'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6',
+  is_active boolean not null default true,
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.set_site_announcements_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists site_announcements_updated_at on public.site_announcements;
+create trigger site_announcements_updated_at
+before update on public.site_announcements
+for each row
+execute function public.set_site_announcements_updated_at();
+
 alter table public.products enable row level security;
+alter table public.site_announcements enable row level security;
 
 drop policy if exists "Public can read products" on public.products;
 drop policy if exists "Anon can create products for static admin" on public.products;
@@ -56,6 +85,42 @@ create policy "Anon can delete products for static admin"
   for delete
   to anon
   using (true);
+
+drop policy if exists "Public can read site announcements" on public.site_announcements;
+drop policy if exists "Anon can create site announcements for static admin" on public.site_announcements;
+drop policy if exists "Anon can update site announcements for static admin" on public.site_announcements;
+
+create policy "Public can read site announcements"
+  on public.site_announcements
+  for select
+  to anon
+  using (true);
+
+create policy "Anon can create site announcements for static admin"
+  on public.site_announcements
+  for insert
+  to anon
+  with check (true);
+
+create policy "Anon can update site announcements for static admin"
+  on public.site_announcements
+  for update
+  to anon
+  using (true)
+  with check (true);
+
+insert into public.site_announcements (id, eyebrow, title, message, offer_text, cta_label, cta_url, is_active)
+values (
+  'homepage',
+  'Store update',
+  'New Arrivals Are Live',
+  'Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.',
+  'Ask in store for current festive and seasonal offers.',
+  'Get Directions',
+  'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6',
+  true
+)
+on conflict (id) do nothing;
 
 -- The existing bucket is named product-images for compatibility, but it may store videos too.
 insert into storage.buckets (id, name, public)
