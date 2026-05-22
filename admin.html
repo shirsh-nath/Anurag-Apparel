@@ -147,7 +147,68 @@
 
     <main class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[390px_1fr] lg:px-8">
       <aside class="space-y-6 lg:sticky lg:top-28 lg:self-start">
-        <form id="boardForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+        <section id="functionMenu" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div>
+            <p class="text-sm font-semibold uppercase text-leaf">Admin Menu</p>
+            <h2 class="mt-1 text-2xl font-semibold">Choose a function</h2>
+          </div>
+
+          <div class="mt-6 grid gap-3">
+            <button type="button" data-admin-panel-target="announcement" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.34 3.94 9.14 6H5.25A2.25 2.25 0 0 0 3 8.25v7.5A2.25 2.25 0 0 0 5.25 18h3.89l1.2 2.06a.75.75 0 0 0 1.3 0l1.2-2.06h5.91A2.25 2.25 0 0 0 21 15.75v-7.5A2.25 2.25 0 0 0 18.75 6h-5.91l-1.2-2.06a.75.75 0 0 0-1.3 0Z"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Announcement Board</span>
+                <span class="block text-xs leading-5 text-ink/54">Homepage offer and update text</span>
+              </span>
+            </button>
+
+            <button type="button" data-admin-panel-target="contact" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293a1.125 1.125 0 0 1-1.21.38 12.035 12.035 0 0 1-7.143-7.143 1.125 1.125 0 0 1 .38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102A1.125 1.125 0 0 0 5.872 2.25H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Call Button</span>
+                <span class="block text-xs leading-5 text-ink/54">Store mobile number</span>
+              </span>
+            </button>
+
+            <button type="button" data-admin-panel-target="product" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-brass/10 text-brass">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Add a Product</span>
+                <span class="block text-xs leading-5 text-ink/54">Inventory details and media</span>
+              </span>
+            </button>
+
+            <button type="button" data-admin-panel-target="password" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-clay/10 text-clay">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 0 0-9 0v3.75m-.75 0h10.5A2.25 2.25 0 0 1 19.5 12.75v5.25a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 18v-5.25a2.25 2.25 0 0 1 2.25-2.25Z"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Admin Password</span>
+                <span class="block text-xs leading-5 text-ink/54">Security settings</span>
+              </span>
+            </button>
+          </div>
+        </section>
+
+        <div id="functionEmptyState" class="rounded-lg border border-dashed border-line bg-white/72 p-5 text-sm leading-6 text-ink/58 shadow-crisp backdrop-blur">
+          Select a function from the menu to open its controls.
+        </div>
+
+        <form id="boardForm" data-admin-panel="announcement" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div>
             <p class="text-sm font-semibold uppercase text-leaf">Homepage</p>
             <h2 class="mt-1 text-2xl font-semibold">Announcement Board</h2>
@@ -189,7 +250,7 @@
           <button id="saveBoard" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Board</button>
         </form>
 
-        <form id="contactForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+        <form id="contactForm" data-admin-panel="contact" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div>
             <p class="text-sm font-semibold uppercase text-leaf">Store Contact</p>
             <h2 class="mt-1 text-2xl font-semibold">Call Button</h2>
@@ -206,7 +267,7 @@
           <button id="saveContact" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Number</button>
         </form>
 
-        <form id="passwordForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+        <form id="passwordForm" data-admin-panel="password" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div>
             <p class="text-sm font-semibold uppercase text-clay">Security</p>
             <h2 class="mt-1 text-2xl font-semibold">Admin Password</h2>
@@ -232,7 +293,7 @@
           <button id="savePassword" type="submit" class="mt-6 w-full rounded-md bg-clay px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Update Password</button>
         </form>
 
-        <form id="productForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+        <form id="productForm" data-admin-panel="product" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-sm font-semibold uppercase text-brass">Inventory</p>
@@ -263,14 +324,6 @@
             </label>
 
             <div id="galleryEditor" class="grid grid-cols-3 gap-3"></div>
-
-            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
-              <span>
-                <span class="block text-sm font-semibold">Active</span>
-                <span class="block text-xs text-ink/54">Visible on storefront</span>
-              </span>
-              <input id="productActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
-            </label>
           </div>
 
           <button id="saveProduct" type="submit" class="mt-6 w-full rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-ink/45">Save Product</button>
@@ -380,6 +433,7 @@
       products: [],
       board: DEFAULT_BOARD,
       settings: DEFAULT_SETTINGS,
+      activePanel: null,
       editingId: null,
       originalGallery: [],
       currentGallery: [],
@@ -395,6 +449,7 @@
       cacheDom();
       bindAuth();
       bindDashboard();
+      showAdminPanel(null);
 
       if (sessionStorage.getItem(AUTH_SESSION_KEY) === "true") {
         unlockDashboard();
@@ -410,6 +465,9 @@
       dom.dashboard = document.querySelector("#dashboard");
       dom.logout = document.querySelector("#logout");
       dom.refreshProducts = document.querySelector("#refreshProducts");
+      dom.functionEmptyState = document.querySelector("#functionEmptyState");
+      dom.menuButtons = Array.from(document.querySelectorAll("[data-admin-panel-target]"));
+      dom.adminPanels = Array.from(document.querySelectorAll("[data-admin-panel]"));
       dom.passwordForm = document.querySelector("#passwordForm");
       dom.currentAdminPassword = document.querySelector("#currentAdminPassword");
       dom.newAdminPassword = document.querySelector("#newAdminPassword");
@@ -433,7 +491,6 @@
       dom.productDescription = document.querySelector("#productDescription");
       dom.imageInput = document.querySelector("#imageInput");
       dom.galleryEditor = document.querySelector("#galleryEditor");
-      dom.productActive = document.querySelector("#productActive");
       dom.saveProduct = document.querySelector("#saveProduct");
       dom.statusMessage = document.querySelector("#statusMessage");
       dom.productCount = document.querySelector("#productCount");
@@ -482,6 +539,15 @@
     function bindDashboard() {
       dom.logout.addEventListener("click", lockDashboard);
       dom.refreshProducts.addEventListener("click", refreshDashboard);
+      dom.menuButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const panelName = button.dataset.adminPanelTarget;
+          if (panelName === "product") {
+            resetForm();
+          }
+          showAdminPanel(panelName);
+        });
+      });
       dom.passwordForm.addEventListener("submit", changeAdminPassword);
       dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
       dom.contactForm.addEventListener("submit", saveSiteSettings);
@@ -518,6 +584,7 @@
       state.products = [];
       state.board = DEFAULT_BOARD;
       state.settings = DEFAULT_SETTINGS;
+      showAdminPanel(null);
       renderProducts();
     }
 
@@ -605,6 +672,29 @@
       await loadAnnouncementBoard();
       await loadSiteSettings();
       await loadProducts();
+    }
+
+    function showAdminPanel(panelName) {
+      state.activePanel = panelName || null;
+
+      dom.adminPanels.forEach((panel) => {
+        panel.classList.toggle("hidden", panel.dataset.adminPanel !== state.activePanel);
+      });
+
+      dom.functionEmptyState.classList.toggle("hidden", Boolean(state.activePanel));
+
+      dom.menuButtons.forEach((button) => {
+        const isActive = button.dataset.adminPanelTarget === state.activePanel;
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        button.className = getMenuButtonClass(isActive);
+      });
+    }
+
+    function getMenuButtonClass(isActive) {
+      const baseClass = "admin-menu-option flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-55 focus:outline-none focus:ring-2 focus:ring-leaf/30";
+      return isActive
+        ? `${baseClass} border-ink bg-white shadow-crisp`
+        : `${baseClass} border-line bg-paper/70 hover:border-leaf hover:bg-white`;
     }
 
     async function changeAdminPassword(event) {
@@ -942,13 +1032,18 @@
         return null;
       }
 
-      return {
+      const payload = {
         title,
         description,
         price,
-        is_active: dom.productActive.checked,
         gallery_images: []
       };
+
+      if (!state.editingId) {
+        payload.is_active = true;
+      }
+
+      return payload;
     }
 
     function handleImageSelection(event) {
@@ -1153,9 +1248,9 @@
       dom.productTitle.value = product.title || "";
       dom.productPrice.value = Number(product.price || 0);
       dom.productDescription.value = product.description || "";
-      dom.productActive.checked = Boolean(product.is_active);
 
       renderGalleryEditor();
+      showAdminPanel("product");
       dom.productTitle.focus();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -1311,7 +1406,6 @@
 
     function resetForm() {
       dom.productForm.reset();
-      dom.productActive.checked = true;
       dom.formTitle.textContent = "Add Product";
       dom.saveProduct.textContent = "Save Product";
       dom.cancelEdit.classList.add("hidden");
