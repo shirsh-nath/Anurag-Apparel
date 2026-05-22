@@ -189,6 +189,23 @@
           <button id="saveBoard" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Board</button>
         </form>
 
+        <form id="contactForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div>
+            <p class="text-sm font-semibold uppercase text-leaf">Store Contact</p>
+            <h2 class="mt-1 text-2xl font-semibold">Call Button</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/58">Update the mobile number used by the storefront call button.</p>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Mobile Number</span>
+              <input id="contactPhone" class="field mt-2 px-4 py-3" type="tel" inputmode="tel" placeholder="+91 98765 43210" required>
+            </label>
+          </div>
+
+          <button id="saveContact" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Number</button>
+        </form>
+
         <form id="passwordForm" class="rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div>
             <p class="text-sm font-semibold uppercase text-clay">Security</p>
@@ -351,6 +368,10 @@
       cta_url: MAP_URL,
       is_active: true
     };
+    const DEFAULT_SETTINGS = {
+      id: "storefront",
+      phone_number: ""
+    };
 
     const state = {
       client: null,
@@ -358,6 +379,7 @@
       configured: false,
       products: [],
       board: DEFAULT_BOARD,
+      settings: DEFAULT_SETTINGS,
       editingId: null,
       originalGallery: [],
       currentGallery: [],
@@ -400,6 +422,9 @@
       dom.boardOffer = document.querySelector("#boardOffer");
       dom.boardActive = document.querySelector("#boardActive");
       dom.saveBoard = document.querySelector("#saveBoard");
+      dom.contactForm = document.querySelector("#contactForm");
+      dom.contactPhone = document.querySelector("#contactPhone");
+      dom.saveContact = document.querySelector("#saveContact");
       dom.productForm = document.querySelector("#productForm");
       dom.formTitle = document.querySelector("#formTitle");
       dom.cancelEdit = document.querySelector("#cancelEdit");
@@ -459,6 +484,7 @@
       dom.refreshProducts.addEventListener("click", refreshDashboard);
       dom.passwordForm.addEventListener("submit", changeAdminPassword);
       dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
+      dom.contactForm.addEventListener("submit", saveSiteSettings);
       dom.productForm.addEventListener("submit", saveProduct);
       dom.cancelEdit.addEventListener("click", resetForm);
       dom.imageInput.addEventListener("change", handleImageSelection);
@@ -477,6 +503,7 @@
 
       setAdminControlsEnabled(true);
       await loadAnnouncementBoard();
+      await loadSiteSettings();
       await loadProducts();
     }
 
@@ -490,6 +517,7 @@
       state.supabaseConfig = null;
       state.products = [];
       state.board = DEFAULT_BOARD;
+      state.settings = DEFAULT_SETTINGS;
       renderProducts();
     }
 
@@ -575,6 +603,7 @@
 
     async function refreshDashboard() {
       await loadAnnouncementBoard();
+      await loadSiteSettings();
       await loadProducts();
     }
 
@@ -722,6 +751,96 @@
         cta_url: ctaUrl,
         is_active: dom.boardActive.checked
       };
+    }
+
+    async function loadSiteSettings() {
+      if (!state.client) {
+        populateContactForm(DEFAULT_SETTINGS);
+        return;
+      }
+
+      try {
+        const { data, error } = await state.client
+          .from("site_settings")
+          .select("id,phone_number,updated_at")
+          .eq("id", "storefront")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        state.settings = data || DEFAULT_SETTINGS;
+        populateContactForm(state.settings);
+      } catch (error) {
+        console.error(error);
+        populateContactForm(DEFAULT_SETTINGS);
+        setStatus(error.message || "Unable to load store contact settings.", "error");
+      }
+    }
+
+    function populateContactForm(settings) {
+      dom.contactPhone.value = settings.phone_number || DEFAULT_SETTINGS.phone_number;
+    }
+
+    async function saveSiteSettings(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const payload = readSettingsPayload();
+      if (!payload) {
+        return;
+      }
+
+      setContactSaving(true);
+      setStatus("Saving call button number...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("site_settings")
+          .upsert(payload, { onConflict: "id" });
+
+        if (error) {
+          throw error;
+        }
+
+        state.settings = payload;
+        setStatus("Call button number updated.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to save call button number.", "error");
+      } finally {
+        setContactSaving(false);
+      }
+    }
+
+    function readSettingsPayload() {
+      const phoneNumber = dom.contactPhone.value.trim();
+      const dialableNumber = normalizePhoneNumber(phoneNumber);
+      const digitCount = dialableNumber.replace(/\D/g, "").length;
+
+      if (digitCount < 7 || digitCount > 15) {
+        setStatus("Please enter a valid mobile number with 7 to 15 digits.", "error");
+        return null;
+      }
+
+      return {
+        id: "storefront",
+        phone_number: phoneNumber
+      };
+    }
+
+    function normalizePhoneNumber(value) {
+      const trimmed = String(value || "").trim();
+      const digits = trimmed.replace(/\D/g, "");
+      if (!digits) {
+        return "";
+      }
+      return `${trimmed.startsWith("+") ? "+" : ""}${digits}`;
     }
 
     async function loadProducts() {
@@ -1222,6 +1341,11 @@
     function setBoardSaving(isSaving) {
       dom.saveBoard.disabled = isSaving;
       dom.saveBoard.textContent = isSaving ? "Saving..." : "Save Board";
+    }
+
+    function setContactSaving(isSaving) {
+      dom.saveContact.disabled = isSaving;
+      dom.saveContact.textContent = isSaving ? "Saving..." : "Save Number";
     }
 
     function setPasswordSaving(isSaving) {

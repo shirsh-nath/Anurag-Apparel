@@ -39,6 +39,14 @@ create table if not exists public.site_announcements (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.site_settings (
+  id text primary key default 'storefront',
+  phone_number text not null default '',
+  constraint site_settings_phone_number_length
+    check (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15),
+  updated_at timestamptz not null default now()
+);
+
 create or replace function public.set_site_announcements_updated_at()
 returns trigger
 language plpgsql
@@ -55,6 +63,23 @@ create trigger site_announcements_updated_at
 before update on public.site_announcements
 for each row
 execute function public.set_site_announcements_updated_at();
+
+create or replace function public.set_site_settings_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists site_settings_updated_at on public.site_settings;
+create trigger site_settings_updated_at
+before update on public.site_settings
+for each row
+execute function public.set_site_settings_updated_at();
 
 create table if not exists private.admin_credentials (
   id text primary key default 'dashboard',
@@ -158,6 +183,11 @@ grant execute on function public.change_admin_password(text, text, text) to anon
 
 alter table public.products enable row level security;
 alter table public.site_announcements enable row level security;
+alter table public.site_settings enable row level security;
+
+grant select, insert, update, delete on table public.products to anon;
+grant select, insert, update on table public.site_announcements to anon;
+grant select, insert, update on table public.site_settings to anon;
 
 drop policy if exists "Public can read products" on public.products;
 drop policy if exists "Anon can create products for static admin" on public.products;
@@ -212,6 +242,35 @@ create policy "Anon can update site announcements for static admin"
   using (true)
   with check (true);
 
+drop policy if exists "Public can read site settings" on public.site_settings;
+drop policy if exists "Anon can create site settings for static admin" on public.site_settings;
+drop policy if exists "Anon can update site settings for static admin" on public.site_settings;
+
+create policy "Public can read site settings"
+  on public.site_settings
+  for select
+  to anon
+  using (true);
+
+create policy "Anon can create site settings for static admin"
+  on public.site_settings
+  for insert
+  to anon
+  with check (
+    id = 'storefront'
+    and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
+  );
+
+create policy "Anon can update site settings for static admin"
+  on public.site_settings
+  for update
+  to anon
+  using (id = 'storefront')
+  with check (
+    id = 'storefront'
+    and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
+  );
+
 insert into public.site_announcements (id, eyebrow, title, message, offer_text, cta_label, cta_url, is_active)
 values (
   'homepage',
@@ -223,6 +282,10 @@ values (
   'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6',
   true
 )
+on conflict (id) do nothing;
+
+insert into public.site_settings (id, phone_number)
+values ('storefront', '')
 on conflict (id) do nothing;
 
 -- The existing bucket is named product-images for compatibility, but it may store videos too.

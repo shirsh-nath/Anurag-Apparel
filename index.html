@@ -201,19 +201,25 @@
 </head>
 <body class="bg-paper text-ink antialiased">
   <header class="site-header fixed inset-x-0 top-0 z-40 backdrop-blur-xl">
-    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-      <a href="#home" class="flex items-center gap-3" aria-label="Anurag Apparel home">
-        <span class="grid h-10 w-10 place-items-center rounded-md border border-line bg-white text-sm font-semibold text-ink shadow-crisp">AA</span>
-        <span>
-          <span class="block text-base font-semibold">Anurag Apparel</span>
-          <span class="block text-xs font-medium text-ink/62">Hazaribagh, Jharkhand</span>
+    <nav class="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 py-3 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:px-8">
+      <a href="#home" class="flex min-w-0 items-center gap-3" aria-label="Anurag Apparel home">
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-line bg-white text-sm font-semibold text-ink shadow-crisp">AA</span>
+        <span class="min-w-0">
+          <span class="block truncate text-base font-semibold">Anurag Apparel</span>
+          <span class="hidden text-xs font-medium text-ink/62 sm:block">Hazaribagh, Jharkhand</span>
         </span>
       </a>
-      <div class="hidden items-center gap-7 text-sm font-medium text-ink/68 md:flex">
-        <a class="transition hover:text-ink" href="#products">Collection</a>
-        <a class="transition hover:text-ink" href="#visit">Visit</a>
+      <div class="flex items-center justify-center gap-2 text-sm font-medium text-ink/68 md:gap-7">
+        <a class="hidden transition hover:text-ink md:inline-flex" href="#products">Collection</a>
+        <a id="callUsButton" class="inline-flex min-h-10 items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink shadow-crisp transition hover:border-leaf hover:text-leaf sm:px-4" aria-label="Call Anurag Apparel">
+          <svg aria-hidden="true" class="h-4 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293a1.125 1.125 0 0 1-1.21.38 12.035 12.035 0 0 1-7.143-7.143 1.125 1.125 0 0 1 .38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102A1.125 1.125 0 0 0 5.872 2.25H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25z"/>
+          </svg>
+          <span>Call Us</span>
+        </a>
+        <a class="hidden transition hover:text-ink md:inline-flex" href="#visit">Visit</a>
       </div>
-      <a href="#products" class="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white shadow-crisp transition hover:bg-black">Shop</a>
+      <a href="#products" class="justify-self-end rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white shadow-crisp transition hover:bg-black">Shop</a>
     </nav>
   </header>
 
@@ -358,8 +364,8 @@
           <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-7 inline-flex rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Get Directions</a>
         </div>
         <div class="grid gap-4 sm:grid-cols-3">
-          <img class="h-64 w-full rounded-lg object-cover shadow-crisp sm:col-span-2" src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1200&q=82" alt="Clothing rack with premium apparel">
-          <img class="h-64 w-full rounded-lg object-cover shadow-crisp" src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=900&q=82" alt="Folded apparel displayed in a store">
+          <img class="h-64 w-full rounded-lg object-cover shadow-crisp sm:col-span-2" src="Images/Levis.jpeg">
+          <img class="h-64 w-full rounded-lg object-cover shadow-crisp" src="Images/Rear_View.jpeg">
         </div>
       </div>
     </section>
@@ -410,6 +416,10 @@
       cta_url: MAP_URL,
       is_active: true
     };
+    const DEFAULT_SETTINGS = {
+      id: "storefront",
+      phone_number: ""
+    };
 
     const sampleProducts = [
       {
@@ -459,6 +469,7 @@
       configured: false,
       products: [],
       announcement: DEFAULT_ANNOUNCEMENT,
+      settings: DEFAULT_SETTINGS,
       activeProduct: null,
       activeImageIndex: 0
     };
@@ -472,12 +483,14 @@
       bindEvents();
       dom.year.textContent = new Date().getFullYear();
       state.client = await createSupabaseClient();
+      await loadSiteSettings();
       await loadAnnouncementBoard();
       await loadProducts();
     }
 
     function cacheDom() {
       dom.configNotice = document.querySelector("#configNotice");
+      dom.callUsButton = document.querySelector("#callUsButton");
       dom.loadingState = document.querySelector("#loadingState");
       dom.productGrid = document.querySelector("#productGrid");
       dom.emptyState = document.querySelector("#emptyState");
@@ -580,6 +593,67 @@
         !config.url.includes("your_supabase") &&
         !config.anonKey.includes("your_supabase")
       );
+    }
+
+    async function loadSiteSettings() {
+      try {
+        if (!state.client) {
+          renderCallButton(DEFAULT_SETTINGS);
+          return;
+        }
+
+        const { data, error } = await state.client
+          .from("site_settings")
+          .select("id,phone_number,updated_at")
+          .eq("id", "storefront")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        state.settings = data || DEFAULT_SETTINGS;
+        renderCallButton(state.settings);
+      } catch (error) {
+        console.error(error);
+        renderCallButton(DEFAULT_SETTINGS);
+      }
+    }
+
+    function renderCallButton(settings) {
+      const telHref = createTelHref(settings?.phone_number);
+      if (!dom.callUsButton) {
+        return;
+      }
+
+      if (telHref) {
+        dom.callUsButton.href = telHref;
+        dom.callUsButton.title = settings.phone_number;
+        dom.callUsButton.setAttribute("aria-label", `Call Anurag Apparel at ${settings.phone_number}`);
+        dom.callUsButton.removeAttribute("aria-disabled");
+        dom.callUsButton.classList.remove("pointer-events-none", "opacity-55");
+        return;
+      }
+
+      dom.callUsButton.removeAttribute("href");
+      dom.callUsButton.removeAttribute("title");
+      dom.callUsButton.setAttribute("aria-disabled", "true");
+      dom.callUsButton.setAttribute("aria-label", "Call number not set");
+      dom.callUsButton.classList.add("pointer-events-none", "opacity-55");
+    }
+
+    function createTelHref(value) {
+      const phoneNumber = normalizePhoneNumber(value);
+      return phoneNumber ? `tel:${phoneNumber}` : "";
+    }
+
+    function normalizePhoneNumber(value) {
+      const trimmed = String(value || "").trim();
+      const digits = trimmed.replace(/\D/g, "");
+      if (!digits) {
+        return "";
+      }
+      return `${trimmed.startsWith("+") ? "+" : ""}${digits}`;
     }
 
     async function loadAnnouncementBoard() {
