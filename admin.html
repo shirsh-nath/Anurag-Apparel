@@ -190,6 +190,18 @@
               </span>
             </button>
 
+            <button type="button" data-admin-panel-target="brand" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5M3.75 12h16.5M3.75 16.5h16.5"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Brands</span>
+                <span class="block text-xs leading-5 text-ink/54">Logo uploads for homepage</span>
+              </span>
+            </button>
+
             <button type="button" data-admin-panel-target="password" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
               <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-clay/10 text-clay">
                 <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -328,6 +340,46 @@
 
           <button id="saveProduct" type="submit" class="mt-6 w-full rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-ink/45">Save Product</button>
         </form>
+
+        <form id="brandForm" data-admin-panel="brand" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase text-leaf">Homepage Brands</p>
+              <h2 id="brandFormTitle" class="mt-1 text-2xl font-semibold">Add Brand</h2>
+              <p class="mt-2 text-sm leading-6 text-ink/58">Upload transparent logo images for the available brands strip below the map.</p>
+            </div>
+            <button id="cancelBrandEdit" type="button" class="hidden rounded-md border border-line px-3 py-2 text-xs font-semibold transition hover:border-ink">Cancel</button>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Brand Name</span>
+              <input id="brandName" class="field mt-2 px-4 py-3" type="text" required>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Display Order</span>
+              <input id="brandSortOrder" class="field mt-2 px-4 py-3" type="number" step="1" value="0">
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Transparent Logo</span>
+              <input id="brandLogoInput" class="field mt-2 cursor-pointer bg-paper px-4 py-3 file:mr-4 file:rounded-md file:border-0 file:bg-ink file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white" type="file" accept="image/*">
+            </label>
+
+            <div id="brandLogoPreview" class="hidden min-h-28 rounded-lg border border-line bg-paper/70 p-4"></div>
+
+            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
+              <span>
+                <span class="block text-sm font-semibold">Show Brand</span>
+                <span class="block text-xs text-ink/54">Visible below map</span>
+              </span>
+              <input id="brandActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
+            </label>
+          </div>
+
+          <button id="saveBrand" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Brand</button>
+        </form>
       </aside>
 
       <section>
@@ -346,6 +398,22 @@
           <div id="adminEmptyState" class="hidden px-6 py-14 text-center">
             <p class="text-lg font-semibold">No products yet.</p>
             <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Add the first apparel item and upload gallery images to publish it on the storefront.</p>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-lg border border-line bg-white/94 shadow-crisp backdrop-blur">
+          <div class="flex flex-col gap-2 border-b border-line bg-paper/52 p-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-sm font-semibold uppercase text-leaf">Brands</p>
+              <h2 class="mt-1 text-2xl font-semibold">Available Brands</h2>
+            </div>
+            <p id="brandCount" class="text-sm text-ink/56">0 brands</p>
+          </div>
+
+          <div id="brandsList" class="divide-y divide-line"></div>
+          <div id="brandsEmptyState" class="hidden px-6 py-14 text-center">
+            <p class="text-lg font-semibold">No brand logos yet.</p>
+            <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Use the Brands menu option to upload transparent logo images.</p>
           </div>
         </div>
       </section>
@@ -406,6 +474,7 @@
     const BYTES_IN_MB = 1024 * 1024;
     const DEFAULT_MAX_VIDEO_MB = 50;
     const MAX_IMAGE_SIZE = 8 * BYTES_IN_MB;
+    const MAX_BRAND_LOGO_SIZE = 4 * BYTES_IN_MB;
     const MAX_VIDEO_SIZE = (Number(window.ANURAG_MAX_VIDEO_MB) || DEFAULT_MAX_VIDEO_MB) * BYTES_IN_MB;
     const RESUMABLE_UPLOAD_THRESHOLD = 6 * BYTES_IN_MB;
     const TUS_CHUNK_SIZE = 6 * BYTES_IN_MB;
@@ -431,13 +500,18 @@
       supabaseConfig: null,
       configured: false,
       products: [],
+      brands: [],
       board: DEFAULT_BOARD,
       settings: DEFAULT_SETTINGS,
       activePanel: null,
       editingId: null,
+      editingBrandId: null,
+      originalBrandLogoUrl: "",
       originalGallery: [],
       currentGallery: [],
       pendingFiles: [],
+      pendingBrandLogoFile: null,
+      brandLogoPreviewUrl: "",
       objectUrls: []
     };
 
@@ -492,10 +566,22 @@
       dom.imageInput = document.querySelector("#imageInput");
       dom.galleryEditor = document.querySelector("#galleryEditor");
       dom.saveProduct = document.querySelector("#saveProduct");
+      dom.brandForm = document.querySelector("#brandForm");
+      dom.brandFormTitle = document.querySelector("#brandFormTitle");
+      dom.cancelBrandEdit = document.querySelector("#cancelBrandEdit");
+      dom.brandName = document.querySelector("#brandName");
+      dom.brandSortOrder = document.querySelector("#brandSortOrder");
+      dom.brandLogoInput = document.querySelector("#brandLogoInput");
+      dom.brandLogoPreview = document.querySelector("#brandLogoPreview");
+      dom.brandActive = document.querySelector("#brandActive");
+      dom.saveBrand = document.querySelector("#saveBrand");
       dom.statusMessage = document.querySelector("#statusMessage");
       dom.productCount = document.querySelector("#productCount");
       dom.productsList = document.querySelector("#productsList");
       dom.adminEmptyState = document.querySelector("#adminEmptyState");
+      dom.brandCount = document.querySelector("#brandCount");
+      dom.brandsList = document.querySelector("#brandsList");
+      dom.brandsEmptyState = document.querySelector("#brandsEmptyState");
     }
 
     function bindAuth() {
@@ -544,6 +630,8 @@
           const panelName = button.dataset.adminPanelTarget;
           if (panelName === "product") {
             resetForm();
+          } else if (panelName === "brand") {
+            resetBrandForm();
           }
           showAdminPanel(panelName);
         });
@@ -552,8 +640,11 @@
       dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
       dom.contactForm.addEventListener("submit", saveSiteSettings);
       dom.productForm.addEventListener("submit", saveProduct);
+      dom.brandForm.addEventListener("submit", saveBrand);
       dom.cancelEdit.addEventListener("click", resetForm);
+      dom.cancelBrandEdit.addEventListener("click", resetBrandForm);
       dom.imageInput.addEventListener("change", handleImageSelection);
+      dom.brandLogoInput.addEventListener("change", handleBrandLogoSelection);
     }
 
     async function unlockDashboard(existingClient = null) {
@@ -570,6 +661,7 @@
       setAdminControlsEnabled(true);
       await loadAnnouncementBoard();
       await loadSiteSettings();
+      await loadBrands();
       await loadProducts();
     }
 
@@ -582,10 +674,13 @@
       state.client = null;
       state.supabaseConfig = null;
       state.products = [];
+      state.brands = [];
       state.board = DEFAULT_BOARD;
       state.settings = DEFAULT_SETTINGS;
       showAdminPanel(null);
       renderProducts();
+      resetBrandForm();
+      renderBrands();
     }
 
     async function createSupabaseClient() {
@@ -671,6 +766,7 @@
     async function refreshDashboard() {
       await loadAnnouncementBoard();
       await loadSiteSettings();
+      await loadBrands();
       await loadProducts();
     }
 
@@ -933,6 +1029,150 @@
       return `${trimmed.startsWith("+") ? "+" : ""}${digits}`;
     }
 
+    async function loadBrands() {
+      if (!state.client) {
+        return;
+      }
+
+      try {
+        const { data, error } = await state.client
+          .from("brands")
+          .select("id,name,logo_url,sort_order,is_active,created_at")
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        state.brands = data || [];
+        renderBrands();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to load brand logos.", "error");
+      }
+    }
+
+    async function saveBrand(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const payload = readBrandPayload();
+      if (!payload) {
+        return;
+      }
+
+      setBrandSaving(true);
+      setStatus(state.editingBrandId ? "Saving brand changes..." : "Creating brand...", "info");
+
+      let uploadedLogoUrl = "";
+
+      try {
+        if (state.pendingBrandLogoFile) {
+          uploadedLogoUrl = await uploadBrandLogo(state.pendingBrandLogoFile);
+          payload.logo_url = uploadedLogoUrl;
+        } else if (state.editingBrandId) {
+          payload.logo_url = state.originalBrandLogoUrl;
+        }
+
+        if (!payload.logo_url) {
+          setStatus("Please upload a transparent logo image.", "error");
+          return;
+        }
+
+        if (state.editingBrandId) {
+          const { error } = await state.client
+            .from("brands")
+            .update(payload)
+            .eq("id", state.editingBrandId);
+
+          if (error) {
+            throw error;
+          }
+
+          if (uploadedLogoUrl && state.originalBrandLogoUrl && state.originalBrandLogoUrl !== uploadedLogoUrl) {
+            await removeStorageObjects([state.originalBrandLogoUrl]);
+          }
+          setStatus("Brand updated.", "success");
+        } else {
+          const { error } = await state.client
+            .from("brands")
+            .insert(payload);
+
+          if (error) {
+            throw error;
+          }
+
+          setStatus("Brand created.", "success");
+        }
+
+        resetBrandForm();
+        await loadBrands();
+      } catch (error) {
+        if (uploadedLogoUrl) {
+          await removeStorageObjects([uploadedLogoUrl]);
+        }
+        console.error(error);
+        setStatus(error.message || "Unable to save brand.", "error");
+      } finally {
+        setBrandSaving(false);
+      }
+    }
+
+    function readBrandPayload() {
+      const name = dom.brandName.value.trim();
+      const sortOrder = Number(dom.brandSortOrder.value || 0);
+
+      if (!name || Number.isNaN(sortOrder)) {
+        setStatus("Please enter a valid brand name and display order.", "error");
+        return null;
+      }
+
+      return {
+        name,
+        sort_order: Math.trunc(sortOrder),
+        is_active: dom.brandActive.checked
+      };
+    }
+
+    function handleBrandLogoSelection(event) {
+      const file = Array.from(event.target.files || [])[0];
+      clearBrandLogoPreview();
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        setStatus(`${file.name} is not an image file.`, "error");
+        dom.brandLogoInput.value = "";
+        return;
+      }
+
+      if (file.size > MAX_BRAND_LOGO_SIZE) {
+        setStatus(`${file.name} is larger than ${formatFileSize(MAX_BRAND_LOGO_SIZE)}.`, "error");
+        dom.brandLogoInput.value = "";
+        return;
+      }
+
+      state.pendingBrandLogoFile = file;
+      state.brandLogoPreviewUrl = URL.createObjectURL(file);
+      renderBrandLogoPreview(state.brandLogoPreviewUrl, file.name);
+    }
+
+    async function uploadBrandLogo(file) {
+      const path = `brands/${createFileToken()}-${sanitizeFileName(file.name)}`;
+      setStatus(`Uploading ${file.name} (${formatFileSize(file.size)})...`, "info");
+      await uploadStorageFile(file, path);
+
+      const { data } = state.client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
     async function loadProducts() {
       if (!state.client) {
         return;
@@ -1175,6 +1415,64 @@
       });
     }
 
+    function renderBrands() {
+      dom.brandsList.replaceChildren();
+      dom.brandsEmptyState.classList.toggle("hidden", state.brands.length > 0);
+      dom.brandCount.textContent = `${state.brands.length} brand${state.brands.length === 1 ? "" : "s"}`;
+
+      state.brands.forEach((brand) => {
+        dom.brandsList.appendChild(createBrandRow(brand));
+      });
+    }
+
+    function createBrandRow(brand) {
+      const row = document.createElement("article");
+      row.className = "grid gap-4 p-5 transition hover:bg-linen/45 sm:grid-cols-[128px_1fr_auto] sm:items-center";
+
+      const logoWrap = document.createElement("div");
+      logoWrap.className = "flex h-24 items-center justify-center rounded-lg border border-line bg-paper/70 p-4";
+
+      const logo = document.createElement("img");
+      logo.className = "max-h-16 max-w-full object-contain";
+      logo.src = brand.logo_url || PLACEHOLDER_IMAGE;
+      logo.alt = brand.name ? `${brand.name} logo` : "Brand logo";
+      logo.loading = "lazy";
+      logoWrap.appendChild(logo);
+
+      const details = document.createElement("div");
+      const titleLine = document.createElement("div");
+      titleLine.className = "flex flex-wrap items-center gap-2";
+
+      const title = document.createElement("h3");
+      title.className = "text-lg font-semibold";
+      title.textContent = brand.name || "Untitled brand";
+
+      const status = document.createElement("span");
+      status.className = brand.is_active
+        ? "rounded-md bg-leaf/10 px-2 py-1 text-xs font-semibold text-leaf"
+        : "rounded-md bg-wine/10 px-2 py-1 text-xs font-semibold text-wine";
+      status.textContent = brand.is_active ? "Active" : "Archived";
+
+      titleLine.append(title, status);
+
+      const meta = document.createElement("p");
+      meta.className = "mt-2 text-sm text-ink/58";
+      meta.textContent = `Order ${Number(brand.sort_order || 0)} | ${formatDate(brand.created_at)}`;
+
+      details.append(titleLine, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "flex flex-wrap gap-2 sm:justify-end";
+
+      const editButton = createActionButton("Edit", () => startBrandEdit(brand.id));
+      const activeButton = createActionButton(brand.is_active ? "Archive" : "Restore", () => toggleBrandActive(brand.id));
+      const deleteButton = createActionButton("Delete", () => deleteBrand(brand.id), true);
+
+      actions.append(editButton, activeButton, deleteButton);
+      row.append(logoWrap, details, actions);
+      return row;
+    }
+
     function createProductRow(product) {
       const row = document.createElement("article");
       row.className = "grid gap-4 p-5 transition hover:bg-linen/45 sm:grid-cols-[96px_1fr_auto] sm:items-center";
@@ -1312,6 +1610,86 @@
       }
     }
 
+    function startBrandEdit(brandId) {
+      const brand = state.brands.find((item) => item.id === brandId);
+      if (!brand) {
+        return;
+      }
+
+      state.editingBrandId = brand.id;
+      state.originalBrandLogoUrl = brand.logo_url || "";
+      clearBrandLogoPreview();
+
+      dom.brandFormTitle.textContent = "Edit Brand";
+      dom.saveBrand.textContent = "Save Changes";
+      dom.cancelBrandEdit.classList.remove("hidden");
+      dom.brandName.value = brand.name || "";
+      dom.brandSortOrder.value = Number(brand.sort_order || 0);
+      dom.brandActive.checked = brand.is_active !== false;
+      renderBrandLogoPreview(state.originalBrandLogoUrl, brand.name || "Brand logo");
+
+      showAdminPanel("brand");
+      dom.brandName.focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function toggleBrandActive(brandId) {
+      const brand = state.brands.find((item) => item.id === brandId);
+      if (!brand) {
+        return;
+      }
+
+      setStatus(brand.is_active ? "Archiving brand..." : "Restoring brand...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("brands")
+          .update({ is_active: !brand.is_active })
+          .eq("id", brand.id);
+
+        if (error) {
+          throw error;
+        }
+
+        await loadBrands();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to update brand status.", "error");
+      }
+    }
+
+    async function deleteBrand(brandId) {
+      const brand = state.brands.find((item) => item.id === brandId);
+      if (!brand || !confirm(`Delete "${brand.name}" from available brands?`)) {
+        return;
+      }
+
+      setStatus("Deleting brand...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("brands")
+          .delete()
+          .eq("id", brand.id);
+
+        if (error) {
+          throw error;
+        }
+
+        await removeStorageObjects([brand.logo_url]);
+
+        if (state.editingBrandId === brand.id) {
+          resetBrandForm();
+        }
+
+        await loadBrands();
+        setStatus("Brand deleted.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to delete brand.", "error");
+      }
+    }
+
     function renderGalleryEditor() {
       revokeObjectUrls();
       dom.galleryEditor.replaceChildren();
@@ -1378,6 +1756,28 @@
       return image;
     }
 
+    function renderBrandLogoPreview(src, label) {
+      if (!src) {
+        dom.brandLogoPreview.classList.add("hidden");
+        dom.brandLogoPreview.replaceChildren();
+        return;
+      }
+
+      dom.brandLogoPreview.classList.remove("hidden");
+      dom.brandLogoPreview.replaceChildren();
+
+      const preview = document.createElement("div");
+      preview.className = "flex min-h-20 items-center justify-center";
+
+      const image = document.createElement("img");
+      image.className = "max-h-20 max-w-full object-contain";
+      image.src = src;
+      image.alt = label || "Brand logo preview";
+
+      preview.appendChild(image);
+      dom.brandLogoPreview.appendChild(preview);
+    }
+
     async function removeStorageObjects(urls) {
       const paths = urls.map(getStoragePathFromPublicUrl).filter(Boolean);
       if (!paths.length || !state.client) {
@@ -1416,10 +1816,30 @@
       renderGalleryEditor();
     }
 
+    function resetBrandForm() {
+      dom.brandForm.reset();
+      dom.brandFormTitle.textContent = "Add Brand";
+      dom.saveBrand.textContent = "Save Brand";
+      dom.cancelBrandEdit.classList.add("hidden");
+      state.editingBrandId = null;
+      state.originalBrandLogoUrl = "";
+      clearBrandLogoPreview();
+      renderBrandLogoPreview("", "");
+    }
+
     function clearPendingFiles() {
       revokeObjectUrls();
       state.pendingFiles = [];
       dom.imageInput.value = "";
+    }
+
+    function clearBrandLogoPreview() {
+      if (state.brandLogoPreviewUrl) {
+        URL.revokeObjectURL(state.brandLogoPreviewUrl);
+      }
+      state.pendingBrandLogoFile = null;
+      state.brandLogoPreviewUrl = "";
+      dom.brandLogoInput.value = "";
     }
 
     function revokeObjectUrls() {
@@ -1440,6 +1860,11 @@
     function setContactSaving(isSaving) {
       dom.saveContact.disabled = isSaving;
       dom.saveContact.textContent = isSaving ? "Saving..." : "Save Number";
+    }
+
+    function setBrandSaving(isSaving) {
+      dom.saveBrand.disabled = isSaving;
+      dom.saveBrand.textContent = isSaving ? "Saving..." : state.editingBrandId ? "Save Changes" : "Save Brand";
     }
 
     function setPasswordSaving(isSaving) {

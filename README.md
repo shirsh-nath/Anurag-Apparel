@@ -6,6 +6,7 @@ Product media is stored as public Supabase Storage URLs in the existing `product
 
 The homepage announcement/offers board is powered by `public.site_announcements` and can be edited from `admin.html`.
 The storefront call button is powered by `public.site_settings.phone_number` and can be edited from `admin.html`.
+The available brands strip is powered by `public.brands`; transparent logo images are uploaded from `admin.html` and stored in the `product-images` bucket under `brands/`.
 
 The admin password is verified through Supabase RPC functions created by `supabase-schema.sql`; use the Security panel in `admin.html` to change it.
 

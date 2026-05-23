@@ -27,6 +27,21 @@ create index if not exists products_created_at_idx
 create index if not exists products_is_active_idx
   on public.products (is_active);
 
+create table if not exists public.brands (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  logo_url text not null,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists brands_sort_order_created_at_idx
+  on public.brands (sort_order asc, created_at desc);
+
+create index if not exists brands_is_active_idx
+  on public.brands (is_active);
+
 create table if not exists public.site_announcements (
   id text primary key default 'homepage',
   eyebrow text not null default 'Store update',
@@ -182,10 +197,12 @@ grant execute on function public.verify_admin_login(text, text) to anon;
 grant execute on function public.change_admin_password(text, text, text) to anon;
 
 alter table public.products enable row level security;
+alter table public.brands enable row level security;
 alter table public.site_announcements enable row level security;
 alter table public.site_settings enable row level security;
 
 grant select, insert, update, delete on table public.products to anon;
+grant select, insert, update, delete on table public.brands to anon;
 grant select, insert, update on table public.site_announcements to anon;
 grant select, insert, update on table public.site_settings to anon;
 
@@ -215,6 +232,37 @@ create policy "Anon can update products for static admin"
 
 create policy "Anon can delete products for static admin"
   on public.products
+  for delete
+  to anon
+  using (true);
+
+drop policy if exists "Public can read brands" on public.brands;
+drop policy if exists "Anon can create brands for static admin" on public.brands;
+drop policy if exists "Anon can update brands for static admin" on public.brands;
+drop policy if exists "Anon can delete brands for static admin" on public.brands;
+drop policy if exists "Anon can delete brands" on public.brands;
+
+create policy "Public can read brands"
+  on public.brands
+  for select
+  to anon
+  using (true);
+
+create policy "Anon can create brands for static admin"
+  on public.brands
+  for insert
+  to anon
+  with check (true);
+
+create policy "Anon can update brands for static admin"
+  on public.brands
+  for update
+  to anon
+  using (true)
+  with check (true);
+
+create policy "Anon can delete brands"
+  on public.brands
   for delete
   to anon
   using (true);
