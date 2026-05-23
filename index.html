@@ -510,6 +510,7 @@
     }
 
     function bindEvents() {
+      dom.callUsButton?.addEventListener("click", handleCallButtonClick);
       dom.closeModal.addEventListener("click", closeProductModal);
       dom.productModal.addEventListener("click", (event) => {
         if (event.target === dom.productModal || event.target.classList.contains("modal-backdrop")) {
@@ -627,6 +628,7 @@
       }
 
       if (telHref) {
+        dom.callUsButton.dataset.phoneNumber = settings.phone_number || "";
         dom.callUsButton.href = telHref;
         dom.callUsButton.title = settings.phone_number;
         dom.callUsButton.setAttribute("aria-label", `Call Anurag Apparel at ${settings.phone_number}`);
@@ -635,11 +637,27 @@
         return;
       }
 
+      delete dom.callUsButton.dataset.phoneNumber;
       dom.callUsButton.removeAttribute("href");
       dom.callUsButton.removeAttribute("title");
       dom.callUsButton.setAttribute("aria-disabled", "true");
       dom.callUsButton.setAttribute("aria-label", "Call number not set");
       dom.callUsButton.classList.add("pointer-events-none", "opacity-55");
+    }
+
+    function handleCallButtonClick(event) {
+      const phoneNumber = dom.callUsButton?.dataset.phoneNumber || "";
+      if (!phoneNumber || isPhoneDevice()) {
+        return;
+      }
+
+      event.preventDefault();
+      window.alert(`Call us at ${phoneNumber}`);
+    }
+
+    function isPhoneDevice() {
+      const userAgent = navigator.userAgent || "";
+      return /Android|iPhone|iPod|Windows Phone/i.test(userAgent);
     }
 
     function createTelHref(value) {
