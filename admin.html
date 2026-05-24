@@ -548,14 +548,6 @@
               <span class="text-sm font-medium text-ink/70">Description</span>
               <textarea id="subcategoryDescription" class="field mt-2 min-h-24 px-4 py-3" placeholder="Optional note for your team"></textarea>
             </label>
-
-            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
-              <span>
-                <span class="block text-sm font-semibold">Show Subcategory</span>
-                <span class="block text-xs text-ink/54">Visible in storefront slider and product dropdown</span>
-              </span>
-              <input id="subcategoryActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
-            </label>
           </div>
 
           <button id="saveSubcategory" type="submit" class="mt-6 w-full rounded-md bg-brass px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Subcategory</button>
@@ -588,14 +580,6 @@
             </label>
 
             <div id="brandLogoPreview" class="hidden min-h-28 rounded-lg border border-line bg-paper/70 p-4"></div>
-
-            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
-              <span>
-                <span class="block text-sm font-semibold">Show Brand</span>
-                <span class="block text-xs text-ink/54">Visible below map</span>
-              </span>
-              <input id="brandActive" type="checkbox" class="h-5 w-5 accent-leaf" checked>
-            </label>
           </div>
 
           <button id="saveBrand" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Brand</button>
@@ -751,6 +735,8 @@
       editingId: null,
       editingBrandId: null,
       editingSubcategoryId: null,
+      originalBrandActive: true,
+      originalSubcategoryActive: true,
       originalBrandLogoUrl: "",
       originalGallery: [],
       currentGallery: [],
@@ -824,7 +810,6 @@
       dom.subcategoryName = document.querySelector("#subcategoryName");
       dom.subcategorySortOrder = document.querySelector("#subcategorySortOrder");
       dom.subcategoryDescription = document.querySelector("#subcategoryDescription");
-      dom.subcategoryActive = document.querySelector("#subcategoryActive");
       dom.saveSubcategory = document.querySelector("#saveSubcategory");
       dom.brandForm = document.querySelector("#brandForm");
       dom.brandFormTitle = document.querySelector("#brandFormTitle");
@@ -833,7 +818,6 @@
       dom.brandSortOrder = document.querySelector("#brandSortOrder");
       dom.brandLogoInput = document.querySelector("#brandLogoInput");
       dom.brandLogoPreview = document.querySelector("#brandLogoPreview");
-      dom.brandActive = document.querySelector("#brandActive");
       dom.saveBrand = document.querySelector("#saveBrand");
       dom.statusMessage = document.querySelector("#statusMessage");
       dom.productCount = document.querySelector("#productCount");
@@ -1493,7 +1477,7 @@
         slug: slugify(name),
         description,
         sort_order: Math.trunc(sortOrder),
-        is_active: dom.subcategoryActive.checked
+        is_active: state.editingSubcategoryId ? state.originalSubcategoryActive : true
       };
     }
 
@@ -1605,7 +1589,7 @@
       return {
         name,
         sort_order: Math.trunc(sortOrder),
-        is_active: dom.brandActive.checked
+        is_active: state.editingBrandId ? state.originalBrandActive : true
       };
     }
 
@@ -2149,6 +2133,7 @@
       }
 
       state.editingSubcategoryId = subcategory.id;
+      state.originalSubcategoryActive = subcategory.is_active !== false;
 
       dom.subcategoryFormTitle.textContent = "Edit Subcategory";
       dom.saveSubcategory.textContent = "Save Changes";
@@ -2156,7 +2141,6 @@
       dom.subcategoryName.value = subcategory.name || "";
       dom.subcategorySortOrder.value = Number(subcategory.sort_order || 0);
       dom.subcategoryDescription.value = subcategory.description || "";
-      dom.subcategoryActive.checked = subcategory.is_active !== false;
 
       showAdminPanel("subcategory");
       showAdminView("subcategories");
@@ -2228,6 +2212,7 @@
       }
 
       state.editingBrandId = brand.id;
+      state.originalBrandActive = brand.is_active !== false;
       state.originalBrandLogoUrl = brand.logo_url || "";
       clearBrandLogoPreview();
 
@@ -2236,7 +2221,6 @@
       dom.cancelBrandEdit.classList.remove("hidden");
       dom.brandName.value = brand.name || "";
       dom.brandSortOrder.value = Number(brand.sort_order || 0);
-      dom.brandActive.checked = brand.is_active !== false;
       renderBrandLogoPreview(state.originalBrandLogoUrl, brand.name || "Brand logo");
 
       showAdminPanel("brand");
@@ -2435,7 +2419,7 @@
       dom.saveSubcategory.textContent = "Save Subcategory";
       dom.cancelSubcategoryEdit.classList.add("hidden");
       state.editingSubcategoryId = null;
-      dom.subcategoryActive.checked = true;
+      state.originalSubcategoryActive = true;
     }
 
     function resetBrandForm() {
@@ -2444,6 +2428,7 @@
       dom.saveBrand.textContent = "Save Brand";
       dom.cancelBrandEdit.classList.add("hidden");
       state.editingBrandId = null;
+      state.originalBrandActive = true;
       state.originalBrandLogoUrl = "";
       clearBrandLogoPreview();
       renderBrandLogoPreview("", "");
