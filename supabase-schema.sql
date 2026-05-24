@@ -9,11 +9,32 @@ create schema if not exists extensions;
 create extension if not exists pgcrypto with schema extensions;
 create schema if not exists private;
 
+create table if not exists public.product_subcategories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  description text not null default '',
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  constraint product_subcategories_name_not_blank
+    check (length(trim(name)) > 0),
+  constraint product_subcategories_slug_not_blank
+    check (length(trim(slug)) > 0)
+);
+
+create index if not exists product_subcategories_sort_order_created_at_idx
+  on public.product_subcategories (sort_order asc, created_at desc);
+
+create index if not exists product_subcategories_is_active_idx
+  on public.product_subcategories (is_active);
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   description text not null default '',
   price numeric(10, 2) not null check (price >= 0),
+  subcategory_id uuid references public.product_subcategories(id) on delete set null,
   -- Stores public Supabase Storage URLs for product media.
   -- The existing column name is kept for compatibility; it can contain image and video URLs.
   gallery_images text[] not null default '{}',
@@ -21,11 +42,17 @@ create table if not exists public.products (
   created_at timestamptz not null default now()
 );
 
+alter table public.products
+  add column if not exists subcategory_id uuid references public.product_subcategories(id) on delete set null;
+
 create index if not exists products_created_at_idx
   on public.products (created_at desc);
 
 create index if not exists products_is_active_idx
   on public.products (is_active);
+
+create index if not exists products_subcategory_id_idx
+  on public.products (subcategory_id);
 
 create table if not exists public.brands (
   id uuid primary key default gen_random_uuid(),
@@ -197,14 +224,46 @@ grant execute on function public.verify_admin_login(text, text) to anon;
 grant execute on function public.change_admin_password(text, text, text) to anon;
 
 alter table public.products enable row level security;
+alter table public.product_subcategories enable row level security;
 alter table public.brands enable row level security;
 alter table public.site_announcements enable row level security;
 alter table public.site_settings enable row level security;
 
 grant select, insert, update, delete on table public.products to anon;
+grant select, insert, update, delete on table public.product_subcategories to anon;
 grant select, insert, update, delete on table public.brands to anon;
 grant select, insert, update on table public.site_announcements to anon;
 grant select, insert, update on table public.site_settings to anon;
+
+drop policy if exists "Public can read product subcategories" on public.product_subcategories;
+drop policy if exists "Anon can create product subcategories for static admin" on public.product_subcategories;
+drop policy if exists "Anon can update product subcategories for static admin" on public.product_subcategories;
+drop policy if exists "Anon can delete product subcategories" on public.product_subcategories;
+
+create policy "Public can read product subcategories"
+  on public.product_subcategories
+  for select
+  to anon
+  using (true);
+
+create policy "Anon can create product subcategories for static admin"
+  on public.product_subcategories
+  for insert
+  to anon
+  with check (true);
+
+create policy "Anon can update product subcategories for static admin"
+  on public.product_subcategories
+  for update
+  to anon
+  using (true)
+  with check (true);
+
+create policy "Anon can delete product subcategories"
+  on public.product_subcategories
+  for delete
+  to anon
+  using (true);
 
 drop policy if exists "Public can read products" on public.products;
 drop policy if exists "Anon can create products for static admin" on public.products;
@@ -335,6 +394,16 @@ on conflict (id) do nothing;
 insert into public.site_settings (id, phone_number)
 values ('storefront', '')
 on conflict (id) do nothing;
+
+insert into public.product_subcategories (name, slug, description, sort_order, is_active)
+values
+  ('Shirts', 'shirts', 'Button-downs, casual shirts, and formal shirts.', 10, true),
+  ('T-Shirts', 't-shirts', 'Everyday tees and casual essentials.', 20, true),
+  ('Jeans', 'jeans', 'Denim fits and jeans for daily wear.', 30, true),
+  ('Trousers', 'trousers', 'Smart trousers and weekday bottoms.', 40, true),
+  ('Kurtas', 'kurtas', 'Festive and everyday ethnic wear.', 50, true),
+  ('Jackets', 'jackets', 'Layering pieces and occasion jackets.', 60, true)
+on conflict (slug) do nothing;
 
 -- The existing bucket is named product-images for compatibility, but it may store videos too.
 insert into storage.buckets (id, name, public)

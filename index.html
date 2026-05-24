@@ -276,16 +276,29 @@
     .brand-logo-item {
       align-items: center;
       display: flex;
+      flex: 0 1 auto;
       justify-content: center;
-      min-height: 5.5rem;
-      padding: 1rem;
+      min-height: 3.4rem;
+      padding: 0.25rem 0.5rem;
     }
 
     .brand-logo-item img {
       display: block;
-      max-height: 3.5rem;
-      max-width: 8.75rem;
+      max-height: 2.4rem;
+      max-width: 5.9rem;
       object-fit: contain;
+    }
+
+    @media (min-width: 640px) {
+      .brand-logo-item {
+        min-height: 4.25rem;
+        padding: 0.4rem 1rem;
+      }
+
+      .brand-logo-item img {
+        max-height: 3.5rem;
+        max-width: 8.75rem;
+      }
     }
 
     .collection-masthead {
@@ -336,6 +349,122 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(231, 225, 216, 0.82);
+    }
+
+    .category-slider {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .category-slider-header {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .category-menu {
+      align-items: center;
+      display: grid;
+      gap: 0.65rem;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .category-nav-button {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(80, 64, 42, 0.08);
+      color: #171717;
+      display: inline-flex;
+      height: 2.25rem;
+      justify-content: center;
+      position: relative;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease, opacity 180ms ease, transform 180ms ease;
+      width: 2.25rem;
+      z-index: 2;
+    }
+
+    .category-nav-button:hover:not(:disabled) {
+      background: #171717;
+      border-color: #171717;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .category-nav-button:disabled {
+      cursor: default;
+      opacity: 0.38;
+    }
+
+    .category-nav-button svg {
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .category-track {
+      display: flex;
+      gap: 0.75rem;
+      min-width: 0;
+      overflow-x: auto;
+      padding: 0.15rem 0.65rem 0.7rem 0.35rem;
+      scroll-padding-inline: 0.35rem;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .category-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-chip {
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(251, 250, 247, 0.74)),
+        radial-gradient(circle at 20% 0%, rgba(183, 135, 45, 0.14), transparent 34%);
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 999px;
+      box-shadow: 0 12px 26px rgba(80, 64, 42, 0.08);
+      color: #171717;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font-size: 0.9rem;
+      font-weight: 700;
+      gap: 0.55rem;
+      min-height: 2.75rem;
+      line-height: 1.1;
+      padding: 0 1.2rem;
+      scroll-snap-align: start;
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
+      white-space: nowrap;
+    }
+
+    .category-chip:hover {
+      border-color: rgba(183, 135, 45, 0.55);
+      box-shadow: 0 16px 32px rgba(80, 64, 42, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .category-chip.is-active {
+      background:
+        linear-gradient(135deg, #171717, #2d2a24),
+        radial-gradient(circle at 18% 12%, rgba(183, 135, 45, 0.28), transparent 34%);
+      border-color: #171717;
+      color: #fff;
+    }
+
+    .category-chip-count {
+      align-items: center;
+      background: rgba(183, 135, 45, 0.13);
+      border-radius: 999px;
+      color: inherit;
+      display: inline-flex;
+      font-size: 0.72rem;
+      justify-content: center;
+      min-width: 1.75rem;
+      padding: 0.24rem 0.45rem;
     }
 
     .announcement-board {
@@ -513,17 +642,16 @@
 
     <section id="availableBrands" class="brands-strip hidden px-4 py-10 sm:px-6 lg:px-8">
       <div class="brands-glass-card mx-auto max-w-7xl px-6 py-7 sm:px-8">
-        <div class="grid gap-6 lg:grid-cols-[260px_1fr] lg:items-center">
+        <div class="flex flex-col items-center gap-2 text-center">
           <div>
             <p class="brands-heading">Available brands</p>
-            <h2 class="mt-2 text-2xl font-semibold leading-tight text-ink sm:text-3xl">Brands with us</h2>
           </div>
-          <div id="brandLogoGrid" class="grid grid-cols-2 items-center gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
+          <div id="brandLogoGrid" class="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3"></div>
         </div>
       </div>
     </section>
 
-    <section id="announcements" class="bg-paper px-4 py-10 sm:px-6 lg:px-8">
+    <section id="announcements" class="bg-paper px-4 pt-10 pb-5 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
         <article id="announcementBoard" class="announcement-board text-white">
           <div class="grid gap-6 px-5 py-7 sm:px-7 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8 lg:py-8">
@@ -541,17 +669,38 @@
       </div>
     </section>
 
-    <section id="products" class="border-b border-line bg-linen px-4 py-20 sm:px-6 lg:px-8">
+    <section id="products" class="border-b border-line bg-linen px-4 pt-8 pb-20 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
         <div class="collection-masthead grid lg:grid-cols-[1fr_360px]">
-          <div class="px-5 py-8 sm:px-7 lg:px-8 lg:py-10">
+          <div class="px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8">
             <p class="collection-kicker">Fresh inventory</p>
-            <h2 class="mt-4 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Current Collection</h2>
-            <p class="mt-4 max-w-2xl text-sm leading-6 text-ink/62">New arrivals from Anurag Apparel, refreshed with product and more.</p>
+            <h2 class="mt-3 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Current Collection</h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-ink/62">New arrivals from Anurag Apparel, refreshed with product and more.</p>
           </div>
-          <div class="collection-status flex flex-col justify-center gap-2 px-5 py-6 text-left sm:px-7 lg:px-8 lg:text-right">
+          <div class="collection-status flex flex-col justify-center gap-1.5 px-5 py-4 text-left sm:px-7 sm:py-5 lg:px-8 lg:text-right">
             <span class="block text-base font-semibold text-ink">Try on new fits!</span>
             <span class="block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
+          </div>
+        </div>
+
+        <div id="categorySlider" class="category-slider mt-6 hidden" aria-label="Product categories">
+          <div class="category-slider-header mb-2">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brass">Shop by category</p>
+            </div>
+          </div>
+          <div class="category-menu" aria-label="Navigate product categories">
+            <button id="categoryPrev" class="category-nav-button" type="button" aria-label="Previous categories">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div id="categoryTrack" class="category-track" role="tablist" aria-label="Filter products by clothing category"></div>
+            <button id="categoryNext" class="category-nav-button" type="button" aria-label="Next categories">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -655,6 +804,14 @@
       id: "storefront",
       phone_number: ""
     };
+    const DEFAULT_SUBCATEGORIES = [
+      { id: "shirts", name: "Shirts", slug: "shirts", sort_order: 10, is_active: true },
+      { id: "t-shirts", name: "T-Shirts", slug: "t-shirts", sort_order: 20, is_active: true },
+      { id: "jeans", name: "Jeans", slug: "jeans", sort_order: 30, is_active: true },
+      { id: "trousers", name: "Trousers", slug: "trousers", sort_order: 40, is_active: true },
+      { id: "kurtas", name: "Kurtas", slug: "kurtas", sort_order: 50, is_active: true },
+      { id: "jackets", name: "Jackets", slug: "jackets", sort_order: 60, is_active: true }
+    ];
 
     const sampleProducts = [
       {
@@ -662,6 +819,7 @@
         title: "Tailored Linen Shirt",
         description: "A breathable linen shirt with a crisp collar and clean drape, selected for warm days and polished evenings.",
         price: 1899,
+        subcategory_id: "shirts",
         gallery_images: [
           "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1200&q=82",
           "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=1200&q=82"
@@ -672,6 +830,7 @@
         title: "Structured Occasion Jacket",
         description: "A modern jacket with a refined profile, easy layering, and a premium finish for celebrations and formal plans.",
         price: 4299,
+        subcategory_id: "jackets",
         gallery_images: [
           "https://images.unsplash.com/photo-1593032465175-481ac7f401a0?auto=format&fit=crop&w=1200&q=82",
           "https://images.unsplash.com/photo-1506629905607-d9e297d0b78d?auto=format&fit=crop&w=1200&q=82"
@@ -682,6 +841,7 @@
         title: "Everyday Cotton Tee",
         description: "A soft cotton staple with a dependable fit, made for repeat wear across weekdays, travel, and casual plans.",
         price: 799,
+        subcategory_id: "t-shirts",
         gallery_images: [
           "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1200&q=82",
           "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1200&q=82"
@@ -692,6 +852,7 @@
         title: "Festive Embroidered Kurta",
         description: "A graceful festive piece with detailed embroidery and comfortable movement for family gatherings and occasions.",
         price: 2499,
+        subcategory_id: "kurtas",
         gallery_images: [
           "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=1200&q=82",
           "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?auto=format&fit=crop&w=1200&q=82"
@@ -704,6 +865,8 @@
       configured: false,
       products: [],
       brands: [],
+      subcategories: [],
+      activeSubcategoryId: "all",
       announcement: DEFAULT_ANNOUNCEMENT,
       settings: DEFAULT_SETTINGS,
       activeProduct: null,
@@ -722,6 +885,7 @@
       await loadSiteSettings();
       await loadAnnouncementBoard();
       await loadBrands();
+      await loadSubcategories();
       await loadProducts();
     }
 
@@ -729,6 +893,10 @@
       dom.configNotice = document.querySelector("#configNotice");
       dom.callUsButton = document.querySelector("#callUsButton");
       dom.loadingState = document.querySelector("#loadingState");
+      dom.categorySlider = document.querySelector("#categorySlider");
+      dom.categoryTrack = document.querySelector("#categoryTrack");
+      dom.categoryPrev = document.querySelector("#categoryPrev");
+      dom.categoryNext = document.querySelector("#categoryNext");
       dom.productGrid = document.querySelector("#productGrid");
       dom.emptyState = document.querySelector("#emptyState");
       dom.announcementBoard = document.querySelector("#announcementBoard");
@@ -750,6 +918,10 @@
 
     function bindEvents() {
       dom.callUsButton?.addEventListener("click", handleCallButtonClick);
+      dom.categoryPrev?.addEventListener("click", () => scrollCategoryTrack(-1));
+      dom.categoryNext?.addEventListener("click", () => scrollCategoryTrack(1));
+      dom.categoryTrack?.addEventListener("scroll", updateCategoryNavState, { passive: true });
+      window.addEventListener("resize", updateCategoryNavState);
       dom.closeModal.addEventListener("click", closeProductModal);
       dom.productModal.addEventListener("click", (event) => {
         if (event.target === dom.productModal || event.target.classList.contains("modal-backdrop")) {
@@ -952,18 +1124,46 @@
 
     }
 
+    async function loadSubcategories() {
+      try {
+        if (!state.client) {
+          state.subcategories = DEFAULT_SUBCATEGORIES;
+          renderCategorySlider();
+          return;
+        }
+
+        const { data, error } = await state.client
+          .from("product_subcategories")
+          .select("id,name,slug,sort_order,is_active,created_at")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        state.subcategories = data || [];
+        renderCategorySlider();
+      } catch (error) {
+        console.error(error);
+        state.subcategories = DEFAULT_SUBCATEGORIES;
+        renderCategorySlider();
+      }
+    }
+
     async function loadProducts() {
       setLoading(true);
       try {
         if (!state.client) {
           state.products = sampleProducts;
-          renderProducts(state.products);
+          renderProducts();
           return;
         }
 
         const { data, error } = await state.client
           .from("products")
-          .select("id,title,description,price,gallery_images,created_at,is_active")
+          .select("id,title,description,price,subcategory_id,gallery_images,created_at,is_active")
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
@@ -972,12 +1172,12 @@
         }
 
         state.products = data || [];
-        renderProducts(state.products);
+        renderProducts();
       } catch (error) {
         console.error(error);
         showNotice("Live inventory could not be loaded, so sample products are shown for preview.");
         state.products = sampleProducts;
-        renderProducts(state.products);
+        renderProducts();
       } finally {
         setLoading(false);
       }
@@ -1043,7 +1243,100 @@
       dom.configNotice.classList.remove("hidden");
     }
 
-    function renderProducts(products) {
+    function renderCategorySlider() {
+      if (!dom.categorySlider || !dom.categoryTrack) {
+        return;
+      }
+
+      const categories = state.subcategories.filter((category) => category.is_active !== false);
+      const activeCategoryExists = state.activeSubcategoryId === "all" || categories.some((category) => category.id === state.activeSubcategoryId);
+      if (!activeCategoryExists) {
+        state.activeSubcategoryId = "all";
+      }
+
+      dom.categorySlider.classList.toggle("hidden", categories.length === 0);
+      dom.categoryTrack.replaceChildren();
+
+      if (!categories.length) {
+        return;
+      }
+
+      dom.categoryTrack.appendChild(createCategoryChip({
+        id: "all",
+        name: "All",
+        count: state.products.length
+      }));
+
+      categories.forEach((category) => {
+        dom.categoryTrack.appendChild(createCategoryChip({
+          id: category.id,
+          name: category.name,
+          count: countProductsInSubcategory(category.id)
+        }));
+      });
+
+      requestAnimationFrame(updateCategoryNavState);
+    }
+
+    function scrollCategoryTrack(direction) {
+      if (!dom.categoryTrack) {
+        return;
+      }
+
+      const scrollAmount = Math.max(dom.categoryTrack.clientWidth * 0.72, 180);
+      dom.categoryTrack.scrollBy({
+        left: direction * scrollAmount,
+        behavior: "smooth"
+      });
+    }
+
+    function updateCategoryNavState() {
+      if (!dom.categoryTrack || !dom.categoryPrev || !dom.categoryNext) {
+        return;
+      }
+
+      const overflowAmount = dom.categoryTrack.scrollWidth - dom.categoryTrack.clientWidth;
+      const hasOverflow = overflowAmount > 1;
+      dom.categoryPrev.disabled = !hasOverflow || dom.categoryTrack.scrollLeft <= 1;
+      dom.categoryNext.disabled = !hasOverflow || dom.categoryTrack.scrollLeft >= overflowAmount - 1;
+    }
+
+    function createCategoryChip(category) {
+      const button = document.createElement("button");
+      const isActive = state.activeSubcategoryId === category.id;
+      button.type = "button";
+      button.className = `category-chip${isActive ? " is-active" : ""}`;
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+      button.textContent = category.name;
+      button.addEventListener("click", () => {
+        state.activeSubcategoryId = category.id;
+        renderCategorySlider();
+        renderProducts();
+      });
+
+      const count = document.createElement("span");
+      count.className = "category-chip-count";
+      count.textContent = String(category.count || 0);
+      button.appendChild(count);
+      return button;
+    }
+
+    function countProductsInSubcategory(subcategoryId) {
+      return state.products.filter((product) => product.subcategory_id === subcategoryId).length;
+    }
+
+    function getVisibleProducts() {
+      if (state.activeSubcategoryId === "all") {
+        return state.products;
+      }
+
+      return state.products.filter((product) => product.subcategory_id === state.activeSubcategoryId);
+    }
+
+    function renderProducts() {
+      const products = getVisibleProducts();
+      renderCategorySlider();
       dom.productGrid.replaceChildren();
       dom.emptyState.classList.toggle("hidden", products.length > 0);
       dom.productGrid.className = getProductGridClass(products.length);
@@ -1053,17 +1346,17 @@
     }
 
     function getProductGridClass(productCount) {
-      const baseClass = "mt-10 grid gap-6";
+      const baseClass = "mt-10 grid grid-cols-2 gap-3 sm:gap-6";
       if (productCount === 1) {
-        return `${baseClass} mx-auto max-w-sm sm:max-w-md`;
+        return "mt-10 grid mx-auto max-w-xs sm:max-w-sm";
       }
       if (productCount === 2) {
-        return `${baseClass} mx-auto max-w-3xl sm:grid-cols-2`;
+        return `${baseClass} mx-auto max-w-3xl`;
       }
       if (productCount === 3) {
-        return `${baseClass} mx-auto max-w-5xl sm:grid-cols-2 lg:grid-cols-3`;
+        return `${baseClass} mx-auto max-w-5xl lg:grid-cols-3`;
       }
-      return `${baseClass} sm:grid-cols-2 lg:grid-cols-4`;
+      return `${baseClass} lg:grid-cols-4`;
     }
 
     function createProductCard(product) {
@@ -1074,14 +1367,16 @@
       card.addEventListener("click", () => openProductModal(product));
 
       const imageWrap = document.createElement("div");
-      imageWrap.className = "relative aspect-[4/5] overflow-hidden bg-line";
+      imageWrap.className = "relative aspect-[3/4] overflow-hidden bg-linen";
 
-      imageWrap.appendChild(createMediaElement(mediaItems[0], product.title || "Anurag Apparel product", "h-full w-full object-cover transition duration-500 group-hover:scale-105"));
+      imageWrap.appendChild(createMediaElement(mediaItems[0], product.title || "Anurag Apparel product", "h-full w-full object-contain p-1 transition duration-500 group-hover:scale-[1.02]"));
 
-      const mediaBadge = document.createElement("span");
-      mediaBadge.className = "absolute left-3 top-3 rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink shadow-crisp backdrop-blur";
-      mediaBadge.textContent = isVideoUrl(mediaItems[0]) ? "Video" : "New";
-      imageWrap.appendChild(mediaBadge);
+      if (isVideoUrl(mediaItems[0])) {
+        const mediaBadge = document.createElement("span");
+        mediaBadge.className = "absolute left-3 top-3 rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink shadow-crisp backdrop-blur";
+        mediaBadge.textContent = "Video";
+        imageWrap.appendChild(mediaBadge);
+      }
 
       if (mediaItems.length > 1) {
         const countBadge = document.createElement("span");
@@ -1091,25 +1386,33 @@
       }
 
       const content = document.createElement("div");
-      content.className = "p-5";
+      content.className = "p-3 sm:p-5";
+
+      const subcategoryName = getSubcategoryName(product.subcategory_id);
+      if (subcategoryName) {
+        const categoryBadge = document.createElement("p");
+        categoryBadge.className = "mb-1.5 inline-flex rounded-full bg-brass/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-brass sm:mb-2 sm:px-2.5 sm:py-1 sm:text-[11px] sm:tracking-[0.12em]";
+        categoryBadge.textContent = subcategoryName;
+        content.appendChild(categoryBadge);
+      }
 
       const title = document.createElement("h3");
-      title.className = "text-lg font-semibold text-ink";
+      title.className = "text-sm font-semibold leading-tight text-ink sm:text-lg";
       title.textContent = product.title || "Untitled product";
 
       const description = document.createElement("p");
-      description.className = "mt-2 min-h-[3rem] text-sm leading-6 text-ink/60";
-      description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 92);
+      description.className = "mt-1 min-h-[2rem] text-xs leading-4 text-ink/60 sm:mt-2 sm:min-h-[2.5rem] sm:text-sm sm:leading-5";
+      description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 64);
 
       const footer = document.createElement("div");
-      footer.className = "mt-5 flex items-center justify-between gap-3 border-t border-line pt-4";
+      footer.className = "mt-3 flex items-center justify-between gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3";
 
       const price = document.createElement("p");
-      price.className = "text-lg font-semibold text-leaf";
+      price.className = "text-xs font-semibold text-leaf sm:text-lg";
       price.textContent = formatCurrency(product.price);
 
       const action = document.createElement("span");
-      action.className = "rounded-md bg-ink px-3 py-2 text-xs font-semibold text-white transition group-hover:bg-leaf";
+      action.className = "rounded-md bg-ink px-2 py-1 text-[9px] font-semibold text-white transition group-hover:bg-leaf sm:px-3 sm:py-2 sm:text-xs";
       action.textContent = "View Details";
 
       footer.append(price, action);
@@ -1190,6 +1493,10 @@
       image.alt = altText;
       image.loading = "lazy";
       return image;
+    }
+
+    function getSubcategoryName(subcategoryId) {
+      return state.subcategories.find((category) => category.id === subcategoryId)?.name || "";
     }
 
     function getGalleryImages(product) {
