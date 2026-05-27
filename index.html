@@ -1405,17 +1405,24 @@
       description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 64);
 
       const footer = document.createElement("div");
-      footer.className = "mt-3 flex items-center justify-between gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3";
+      const priceText = formatCurrency(product.price);
+      footer.className = priceText
+        ? "mt-3 flex items-center justify-between gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3"
+        : "mt-3 flex items-center justify-end gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3";
 
       const price = document.createElement("p");
       price.className = "text-xs font-semibold text-leaf sm:text-lg";
-      price.textContent = formatCurrency(product.price);
+      price.textContent = priceText;
 
       const action = document.createElement("span");
       action.className = "rounded-md bg-ink px-2 py-1 text-[9px] font-semibold text-white transition group-hover:bg-leaf sm:px-3 sm:py-2 sm:text-xs";
       action.textContent = "View Details";
 
-      footer.append(price, action);
+      if (priceText) {
+        footer.append(price, action);
+      } else {
+        footer.append(action);
+      }
       content.append(title, description, footer);
       card.append(imageWrap, content);
       return card;
@@ -1443,7 +1450,9 @@
 
       dom.modalMediaFrame.replaceChildren(createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-cover", true));
       dom.modalTitle.textContent = product.title || "Untitled product";
-      dom.modalPrice.textContent = formatCurrency(product.price);
+      const priceText = formatCurrency(product.price);
+      dom.modalPrice.textContent = priceText;
+      dom.modalPrice.classList.toggle("hidden", !priceText);
       dom.modalDescription.textContent = product.description || "Visit Anurag Apparel to explore this item in store.";
       dom.modalThumbs.replaceChildren();
 
@@ -1532,7 +1541,11 @@
     }
 
     function formatCurrency(value) {
-      const amount = Number(value || 0);
+      if (value === null || value === undefined || value === "") {
+        return "";
+      }
+
+      const amount = Number(value);
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",

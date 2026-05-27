@@ -497,7 +497,7 @@
 
             <label class="block">
               <span class="text-sm font-medium text-ink/70">Price</span>
-              <input id="productPrice" class="field mt-2 px-4 py-3" type="number" min="0" step="1" required>
+              <input id="productPrice" class="field mt-2 px-4 py-3" type="number" min="0" step="1">
             </label>
 
             <label class="block">
@@ -1722,11 +1722,12 @@
     function readProductPayload() {
       const title = dom.productTitle.value.trim();
       const description = dom.productDescription.value.trim();
-      const price = Number(dom.productPrice.value);
+      const priceValue = dom.productPrice.value.trim();
+      const price = priceValue === "" ? null : Number(priceValue);
       const subcategoryId = dom.productSubcategory.value;
 
       if (!title || !description || Number.isNaN(price) || price < 0) {
-        setStatus("Please enter a valid title, price, and description.", "error");
+        setStatus("Please enter a valid title and description. Price can be empty or zero and above.", "error");
         return null;
       }
 
@@ -2011,7 +2012,12 @@
       meta.className = "mt-2 text-sm text-ink/58";
       const mediaCount = getStoredGallery(product).length;
       const subcategoryName = getSubcategoryName(product.subcategory_id);
-      meta.textContent = `${formatCurrency(product.price)} | ${subcategoryName || "No subcategory"} | ${formatDate(product.created_at)} | ${mediaCount} media item${mediaCount === 1 ? "" : "s"}`;
+      meta.textContent = [
+        formatCurrency(product.price),
+        subcategoryName || "No subcategory",
+        formatDate(product.created_at),
+        `${mediaCount} media item${mediaCount === 1 ? "" : "s"}`
+      ].filter(Boolean).join(" | ");
 
       const description = document.createElement("p");
       description.className = "mt-2 text-sm leading-6 text-ink/62";
@@ -2057,7 +2063,7 @@
       dom.saveProduct.textContent = "Save Changes";
       dom.cancelEdit.classList.remove("hidden");
       dom.productTitle.value = product.title || "";
-      dom.productPrice.value = Number(product.price || 0);
+      dom.productPrice.value = product.price == null ? "" : Number(product.price);
       renderProductSubcategoryOptions(product.subcategory_id || "");
       dom.productSubcategory.value = product.subcategory_id || "";
       dom.productDescription.value = product.description || "";
@@ -2614,11 +2620,15 @@
     }
 
     function formatCurrency(value) {
+      if (value === null || value === undefined || value === "") {
+        return "";
+      }
+
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 0
-      }).format(Number(value || 0));
+      }).format(Number(value));
     }
 
     function formatDate(value) {

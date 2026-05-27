@@ -33,7 +33,7 @@ create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   description text not null default '',
-  price numeric(10, 2) not null check (price >= 0),
+  price numeric(10, 2) check (price >= 0),
   subcategory_id uuid references public.product_subcategories(id) on delete set null,
   -- Stores public Supabase Storage URLs for product media.
   -- The existing column name is kept for compatibility; it can contain image and video URLs.
@@ -44,6 +44,9 @@ create table if not exists public.products (
 
 alter table public.products
   add column if not exists subcategory_id uuid references public.product_subcategories(id) on delete set null;
+
+alter table public.products
+  alter column price drop not null;
 
 create index if not exists products_created_at_idx
   on public.products (created_at desc);
