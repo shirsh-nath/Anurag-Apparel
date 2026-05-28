@@ -548,40 +548,166 @@
       transform: translateY(0) scale(1);
     }
 
-    /* ─────────────────────────────────────────────────────────────────
-       SAMSUNG INTERNET FORCE-DARK COUNTER-MEASURE
-       Samsung applies an inversion filter over the entire rendered page.
-       We pre-apply the SAME inversion ourselves so the two cancel out,
-       keeping the light paper aesthetic. Images/videos get a second
-       inversion to restore their natural appearance.
-    ───────────────────────────────────────────────────────────────── */
+    /* ─── Dark-mode override ──────────────────────────────────────
+       Samsung Internet and Chromium-based browsers apply their own
+       auto-inversion when they detect no dark-mode support.
+       By defining a dark-mode block with the EXACT SAME light colors,
+       we signal that we handle dark mode ourselves, causing the
+       browser to skip auto-inversion — keeping the paper aesthetic.
+    ─────────────────────────────────────────────────────────────── */
     @media (prefers-color-scheme: dark) {
       html {
-        filter: invert(1) hue-rotate(180deg) !important;
-        background: #171717 !important; /* pre-inverted black → looks white */
+        background: #fbfaf7 !important;
+        color: #171717 !important;
       }
-      img, video, iframe, canvas, svg image {
-        filter: invert(1) hue-rotate(180deg) !important;
+
+      body {
+        background:
+          linear-gradient(180deg, #fbfaf7 0%, #f3eee5 52%, #fbfaf7 100%) !important;
+        color: #171717 !important;
+      }
+
+      /* Nav / header */
+      .site-header {
+        background: rgba(251, 250, 247, 0.92) !important;
+        border-bottom-color: rgba(231, 225, 216, 0.9) !important;
+        color: #171717 !important;
+      }
+      .nav-link { color: rgba(23, 23, 23, 0.66) !important; }
+      .nav-action {
+        background: #fff !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: #171717 !important;
+      }
+      .nav-shop {
+        background: #171717 !important;
+        color: #fff !important;
+      }
+      .brand-location { color: rgba(23, 23, 23, 0.58) !important; }
+
+      /* Sections */
+      #announcements {
+        background: #fbfaf7 !important;
+      }
+      #products {
+        background: #f3eee5 !important;
+        border-color: #e7e1d8 !important;
+      }
+      #visit {
+        background: #fbfaf7 !important;
+      }
+
+      /* Glass card on hero map */
+      .glass {
+        background: rgba(251, 250, 247, 0.88) !important;
+      }
+
+      /* Brands strip */
+      .brands-strip {
+        background:
+          linear-gradient(180deg, rgba(251, 250, 247, 0.82), rgba(243, 238, 229, 0.68)),
+          radial-gradient(circle at 14% 18%, rgba(183, 135, 45, 0.22), transparent 34%),
+          radial-gradient(circle at 88% 74%, rgba(45, 106, 79, 0.16), transparent 32%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(183, 135, 45, 0.08)) !important;
+        border-color: rgba(231, 225, 216, 0.9) !important;
+      }
+      .brands-glass-card {
+        background:
+          linear-gradient(120deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.24)),
+          linear-gradient(180deg, rgba(251, 250, 247, 0.16), rgba(243, 238, 229, 0.08)) !important;
+        border-color: rgba(255, 255, 255, 0.78) !important;
+      }
+      .brands-heading { color: #b7872d !important; }
+
+      /* Collection masthead */
+      .collection-masthead {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.58)),
+          radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 32%),
+          radial-gradient(circle at bottom left, rgba(168, 95, 61, 0.12), transparent 44%),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(243, 238, 229, 0.34)) !important;
+        border-color: rgba(255, 255, 255, 0.72) !important;
+        color: #171717 !important;
+      }
+      .collection-kicker { color: #b7872d !important; }
+      .collection-status {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(251, 250, 247, 0.18)) !important;
+        border-color: rgba(231, 225, 216, 0.82) !important;
+        color: #171717 !important;
+      }
+
+      /* Category chips */
+      .category-nav-button {
+        background: rgba(255, 255, 255, 0.86) !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: #171717 !important;
+      }
+      .category-chip {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(251, 250, 247, 0.74)),
+          radial-gradient(circle at 20% 0%, rgba(183, 135, 45, 0.14), transparent 34%) !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: #171717 !important;
+      }
+      .category-chip.is-active {
+        background: linear-gradient(135deg, #171717, #2d2a24) !important;
+        border-color: #171717 !important;
+        color: #fff !important;
+      }
+
+      /* Announcement board (intentionally dark — keep as-is) */
+      .announcement-board {
+        background:
+          linear-gradient(135deg, rgba(23, 23, 23, 0.96), rgba(45, 106, 79, 0.92)),
+          linear-gradient(90deg, rgba(183, 135, 45, 0.28), transparent) !important;
+        border-color: rgba(255, 255, 255, 0.14) !important;
+        color: #fff !important;
+      }
+      #announcementEyebrow { color: #b7872d !important; }
+      #announcementTitle   { color: #fff !important; }
+      #announcementMessage { color: rgba(255,255,255,0.74) !important; }
+      #announcementOffer   { color: rgba(255,255,255,0.82) !important; }
+
+      /* Visit section */
+      .visit-address-card {
+        background:
+          radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 34%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(243, 238, 229, 0.9)) !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: #171717 !important;
+      }
+      .visit-address-pin {
+        background: rgba(255, 255, 255, 0.92) !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: #a85f3d !important;
+      }
+
+      /* Config notice & empty state */
+      #configNotice {
+        background: #fff !important;
+        border-color: rgba(183, 135, 45, 0.35) !important;
+        color: rgba(23, 23, 23, 0.72) !important;
+      }
+      #emptyState {
+        background: #fff !important;
+        border-color: #e7e1d8 !important;
+        color: #171717 !important;
+      }
+
+      /* Footer */
+      footer {
+        background: #171717 !important;
+        border-color: #e7e1d8 !important;
+        color: rgba(255, 255, 255, 0.62) !important;
+      }
+
+      /* Modal */
+      .modal-panel {
+        background: #fbfaf7 !important;
+        color: #171717 !important;
       }
     }
   </style>
-
-  <!-- Same inversion via JS attribute selector for browsers that
-       apply forced dark outside of prefers-color-scheme -->
-  <script>
-    (function () {
-      var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-      if (mq && mq.matches) {
-        document.documentElement.setAttribute('data-force-light', '');
-      }
-      if (mq && mq.addEventListener) {
-        mq.addEventListener('change', function (e) {
-          if (e.matches) document.documentElement.setAttribute('data-force-light', '');
-          else document.documentElement.removeAttribute('data-force-light');
-        });
-      }
-    })();
-  </script>
 </head>
 <body class="bg-paper text-ink antialiased">
   <header class="site-header fixed inset-x-0 top-0 z-40 backdrop-blur-xl">
