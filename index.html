@@ -706,8 +706,89 @@
         background: #fbfaf7 !important;
         color: #171717 !important;
       }
+
+      /* ── Tailwind utility class overrides ─────────────────────── */
+      /* These lock the Tailwind bg-* and text-* classes used in the HTML */
+      .bg-paper  { background-color: #fbfaf7 !important; }
+      .bg-linen  { background-color: #f3eee5 !important; }
+      .bg-ink    { background-color: #171717 !important; }
+      .bg-white  { background-color: #ffffff !important; }
+      .bg-line   { background-color: #e7e1d8 !important; }
+
+      .text-ink   { color: #171717 !important; }
+      .text-white { color: #ffffff !important; }
+      .text-brass { color: #b7872d !important; }
+      .text-leaf  { color: #2d6a4f !important; }
+      .text-clay  { color: #a85f3d !important; }
+
+      .border-line { border-color: #e7e1d8 !important; }
+
+      /* Text opacity utilities */
+      .text-ink\/62 { color: rgba(23,23,23,0.62) !important; }
+      .text-ink\/68 { color: rgba(23,23,23,0.68) !important; }
+      .text-ink\/72 { color: rgba(23,23,23,0.72) !important; }
+      .text-ink\/58 { color: rgba(23,23,23,0.58) !important; }
+      .text-white\/70 { color: rgba(255,255,255,0.70) !important; }
+      .text-white\/74 { color: rgba(255,255,255,0.74) !important; }
+      .text-white\/80 { color: rgba(255,255,255,0.80) !important; }
+      .text-white\/82 { color: rgba(255,255,255,0.82) !important; }
     }
+
+    /* ─── JS-detected force-light (works against browser-level dark filters) */
+    html[data-force-light] body {
+      background: linear-gradient(180deg, #fbfaf7 0%, #f3eee5 52%, #fbfaf7 100%) !important;
+      color: #171717 !important;
+    }
+    html[data-force-light] .site-header {
+      background: rgba(251,250,247,0.92) !important;
+      color: #171717 !important;
+    }
+    html[data-force-light] .nav-action  { background: #fff !important; color: #171717 !important; }
+    html[data-force-light] .nav-shop    { background: #171717 !important; color: #fff !important; }
+    html[data-force-light] #announcements { background: #fbfaf7 !important; }
+    html[data-force-light] #products      { background: #f3eee5 !important; }
+    html[data-force-light] #visit         { background: #fbfaf7 !important; }
+    html[data-force-light] footer         { background: #171717 !important; color: rgba(255,255,255,0.62) !important; }
+    html[data-force-light] .collection-masthead {
+      background: linear-gradient(135deg,rgba(255,255,255,.82),rgba(251,250,247,.58)),radial-gradient(circle at top right,rgba(183,135,45,.18),transparent 32%),radial-gradient(circle at bottom left,rgba(168,95,61,.12),transparent 44%),linear-gradient(90deg,rgba(255,255,255,.65),rgba(243,238,229,.34)) !important;
+      color: #171717 !important;
+    }
+    html[data-force-light] .category-chip {
+      background: linear-gradient(135deg,rgba(255,255,255,.92),rgba(251,250,247,.74)) !important;
+      color: #171717 !important;
+    }
+    html[data-force-light] .category-chip.is-active { background: #171717 !important; color: #fff !important; }
+    html[data-force-light] .category-nav-button { background: rgba(255,255,255,.86) !important; color: #171717 !important; }
+    html[data-force-light] .visit-address-card  { background: linear-gradient(135deg,rgba(255,255,255,.94),rgba(243,238,229,.9)) !important; color: #171717 !important; }
+    html[data-force-light] .visit-address-pin   { background: rgba(255,255,255,.92) !important; color: #a85f3d !important; }
+    html[data-force-light] .glass               { background: rgba(251,250,247,.88) !important; }
+    html[data-force-light] .modal-panel         { background: #fbfaf7 !important; color: #171717 !important; }
+    html[data-force-light] #emptyState          { background: #fff !important; color: #171717 !important; }
+    html[data-force-light] .bg-paper  { background-color: #fbfaf7 !important; }
+    html[data-force-light] .bg-linen  { background-color: #f3eee5 !important; }
+    html[data-force-light] .bg-white  { background-color: #ffffff !important; }
+    html[data-force-light] .bg-ink    { background-color: #171717 !important; }
+    html[data-force-light] .text-ink  { color: #171717 !important; }
+    html[data-force-light] .text-white { color: #ffffff !important; }
   </style>
+
+  <!-- Force light theme: runs before first paint so no flash -->
+  <script>
+    (function () {
+      function applyLight() {
+        document.documentElement.setAttribute('data-force-light', '');
+      }
+      // Trigger on system dark mode
+      var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq && mq.matches) applyLight();
+      if (mq && mq.addEventListener) {
+        mq.addEventListener('change', function (e) {
+          if (e.matches) applyLight();
+          else document.documentElement.removeAttribute('data-force-light');
+        });
+      }
+    })();
+  </script>
 </head>
 <body class="bg-paper text-ink antialiased">
   <header class="site-header fixed inset-x-0 top-0 z-40 backdrop-blur-xl">
