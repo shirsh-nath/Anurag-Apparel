@@ -946,34 +946,75 @@
       z-index: 1;
     }
 
+    .offer-board-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      width: fit-content;
+      max-width: 100%;
+      padding: 0.55rem 0.8rem 0.55rem 0.6rem;
+      border: 1px solid rgba(183, 135, 45, 0.34);
+      border-radius: 0.9rem;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 246, 215, 0.24)),
+        rgba(183, 135, 45, 0.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+        0 10px 24px rgba(183, 135, 45, 0.10);
+    }
+
+    .offer-board-heading-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+
+    .offer-board-title {
+      color: #7a4f12;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
     .offer-board-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 2.75rem;
-      height: 2.75rem;
-      border-radius: 0.5rem;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 0.7rem;
       background:
         linear-gradient(135deg, rgba(183, 135, 45, 0.16), rgba(183, 135, 45, 0.04));
-      border: 1px solid rgba(183, 135, 45, 0.28);
       color: #b7872d;
       flex-shrink: 0;
     }
 
     .offer-board-icon svg {
-      width: 1.25rem;
-      height: 1.25rem;
+      width: 1.38rem;
+      height: 1.38rem;
     }
 
     @media (min-width: 640px) {
+      .offer-board-header {
+        gap: 1rem;
+        padding: 0.65rem 1rem 0.65rem 0.7rem;
+        border-radius: 1rem;
+      }
+      .offer-board-title {
+        font-size: 0.92rem;
+      }
       .offer-board-icon {
-        width: 3.25rem;
-        height: 3.25rem;
-        border-radius: 0.625rem;
+        width: 3.55rem;
+        height: 3.55rem;
+        border-radius: 0.8rem;
       }
       .offer-board-icon svg {
-        width: 1.45rem;
-        height: 1.45rem;
+        width: 1.58rem;
+        height: 1.58rem;
       }
     }
 
@@ -982,14 +1023,14 @@
       align-items: center;
       gap: 0.375rem;
       background: rgba(183, 135, 45, 0.12);
-      border: 1px solid rgba(183, 135, 45, 0.28);
+      border: 1px solid rgba(183, 135, 45, 0.32);
       border-radius: 999px;
       padding: 0.2rem 0.65rem 0.2rem 0.45rem;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #b7872d;
+      color: #765018;
     }
 
     .offer-live-dot {
@@ -1139,7 +1180,7 @@
       
       /* Only split into grid if slider has images (is NOT hidden) */
       .offer-board-grid-container:not(:has(#offerImageSlider.hidden)) {
-        grid-template-columns: 45% 1px 55%;
+        grid-template-columns: 50% 1px 50%;
         align-items: stretch;
       }
 
@@ -1180,14 +1221,13 @@
     /* ── Offer Board text styling (light background section) ── */
     .offer-board-text-col .offer-board-icon {
       background: rgba(183, 135, 45, 0.12);
-      border-color: rgba(183, 135, 45, 0.3);
       color: #a07020;
     }
 
     .offer-board-text-col .offer-live-badge {
-      background: rgba(183, 135, 45, 0.10);
-      border-color: rgba(183, 135, 45, 0.28);
-      color: #9a6c1c;
+      background: rgba(183, 135, 45, 0.12);
+      border-color: rgba(183, 135, 45, 0.34);
+      color: #765018;
     }
 
     .offer-board-text-col .offer-live-dot {
@@ -1197,6 +1237,14 @@
     .offer-board-text-col p[style*="color:#d4a640"] {
       color: #8a6018 !important;
       letter-spacing: 0.14em;
+    }
+
+    #announcementOffer {
+      color: #3b3329;
+    }
+
+    .offer-inline-copy {
+      color: #4d4439;
     }
 
     /* Clean editorial list for light background */
@@ -1212,17 +1260,22 @@
       align-items: flex-start;
       gap: 0.55rem;
       font-size: 0.975rem;
-      font-weight: 500;
+      font-weight: 650;
       line-height: 1.7;
-      color: rgba(40, 28, 8, 0.82);
+      color: #44392d;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
     }
 
     .offer-clean-list li.has-bullet::before {
       content: "◆";
-      color: #b7872d;
+      color: #b07a24;
       font-size: 0.65rem;
       margin-top: 0.52em;
       flex-shrink: 0;
+    }
+
+    #offerSwipeHint {
+      color: #ad7a2d;
     }
 
     @media (min-width: 640px) {
@@ -1245,9 +1298,21 @@
     .store-update-divider {
       width: 2.5rem;
       height: 2px;
-      background: linear-gradient(90deg, #b7872d, rgba(183,135,45,0.3));
+      background: linear-gradient(90deg, #b7872d, rgba(183,135,45,0.24));
       margin: 0.9rem 0;
       border-radius: 99px;
+    }
+
+    #announcementEyebrow {
+      color: #a36f20;
+    }
+
+    #announcementTitle {
+      color: #1b1712;
+    }
+
+    #announcementMessage {
+      color: #655d52;
     }
 
     /* ── Visit Section — vivid blob background ── */
@@ -1506,9 +1571,9 @@
         border-color: rgba(255, 255, 255, 0.14) !important;
         color: #fff !important;
       }
-      #announcementEyebrow { color: #b7872d !important; }
-      #announcementTitle   { color: #171717 !important; }
-      #announcementMessage { color: rgba(23, 23, 23, 0.72) !important; }
+      #announcementEyebrow { color: #a36f20 !important; }
+      #announcementTitle   { color: #1b1712 !important; }
+      #announcementMessage { color: #655d52 !important; }
 
       #offerSection {
         background:
@@ -1524,7 +1589,7 @@
         border-color: rgba(255, 255, 255, 0.45) !important;
         color: #171717 !important;
       }
-      #announcementOffer { color: #171717 !important; }
+      #announcementOffer { color: #3b3329 !important; }
 
       /* Visit section */
       #visit {
@@ -1741,7 +1806,7 @@
             <div class="offer-board-text-col relative z-10 flex flex-col gap-2 px-5 pt-5 pb-4 sm:px-7 sm:py-6 lg:px-8">
 
               <!-- Header Row: Icon + Title & Badge -->
-              <div class="flex items-center gap-4 relative z-10">
+              <div class="offer-board-header relative z-10">
                 <!-- Icon -->
                 <span class="offer-board-icon" aria-hidden="true">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -1749,8 +1814,8 @@
                   </svg>
                 </span>
                 <!-- Title & Badge -->
-                <div class="flex flex-wrap items-center gap-2.5">
-                  <p class="text-xs font-bold uppercase tracking-[0.14em]" style="color:#8a6018">Offer Board</p>
+                <div class="offer-board-heading-group">
+                  <p class="offer-board-title">Offer Board</p>
                   <span class="offer-live-badge">
                     <span class="offer-live-dot" aria-hidden="true"></span>Live
                   </span>
@@ -1758,7 +1823,7 @@
               </div>
 
               <!-- Text -->
-              <div id="announcementOffer" class="relative z-10 text-base font-medium leading-7 sm:text-lg sm:leading-8" style="color:rgba(40,28,8,0.78)">Ask in store for current festive and seasonal offers.</div>
+              <div id="announcementOffer" class="relative z-10 text-base font-medium leading-7 sm:text-lg sm:leading-8">Ask in store for current festive and seasonal offers.</div>
 
             </div>
 
@@ -1777,7 +1842,7 @@
                 </button>
                 <div id="offerImageTrack" class="offer-image-track" aria-label="Offer poster images"></div>
               </div>
-              <p id="offerSwipeHint" class="mt-3 hidden text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(183,135,45,0.45)">Swipe to see more offers</p>
+              <p id="offerSwipeHint" class="mt-3 hidden text-[10px] font-semibold uppercase tracking-widest">Swipe to see more offers</p>
             </div>
 
             <!-- Vertical Divider -->
@@ -1791,10 +1856,10 @@
           <!-- Row 2: Store Update -->
           <article id="announcementBoard" class="relative z-10 text-ink">
             <div class="relative z-10 px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-8">
-              <p id="announcementEyebrow" class="text-[10px] font-bold uppercase tracking-[0.18em]" style="color:#a07828">Store update</p>
-              <h2 id="announcementTitle" class="mt-1.5 max-w-3xl text-xl font-semibold leading-tight sm:text-2xl lg:text-3xl" style="color:#1a1208">New Arrivals Are Live</h2>
+              <p id="announcementEyebrow" class="text-[10px] font-bold uppercase tracking-[0.18em]">Store update</p>
+              <h2 id="announcementTitle" class="mt-1.5 max-w-3xl text-xl font-semibold leading-tight sm:text-2xl lg:text-3xl">New Arrivals Are Live</h2>
               <div class="store-update-divider"></div>
-              <p id="announcementMessage" class="whitespace-pre-wrap max-w-2xl text-sm leading-6 sm:text-base sm:leading-7" style="color:rgba(50, 35, 10, 0.68)">Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.</p>
+              <p id="announcementMessage" class="whitespace-pre-wrap max-w-2xl text-sm leading-6 sm:text-base sm:leading-7">Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.</p>
             </div>
           </article>
 
@@ -2758,7 +2823,7 @@
       const isList = lines.some(line => line.match(/^([•\-\*])/));
       
       if (!isList) {
-        return `<p class="font-semibold leading-relaxed text-ink/80 mt-2">${text}</p>`;
+        return `<p class="offer-inline-copy font-semibold leading-relaxed mt-2">${text}</p>`;
       }
       
       const listItems = lines.map(line => {
