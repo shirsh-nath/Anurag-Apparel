@@ -75,6 +75,7 @@ create table if not exists public.site_announcements (
   offer_text  text        not null default 'Visit the store for the latest seasonal deals.',
   cta_label   text        not null default 'Get Directions',
   cta_url     text        not null default 'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6',
+  offer_images text[]        not null default '{}',
   is_active   boolean     not null default true,
   updated_at  timestamptz not null default now()
 );

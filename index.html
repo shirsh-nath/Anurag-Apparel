@@ -303,19 +303,138 @@
       }
     }
 
-    .collection-masthead {
+    /* ─── Products Section Makeover ────────────────────────────── */
+    #products {
+      background: #fbfaf7;
+      padding-top: 0;
+    }
+
+    .products-header-band {
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.58)),
-        radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 32%),
-        radial-gradient(circle at bottom left, rgba(168, 95, 61, 0.12), transparent 44%),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(243, 238, 229, 0.34));
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 1rem;
-      box-shadow: 0 26px 65px rgba(144, 106, 54, 0.1), 0 10px 26px rgba(23, 23, 23, 0.04);
-      isolation: isolate;
+        radial-gradient(ellipse at 0% 100%,  rgba(183, 135, 45, 0.22), transparent 48%),
+        radial-gradient(ellipse at 100% 0%,  rgba(45, 106, 79, 0.18), transparent 44%),
+        linear-gradient(160deg, #111110 0%, #1c1c17 55%, #171714 100%);
+      padding: 1.5rem 0 2rem;
+      position: relative;
       overflow: hidden;
+    }
+
+    .products-header-band::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 38px,
+        rgba(183, 135, 45, 0.028) 38px,
+        rgba(183, 135, 45, 0.028) 39px
+      );
+      pointer-events: none;
+    }
+
+    .products-header-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .products-header-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .products-header-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: rgba(183, 135, 45, 0.12);
+      border: 1px solid rgba(183, 135, 45, 0.28);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem 0.35rem 0.55rem;
+      width: fit-content;
+      margin-bottom: 1rem;
+    }
+
+    .products-header-badge-dot {
+      width: 0.42rem;
+      height: 0.42rem;
+      border-radius: 50%;
+      background: #b7872d;
+      flex-shrink: 0;
+    }
+
+    .products-header-badge-text {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #c9943a;
+    }
+
+    .products-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #b7872d;
+      margin-bottom: 0.85rem;
+    }
+
+    .products-kicker-dot {
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 50%;
+      background: #b7872d;
+      opacity: 0.7;
+    }
+
+    .products-title {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .products-subtitle {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.52);
+      max-width: 34rem;
+    }
+
+    .products-stat {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.46);
+      line-height: 1.5;
+    }
+
+    .products-stat strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.88);
+    }
+
+    /* Category bar */
+    .category-bar {
+      background: #fff;
+      border-bottom: 1px solid rgba(231, 225, 216, 0.9);
+      padding: 0.85rem 0;
+      position: sticky;
+      top: 3.5rem; /* below the fixed nav */
+      z-index: 20;
+    }
+
+    .collection-masthead {
+      background: transparent;
       position: relative;
     }
 
@@ -325,16 +444,7 @@
     }
 
     .collection-masthead::after {
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.92), transparent 34%),
-        radial-gradient(circle at 82% 48%, rgba(183, 135, 45, 0.14), transparent 30%),
-        radial-gradient(circle at 68% 100%, rgba(168, 95, 61, 0.1), transparent 36%);
-      content: "";
-      filter: blur(24px);
-      inset: 0;
-      pointer-events: none;
-      position: absolute;
-      z-index: 0;
+      display: none;
     }
 
     .collection-kicker {
@@ -347,10 +457,8 @@
     }
 
     .collection-status {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(251, 250, 247, 0.18));
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(231, 225, 216, 0.82);
+      background: transparent;
+      border-top: 1px solid rgba(184, 170, 150, 0.38);
     }
 
     .category-slider {
@@ -480,6 +588,268 @@
       position: relative;
     }
 
+
+
+    .offer-board-card {
+      background:
+        radial-gradient(ellipse at 0% 0%,   rgba(183, 135, 45, 0.32), transparent 52%),
+        radial-gradient(ellipse at 100% 100%, rgba(45, 106, 79, 0.22), transparent 48%),
+        linear-gradient(135deg, #1a1a14 0%, #2a2a1e 100%);
+      border: 1px solid rgba(183, 135, 45, 0.38);
+      border-radius: 0.75rem;
+      box-shadow:
+        0 0 0 1px rgba(183, 135, 45, 0.12),
+        0 24px 64px rgba(23, 23, 23, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .offer-board-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -55deg,
+        transparent,
+        transparent 28px,
+        rgba(183, 135, 45, 0.035) 28px,
+        rgba(183, 135, 45, 0.035) 29px
+      );
+      pointer-events: none;
+    }
+
+    .offer-board-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 0.5rem;
+      background:
+        linear-gradient(135deg, rgba(183, 135, 45, 0.24), rgba(183, 135, 45, 0.08));
+      border: 1px solid rgba(183, 135, 45, 0.36);
+      color: #d4a93a;
+      flex-shrink: 0;
+    }
+
+    .offer-board-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .offer-board-icon {
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 0.625rem;
+      }
+      .offer-board-icon svg {
+        width: 1.45rem;
+        height: 1.45rem;
+      }
+    }
+
+    .offer-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      background: rgba(183, 135, 45, 0.15);
+      border: 1px solid rgba(183, 135, 45, 0.32);
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem 0.2rem 0.45rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #d4a93a;
+    }
+
+    .offer-live-dot {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      background: #d4a93a;
+      animation: offerPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes offerPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.45; transform: scale(0.72); }
+    }
+
+    .offer-text-block {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .offer-board-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: linear-gradient(135deg, #b7872d, #d4a93a);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.025em;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.4rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 160ms ease, transform 120ms ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(183, 135, 45, 0.38);
+    }
+
+    .offer-board-cta:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* ─── Offer Image Slider ─────────────────────────────────── */
+    .offer-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 9999px;
+      background: rgba(23, 23, 23, 0.75);
+      border: 1px solid rgba(183, 135, 45, 0.35);
+      color: #d4a93a;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 20;
+      cursor: pointer;
+      transition: all 200ms ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .offer-nav-btn:hover:not(:disabled) {
+      background: rgba(183, 135, 45, 0.22);
+      border-color: #d4a93a;
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .offer-nav-btn:disabled {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (min-width: 640px) {
+      .offer-nav-btn {
+        width: 2.75rem;
+        height: 2.75rem;
+      }
+    }
+
+    .offer-image-track {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 0.25rem;
+    }
+
+    .offer-image-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .offer-image-item {
+      flex: 0 0 calc(42% - 0.5rem);
+      scroll-snap-align: start;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid rgba(183, 135, 45, 0.28);
+      background: rgba(183, 135, 45, 0.06);
+      position: relative;
+      aspect-ratio: 4/5;
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+
+    @media (min-width: 640px) {
+      .offer-image-item {
+        flex: 0 0 calc(33.333% - 0.5rem);
+        aspect-ratio: 4/5;
+      }
+    }
+    @media (min-width: 1024px) {
+      .offer-image-item {
+        flex: 0 0 14rem;
+        aspect-ratio: 4/5;
+      }
+    }
+
+    .offer-image-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(183, 135, 45, 0.55);
+    }
+
+    .offer-image-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ─── Offer Board PC Layout adjustment ─────────────────────── */
+    .offer-vertical-divider {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+      .offer-board-grid-container {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+      
+      /* Only split into grid if slider has images (is NOT hidden) */
+      .offer-board-grid-container:not(:has(#offerImageSlider.hidden)) {
+        grid-template-columns: 45% 1px 55%;
+        align-items: stretch;
+      }
+
+      .offer-board-text-col {
+        grid-column: 1;
+        grid-row: 1;
+        padding-right: 1.5rem !important;
+        padding-left: 2rem !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      #offerImageSlider {
+        grid-column: 3;
+        grid-row: 1;
+        align-self: center;
+        width: 100%;
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+        padding-left: 1.5rem !important;
+        padding-right: 2rem !important;
+        overflow: hidden;
+      }
+
+      .offer-board-grid-container:not(:has(#offerImageSlider.hidden)) .offer-vertical-divider {
+        display: block;
+        grid-column: 2;
+        grid-row: 1;
+        width: 1px;
+        align-self: stretch;
+        background: linear-gradient(to bottom, rgba(183, 135, 45, 0.45) 0%, transparent 100%);
+      }
+    }
+
     .visit-address-card {
       background:
         radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 34%),
@@ -589,10 +959,7 @@
       #announcements {
         background: #fbfaf7 !important;
       }
-      #products {
-        background: #f3eee5 !important;
-        border-color: #e7e1d8 !important;
-      }
+
       #visit {
         background: #fbfaf7 !important;
       }
@@ -619,20 +986,28 @@
       }
       .brands-heading { color: #b7872d !important; }
 
+      /* Products section header band */
+      .products-header-band {
+        background:
+          radial-gradient(ellipse at 0% 100%,  rgba(183, 135, 45, 0.22), transparent 48%),
+          radial-gradient(ellipse at 100% 0%,  rgba(45, 106, 79, 0.18), transparent 44%),
+          linear-gradient(160deg, #111110 0%, #1c1c17 55%, #171714 100%) !important;
+      }
+      .category-bar {
+        background: #fff !important;
+        border-bottom-color: rgba(231,225,216,0.9) !important;
+      }
       /* Collection masthead */
       .collection-masthead {
-        background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.58)),
-          radial-gradient(circle at top right, rgba(183, 135, 45, 0.18), transparent 32%),
-          radial-gradient(circle at bottom left, rgba(168, 95, 61, 0.12), transparent 44%),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(243, 238, 229, 0.34)) !important;
-        border-color: rgba(255, 255, 255, 0.72) !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
         color: #171717 !important;
       }
       .collection-kicker { color: #b7872d !important; }
       .collection-status {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(251, 250, 247, 0.18)) !important;
-        border-color: rgba(231, 225, 216, 0.82) !important;
+        background: transparent !important;
+        border-top-color: rgba(184, 170, 150, 0.38) !important;
         color: #171717 !important;
       }
 
@@ -666,7 +1041,16 @@
       #announcementEyebrow { color: #b7872d !important; }
       #announcementTitle   { color: #fff !important; }
       #announcementMessage { color: rgba(255,255,255,0.74) !important; }
-      #announcementOffer   { color: rgba(255,255,255,0.82) !important; }
+
+      .offer-board-card {
+        background:
+          radial-gradient(ellipse at 0% 0%,   rgba(183, 135, 45, 0.32), transparent 52%),
+          radial-gradient(ellipse at 100% 100%, rgba(45, 106, 79, 0.22), transparent 48%),
+          linear-gradient(135deg, #1a1a14 0%, #2a2a1e 100%) !important;
+        border-color: rgba(183, 135, 45, 0.38) !important;
+        color: #fff !important;
+      }
+      #announcementOffer { color: rgba(255,255,255,0.88) !important; }
 
       /* Visit section */
       .visit-address-card {
@@ -753,7 +1137,7 @@
             <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">A refined edit of everyday essentials, festive pieces, and sharp apparel selected for modern wardrobes in Jharkhand.</p>
             <div class="mt-8 flex flex-wrap justify-center gap-3">
               <a href="#products" class="rounded-md bg-white px-5 py-3 text-sm font-semibold text-ink transition hover:bg-linen">Explore Collection</a>
-              <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="rounded-md border border-white/28 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/10">Open Directions</a>
+              <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="rounded-md border border-white/28 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/70 hover:bg-white/10">Open Directions</a>
             </div>
             <div class="mx-auto mt-10 grid max-w-xl grid-cols-3 border-y border-white/18 py-4 text-sm text-white/72">
               <div>
@@ -774,14 +1158,14 @@
           <div class="glass map-frame relative mt-8 overflow-hidden rounded-lg border border-white/35 shadow-soft">
             <iframe
               title="Anurag Apparel store location on Google Maps"
-              src="https://www.google.com/maps?q=23.9932317,85.3593459&z=17&output=embed"
+              src="https://www.google.com/maps?q=23.9932828,85.3593752&z=17&output=embed"
               class="h-64 w-full border-0 sm:h-72 lg:h-80"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
             <a
               id="mapOverlay"
-              href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6"
+              href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89"
               target="_blank"
               rel="noreferrer"
               aria-label="Open Anurag Apparel on Google Maps"
@@ -813,44 +1197,99 @@
       </div>
     </section>
 
-    <section id="announcements" class="bg-paper px-4 pt-10 pb-5 sm:px-6 lg:px-8">
+    <!-- ─── Offers & Store Update (combined card) ──────────────── -->
+    <section id="offerSection" class="bg-paper px-4 pt-10 pb-5 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <article id="announcementBoard" class="announcement-board text-white">
-          <div class="grid gap-6 px-5 py-7 sm:px-7 lg:grid-cols-[1fr_auto] lg:items-center lg:px-8 lg:py-8">
-            <div>
-              <p id="announcementEyebrow" class="text-sm font-semibold uppercase text-brass">Store update</p>
-              <h2 id="announcementTitle" class="mt-2 max-w-3xl text-2xl font-semibold leading-tight sm:text-3xl">New Arrivals Are Live</h2>
-              <p id="announcementMessage" class="mt-3 max-w-3xl text-sm leading-6 text-white/74">Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.</p>
+        <div class="offer-board-card relative">
+
+          <!-- Grid wrapper for Offer Board section to allow side-by-side on PC -->
+          <div class="offer-board-grid-container">
+
+            <!-- Row 1: Offer Board text row -->
+            <div class="offer-board-text-col relative z-10 flex flex-col gap-2 px-5 py-4 sm:px-7 sm:py-5 lg:px-8">
+
+              <!-- Header Row: Icon + Title & Badge -->
+              <div class="flex items-center gap-4">
+                <!-- Icon -->
+                <span class="offer-board-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.92.92 2.39 1.05 3.46.3a18.68 18.68 0 0 0 5.442-5.44c.75-1.07.62-2.543-.3-3.463l-9.58-9.581A3 3 0 0 0 9.568 2.25H5.25Zm4.5 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" clip-rule="evenodd"/>
+                  </svg>
+                </span>
+                <!-- Title & Badge -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <p class="text-xs font-bold uppercase tracking-[0.12em]" style="color:rgba(183,135,45,0.72)">Offer Board</p>
+                  <span class="offer-live-badge">
+                    <span class="offer-live-dot" aria-hidden="true"></span>Live
+                  </span>
+                </div>
+              </div>
+
+              <!-- Text -->
+              <p id="announcementOffer" class="whitespace-pre-wrap text-base font-semibold leading-6 sm:leading-7 sm:text-lg" style="color:#f0e0a8">Ask in store for current festive and seasonal offers.</p>
+
             </div>
-            <div class="border-t border-white/14 pt-5 lg:w-80 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-              <p class="text-xs font-semibold uppercase text-white/48">Offer board</p>
-              <p id="announcementOffer" class="mt-2 text-sm leading-6 text-white/82">Ask in store for current festive and seasonal offers.</p>
+
+            <!-- Offer Poster Images slider (hidden when no images) -->
+            <div id="offerImageSlider" class="relative z-10 hidden px-5 pb-4 sm:pb-6 sm:px-7 lg:px-8">
+              <div class="relative">
+                <button id="offerPrevBtn" class="offer-nav-btn left-2 sm:left-4" aria-label="Previous offers" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 sm:w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                <button id="offerNextBtn" class="offer-nav-btn right-2 sm:right-4" aria-label="Next offers" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 sm:w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12 8.25 19.5" />
+                  </svg>
+                </button>
+                <div id="offerImageTrack" class="offer-image-track" aria-label="Offer poster images"></div>
+              </div>
+              <p id="offerSwipeHint" class="mt-3 hidden text-[10px] font-semibold uppercase tracking-widest" style="color:rgba(183,135,45,0.45)">Swipe to see more offers</p>
             </div>
+
+            <!-- Vertical Divider -->
+            <div class="offer-vertical-divider"></div>
+
           </div>
-        </article>
+
+          <!-- Divider -->
+          <div style="height:1px;background:rgba(183,135,45,0.22);margin:0 1.5rem"></div>
+
+          <!-- Row 2: Store Update -->
+          <article id="announcementBoard" class="relative z-10 text-white">
+            <div class="px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-7">
+              <p id="announcementEyebrow" class="text-xs font-bold uppercase tracking-[0.12em]" style="color:rgba(183,135,45,0.72)">Store update</p>
+              <h2 id="announcementTitle" class="mt-2 max-w-3xl text-xl font-semibold leading-tight sm:text-2xl" style="color:#f0e0a8">New Arrivals Are Live</h2>
+              <p id="announcementMessage" class="whitespace-pre-wrap mt-2 max-w-3xl text-sm leading-6" style="color:rgba(240,224,168,0.62)">Fresh apparel selections are now available at Anurag Apparel in Hazaribagh.</p>
+            </div>
+          </article>
+
+        </div>
       </div>
     </section>
 
-    <section id="products" class="border-b border-line bg-linen px-4 pt-8 pb-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-7xl">
-        <div class="collection-masthead grid lg:grid-cols-[1fr_360px]">
-          <div class="px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8">
-            <p class="collection-kicker">Fresh inventory</p>
-            <h2 class="mt-3 max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">Current Collection</h2>
-            <p class="mt-2 max-w-2xl text-sm leading-6 text-ink/62">New arrivals from Anurag Apparel, refreshed with product and more.</p>
-          </div>
-          <div class="collection-status flex flex-col justify-center gap-1.5 px-5 py-4 text-left sm:px-7 sm:py-5 lg:px-8 lg:text-right">
-            <span class="block text-base font-semibold text-ink">Try on new fits!</span>
-            <span class="block text-xs leading-5 text-ink/58">Apparel selected for everyday and occasion wear.</span>
-          </div>
-        </div>
+    <section id="products" class="border-b border-line">
 
-        <div id="categorySlider" class="category-slider mt-6 hidden" aria-label="Product categories">
-          <div class="category-slider-header mb-2">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brass">Shop by category</p>
+      <!-- Dark header band -->
+      <div class="products-header-band">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="products-header-inner">
+            <div class="products-header-left">
+              <span class="products-header-badge mb-4">
+                <span class="products-header-badge-dot" aria-hidden="true"></span>
+                <span class="products-header-badge-text">In Store Now &mdash; Everyday &amp; Occasion Wear</span>
+              </span>
+              <h2 class="products-title">Current Collection</h2>
+              <p class="products-subtitle">New arrivals from Anurag Apparel &mdash; curated for everyday style and special occasions in Hazaribagh.</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Sticky category bar -->
+      <div id="categorySlider" class="category-bar hidden" aria-label="Product categories">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="category-menu" aria-label="Navigate product categories">
             <button id="categoryPrev" class="category-nav-button" type="button" aria-label="Previous categories">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -865,22 +1304,27 @@
             </button>
           </div>
         </div>
+      </div>
 
-        <div id="configNotice" class="mt-8 hidden rounded-lg border border-brass/35 bg-white px-4 py-3 text-sm text-ink/72 shadow-crisp"></div>
+      <!-- Product grid -->
+      <div class="mx-auto max-w-7xl px-4 pt-10 pb-20 sm:px-6 lg:px-8">
 
-        <div id="loadingState" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-live="polite">
+        <div id="configNotice" class="hidden rounded-lg border border-brass/35 bg-white px-4 py-3 text-sm text-ink/72 shadow-crisp"></div>
+
+        <div id="loadingState" class="mt-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" aria-live="polite">
           <div class="h-96 animate-pulse rounded-lg bg-white/80"></div>
           <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 sm:block"></div>
           <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 lg:block"></div>
           <div class="hidden h-96 animate-pulse rounded-lg bg-white/80 lg:block"></div>
         </div>
 
-        <div id="productGrid" class="mt-10 grid gap-6"></div>
+        <div id="productGrid" class="mt-2 grid gap-6"></div>
 
         <div id="emptyState" class="mt-10 hidden rounded-lg border border-line bg-white px-6 py-12 text-center shadow-crisp">
           <p class="text-lg font-semibold">The live rack is being arranged.</p>
           <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/62">Add products from the admin portal and they will appear here automatically.</p>
         </div>
+
       </div>
     </section>
 
@@ -907,7 +1351,7 @@
           </div>
           <p class="mt-4 text-sm leading-6 text-ink/62">Stop by our store to explore fabric, fit, color, and seasonal arrivals up close.
           </p>
-          <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-7 inline-flex rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Get Directions</a>
+          <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="mt-7 inline-flex rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Get Directions</a>
         </div>
         <div class="grid gap-4 sm:grid-cols-3">
           <img class="h-64 w-full rounded-lg object-cover shadow-crisp sm:col-span-2" src="Images/Levis.jpeg">
@@ -942,7 +1386,7 @@
             </div>
             <p id="modalPrice" class="mt-5 text-2xl font-semibold text-leaf"></p>
             <p id="modalDescription" class="mt-5 whitespace-pre-line text-sm leading-7 text-ink/68"></p>
-            <a href="https://maps.app.goo.gl/ZsyAXskboHbKB6RA6" target="_blank" rel="noreferrer" class="mt-8 inline-flex w-fit rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Visit Store</a>
+            <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="mt-8 inline-flex w-fit rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Visit Store</a>
           </div>
         </div>
       </article>
@@ -950,7 +1394,7 @@
   </div>
 
   <script type="module">
-    const MAP_URL = "https://maps.app.goo.gl/ZsyAXskboHbKB6RA6";
+    const MAP_URL = "https://maps.app.goo.gl/nyVYJmLnxqmvGUr89";
     const PLACEHOLDER_URL = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
     const DEFAULT_ANNOUNCEMENT = {
       id: "homepage",
@@ -1066,6 +1510,11 @@
       dom.announcementTitle = document.querySelector("#announcementTitle");
       dom.announcementMessage = document.querySelector("#announcementMessage");
       dom.announcementOffer = document.querySelector("#announcementOffer");
+      dom.offerImageSlider = document.querySelector("#offerImageSlider");
+      dom.offerImageTrack = document.querySelector("#offerImageTrack");
+      dom.offerSwipeHint = document.querySelector("#offerSwipeHint");
+      dom.offerPrevBtn = document.querySelector("#offerPrevBtn");
+      dom.offerNextBtn = document.querySelector("#offerNextBtn");
       dom.availableBrands = document.querySelector("#availableBrands");
       dom.brandLogoGrid = document.querySelector("#brandLogoGrid");
       dom.productModal = document.querySelector("#productModal");
@@ -1084,6 +1533,10 @@
       dom.categoryNext?.addEventListener("click", () => scrollCategoryTrack(1));
       dom.categoryTrack?.addEventListener("scroll", updateCategoryNavState, { passive: true });
       window.addEventListener("resize", updateCategoryNavState);
+      dom.offerPrevBtn?.addEventListener("click", () => scrollOfferImageTrack(-1));
+      dom.offerNextBtn?.addEventListener("click", () => scrollOfferImageTrack(1));
+      dom.offerImageTrack?.addEventListener("scroll", updateOfferNavState, { passive: true });
+      window.addEventListener("resize", updateOfferNavState);
       dom.closeModal.addEventListener("click", closeProductModal);
       dom.productModal.addEventListener("click", (event) => {
         if (event.target === dom.productModal || event.target.classList.contains("modal-backdrop")) {
@@ -1256,7 +1709,7 @@
 
         const { data, error } = await state.client
           .from("site_announcements")
-          .select("id,eyebrow,title,message,offer_text,cta_label,cta_url,is_active,updated_at")
+          .select("id,eyebrow,title,message,offer_text,offer_images,cta_label,cta_url,is_active,updated_at")
           .eq("id", "homepage")
           .maybeSingle();
 
@@ -1284,6 +1737,24 @@
       dom.announcementMessage.textContent = board.message || DEFAULT_ANNOUNCEMENT.message;
       dom.announcementOffer.textContent = board.offer_text || DEFAULT_ANNOUNCEMENT.offer_text;
 
+      // Render offer poster images
+      const images = Array.isArray(board.offer_images) ? board.offer_images.filter(Boolean) : [];
+      dom.offerImageSlider.classList.toggle("hidden", images.length === 0);
+      dom.offerSwipeHint.classList.toggle("hidden", images.length <= 2);
+      dom.offerImageTrack.replaceChildren();
+      images.forEach((url) => {
+        const item = document.createElement("div");
+        item.className = "offer-image-item";
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Offer poster";
+        img.loading = "lazy";
+        img.decoding = "async";
+        item.appendChild(img);
+        dom.offerImageTrack.appendChild(item);
+      });
+
+      requestAnimationFrame(updateOfferNavState);
     }
 
     async function loadSubcategories() {
@@ -1463,6 +1934,31 @@
       dom.categoryNext.disabled = !hasOverflow || dom.categoryTrack.scrollLeft >= overflowAmount - 1;
     }
 
+    function scrollOfferImageTrack(direction) {
+      if (!dom.offerImageTrack) {
+        return;
+      }
+      const scrollAmount = Math.max(dom.offerImageTrack.clientWidth * 0.72, 180);
+      dom.offerImageTrack.scrollBy({
+        left: direction * scrollAmount,
+        behavior: "smooth"
+      });
+    }
+
+    function updateOfferNavState() {
+      if (!dom.offerImageTrack || !dom.offerPrevBtn || !dom.offerNextBtn) {
+        return;
+      }
+      const overflowAmount = dom.offerImageTrack.scrollWidth - dom.offerImageTrack.clientWidth;
+      const hasOverflow = overflowAmount > 1;
+      
+      // Center the images horizontally if they do not overflow the container
+      dom.offerImageTrack.classList.toggle("justify-center", !hasOverflow);
+      
+      dom.offerPrevBtn.disabled = !hasOverflow || dom.offerImageTrack.scrollLeft <= 1;
+      dom.offerNextBtn.disabled = !hasOverflow || dom.offerImageTrack.scrollLeft >= overflowAmount - 1;
+    }
+
     function createCategoryChip(category) {
       const button = document.createElement("button");
       const isActive = state.activeSubcategoryId === category.id;
@@ -1529,55 +2025,55 @@
       card.addEventListener("click", () => openProductModal(product));
 
       const imageWrap = document.createElement("div");
-      imageWrap.className = "relative aspect-[3/4] overflow-hidden bg-linen";
+      imageWrap.className = "relative aspect-[4/5] overflow-hidden bg-linen";
 
       imageWrap.appendChild(createMediaElement(mediaItems[0], product.title || "Anurag Apparel product", "h-full w-full object-contain p-1 transition duration-500 group-hover:scale-[1.02]"));
 
       if (isVideoUrl(mediaItems[0])) {
         const mediaBadge = document.createElement("span");
-        mediaBadge.className = "absolute left-3 top-3 rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink shadow-crisp backdrop-blur";
+        mediaBadge.className = "absolute left-2 top-2 rounded bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-ink shadow-crisp backdrop-blur";
         mediaBadge.textContent = "Video";
         imageWrap.appendChild(mediaBadge);
       }
 
       if (mediaItems.length > 1) {
         const countBadge = document.createElement("span");
-        countBadge.className = "absolute bottom-3 right-3 rounded-md bg-ink/82 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur";
+        countBadge.className = "absolute bottom-2 right-2 rounded bg-ink/82 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur";
         countBadge.textContent = `${mediaItems.length} views`;
         imageWrap.appendChild(countBadge);
       }
 
       const content = document.createElement("div");
-      content.className = "p-3 sm:p-5";
+      content.className = "p-2.5 sm:p-3.5";
 
       const subcategoryName = getSubcategoryName(product.subcategory_id);
       if (subcategoryName) {
         const categoryBadge = document.createElement("p");
-        categoryBadge.className = "mb-1.5 inline-flex rounded-full bg-brass/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-brass sm:mb-2 sm:px-2.5 sm:py-1 sm:text-[11px] sm:tracking-[0.12em]";
+        categoryBadge.className = "mb-1 inline-flex rounded-full bg-brass/10 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-brass sm:mb-1.5 sm:px-2.5 sm:py-0.5 sm:text-[10px] sm:tracking-[0.12em]";
         categoryBadge.textContent = subcategoryName;
         content.appendChild(categoryBadge);
       }
 
       const title = document.createElement("h3");
-      title.className = "text-sm font-semibold leading-tight text-ink sm:text-lg";
+      title.className = "text-sm font-semibold leading-tight text-ink sm:text-base";
       title.textContent = product.title || "Untitled product";
 
       const description = document.createElement("p");
-      description.className = "mt-1 min-h-[2rem] text-xs leading-4 text-ink/60 sm:mt-2 sm:min-h-[2.5rem] sm:text-sm sm:leading-5";
+      description.className = "mt-1 text-[11px] leading-4 text-ink/60 sm:mt-1 sm:text-xs sm:leading-5";
       description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 64);
 
       const footer = document.createElement("div");
       const priceText = formatCurrency(product.price);
       footer.className = priceText
-        ? "mt-3 flex items-center justify-between gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3"
-        : "mt-3 flex items-center justify-end gap-2 border-t border-line pt-3 sm:mt-4 sm:gap-3";
+        ? "mt-2.5 flex items-center justify-between gap-2 border-t border-line pt-2.5 sm:mt-3 sm:gap-3"
+        : "mt-2.5 flex items-center justify-end gap-2 border-t border-line pt-2.5 sm:mt-3 sm:gap-3";
 
       const price = document.createElement("p");
-      price.className = "text-xs font-semibold text-leaf sm:text-lg";
+      price.className = "text-xs font-semibold text-leaf sm:text-base";
       price.textContent = priceText;
 
       const action = document.createElement("span");
-      action.className = "rounded-md bg-ink px-2 py-1 text-[9px] font-semibold text-white transition group-hover:bg-leaf sm:px-3 sm:py-2 sm:text-xs";
+      action.className = "rounded bg-ink px-2 py-1 text-[9px] font-semibold text-white transition group-hover:bg-leaf sm:px-2.5 sm:py-1.5 sm:text-[11px]";
       action.textContent = "View Details";
 
       if (priceText) {
