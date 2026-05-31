@@ -2224,6 +2224,7 @@
         return;
       }
 
+      const scrollPosition = captureScrollPosition();
       setStatus(product.is_active ? "Archiving product..." : "Restoring product...", "info");
 
       try {
@@ -2240,6 +2241,8 @@
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Unable to update product status.", "error");
+      } finally {
+        restoreScrollPosition(scrollPosition);
       }
     }
 
@@ -2303,6 +2306,7 @@
         return;
       }
 
+      const scrollPosition = captureScrollPosition();
       setStatus(subcategory.is_active ? "Archiving subcategory..." : "Restoring subcategory...", "info");
 
       try {
@@ -2319,6 +2323,8 @@
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Unable to update subcategory status.", "error");
+      } finally {
+        restoreScrollPosition(scrollPosition);
       }
     }
 
@@ -2384,6 +2390,7 @@
         return;
       }
 
+      const scrollPosition = captureScrollPosition();
       setStatus(brand.is_active ? "Archiving brand..." : "Restoring brand...", "info");
 
       try {
@@ -2400,6 +2407,8 @@
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Unable to update brand status.", "error");
+      } finally {
+        restoreScrollPosition(scrollPosition);
       }
     }
 
@@ -2651,6 +2660,22 @@
       };
       dom.statusMessage.className = classes[type] || classes.info;
       dom.statusMessage.textContent = message;
+    }
+
+    function captureScrollPosition() {
+      return {
+        left: window.scrollX || document.documentElement.scrollLeft || 0,
+        top: window.scrollY || document.documentElement.scrollTop || 0
+      };
+    }
+
+    function restoreScrollPosition(position) {
+      const restore = () => window.scrollTo(position.left, position.top);
+      restore();
+      requestAnimationFrame(() => {
+        restore();
+        requestAnimationFrame(restore);
+      });
     }
 
     function renderProductSubcategoryOptions(selectedId = dom.productSubcategory?.value || "") {

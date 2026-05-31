@@ -31,7 +31,7 @@ window.ANURAG_MAX_VIDEO_MB = 50;
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL="Anurag Apparel <hello@your-domain.com>"
+RESEND_FROM_EMAIL=hello@your-domain.com
 ```
 
 The browser pages load `supabase-browser-config.js` first and then fall back to `/.env`. On hosts that block dotfiles, the browser config file is the reliable option.
@@ -58,7 +58,7 @@ Required Supabase Edge Function secrets:
 
 ```env
 RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL="Anurag Apparel <hello@your-domain.com>"
+RESEND_FROM_EMAIL=hello@your-domain.com
 ```
 
 Optional legacy secret:

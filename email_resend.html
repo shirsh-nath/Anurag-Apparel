@@ -1390,6 +1390,7 @@
     async function toggleContactActive(id) {
       const contact = state.contacts.find((c) => c.id === id);
       if (!contact) return;
+      const scrollPosition = captureScrollPosition();
       setStatus(contact.is_active ? "Archiving contact…" : "Restoring contact…", "info");
       try {
         const { error } = await state.client
@@ -1401,6 +1402,8 @@
       } catch (err) {
         console.error(err);
         setStatus(err.message || "Unable to update contact.", "error");
+      } finally {
+        restoreScrollPosition(scrollPosition);
       }
     }
 
@@ -1459,6 +1462,22 @@
       };
       dom.statusMessage.className = classes[type] || classes.info;
       dom.statusMessage.textContent = message;
+    }
+
+    function captureScrollPosition() {
+      return {
+        left: window.scrollX || document.documentElement.scrollLeft || 0,
+        top: window.scrollY || document.documentElement.scrollTop || 0
+      };
+    }
+
+    function restoreScrollPosition(position) {
+      const restore = () => window.scrollTo(position.left, position.top);
+      restore();
+      requestAnimationFrame(() => {
+        restore();
+        requestAnimationFrame(restore);
+      });
     }
 
     function sanitizeFileName(name) {

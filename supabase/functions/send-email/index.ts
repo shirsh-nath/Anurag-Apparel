@@ -26,11 +26,13 @@ Deno.serve(async (req) => {
 
   try {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL");
+    const fromEmailSecret = Deno.env.get("RESEND_FROM_EMAIL");
 
-    if (!resendApiKey || !fromEmail) {
+    if (!resendApiKey || !fromEmailSecret) {
       return json({ error: "Missing RESEND_API_KEY or RESEND_FROM_EMAIL secret." }, 500);
     }
+
+    const fromEmail = formatSenderAddress(fromEmailSecret);
 
     const payload = await req.json() as SendEmailPayload;
     const requestedRecipients = Array.isArray(payload.to)
@@ -302,6 +304,11 @@ function safeImageUrl(value: unknown) {
 function extractEmailAddress(value: string) {
   const match = value.match(/<([^>]+)>/);
   return (match?.[1] || value).trim();
+}
+
+function formatSenderAddress(value: string) {
+  const email = extractEmailAddress(value);
+  return `Anurag Apparel <${email}>`;
 }
 
 function escapeHtml(value: unknown) {
