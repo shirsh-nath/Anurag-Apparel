@@ -135,6 +135,31 @@ create trigger trg_email_contacts_updated_at
   before update on public.email_contacts
   for each row execute function public.set_email_contacts_updated_at();
 
+-- Stores reusable named campaign images for the Email Customers feature.
+create table if not exists public.email_campaign_images (
+  id           uuid        primary key default gen_random_uuid(),
+  name         text        not null,
+  image_url    text        not null,
+  storage_path text        not null,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now(),
+  constraint email_campaign_images_name_not_blank check (length(trim(name)) > 0),
+  constraint email_campaign_images_image_url_not_blank check (length(trim(image_url)) > 0),
+  constraint email_campaign_images_storage_path_unique unique (storage_path)
+);
+
+create index if not exists email_campaign_images_created_at_idx
+  on public.email_campaign_images (created_at desc);
+
+create or replace function public.set_email_campaign_images_updated_at()
+returns trigger language plpgsql set search_path = '' as $$
+begin new.updated_at = now(); return new; end; $$;
+
+drop trigger if exists trg_email_campaign_images_updated_at on public.email_campaign_images;
+create trigger trg_email_campaign_images_updated_at
+  before update on public.email_campaign_images
+  for each row execute function public.set_email_campaign_images_updated_at();
+
 -- ── 7. Admin credentials (private schema) ───────────────────
 create table if not exists private.admin_credentials (
   id            text        primary key default 'dashboard',
@@ -208,6 +233,7 @@ alter table public.brands               enable row level security;
 alter table public.site_announcements   enable row level security;
 alter table public.site_settings        enable row level security;
 alter table public.email_contacts       enable row level security;
+alter table public.email_campaign_images enable row level security;
 
 -- ── 11. Table grants ─────────────────────────────────────────
 grant select, insert, update, delete on table public.products              to anon;
@@ -216,6 +242,7 @@ grant select, insert, update, delete on table public.brands                to an
 grant select, insert, update         on table public.site_announcements    to anon;
 grant select, insert, update         on table public.site_settings         to anon;
 grant select, insert, update, delete on table public.email_contacts        to anon;
+grant select, insert, update, delete on table public.email_campaign_images to anon;
 
 -- ── 12. RLS Policies ─────────────────────────────────────────
 
@@ -317,6 +344,33 @@ create policy "Anon can update email contacts for static admin"
   on public.email_contacts for update to anon using (true) with check (true);
 create policy "Anon can delete email contacts"
   on public.email_contacts for delete to anon using (true);
+
+-- email_campaign_images
+drop policy if exists "Public can read email campaign images"                  on public.email_campaign_images;
+drop policy if exists "Anon can create email campaign images for static admin" on public.email_campaign_images;
+drop policy if exists "Anon can update email campaign images for static admin" on public.email_campaign_images;
+drop policy if exists "Anon can delete email campaign images"                  on public.email_campaign_images;
+
+create policy "Public can read email campaign images"
+  on public.email_campaign_images for select to anon using (true);
+create policy "Anon can create email campaign images for static admin"
+  on public.email_campaign_images for insert to anon
+  with check (
+    length(trim(name)) > 0
+    and length(trim(image_url)) > 0
+    and storage_path like 'campaigns/%'
+  );
+create policy "Anon can update email campaign images for static admin"
+  on public.email_campaign_images for update to anon
+  using (storage_path like 'campaigns/%')
+  with check (
+    length(trim(name)) > 0
+    and length(trim(image_url)) > 0
+    and storage_path like 'campaigns/%'
+  );
+create policy "Anon can delete email campaign images"
+  on public.email_campaign_images for delete to anon
+  using (storage_path like 'campaigns/%');
 
 -- ── 13. Storage bucket ───────────────────────────────────────
 insert into storage.buckets (id, name, public)

@@ -579,20 +579,19 @@
 
     .product-liquid-card {
       background:
-        linear-gradient(142deg, rgba(255, 250, 236, 0.78) 0%, rgba(247, 240, 219, 0.54) 48%, rgba(255, 248, 231, 0.72) 100%),
-        radial-gradient(circle at 14% 12%, rgba(255, 255, 255, 0.82), transparent 30%),
-        radial-gradient(circle at 88% 10%, rgba(183, 135, 45, 0.22), transparent 36%),
-        radial-gradient(circle at 10% 90%, rgba(183, 135, 45, 0.11), transparent 40%),
-        radial-gradient(circle at 84% 84%, rgba(168, 95, 61, 0.1), transparent 38%);
-      backdrop-filter: blur(30px) saturate(165%) brightness(104%);
-      -webkit-backdrop-filter: blur(30px) saturate(165%) brightness(104%);
-      border: 1px solid rgba(255, 255, 255, 0.74);
+        radial-gradient(circle at 88% 12%, rgba(183, 135, 45, 0.10), transparent 36%),
+        radial-gradient(circle at 12% 86%, rgba(212, 166, 64, 0.08), transparent 38%),
+        linear-gradient(120deg, rgba(255, 255, 255, 0.38), rgba(255, 248, 232, 0.16) 42%, rgba(255, 255, 255, 0.26)),
+        linear-gradient(180deg, rgba(251, 250, 247, 0.24), rgba(243, 238, 229, 0.14));
+      backdrop-filter: blur(34px) saturate(180%) contrast(104%);
+      -webkit-backdrop-filter: blur(34px) saturate(180%) contrast(104%);
+      border: 1px solid rgba(255, 255, 255, 0.78);
       border-radius: 1.15rem;
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.92),
         inset 0 -1px 0 rgba(255, 255, 255, 0.28),
-        0 24px 58px rgba(80, 64, 42, 0.13),
-        0 8px 20px rgba(23, 23, 23, 0.07);
+        inset 0 0 42px rgba(255, 255, 255, 0.12),
+        0 24px 54px rgba(80, 64, 42, 0.14);
       isolation: isolate;
       overflow: hidden;
       position: relative;
@@ -609,14 +608,16 @@
 
     .product-liquid-card::before {
       background:
-        linear-gradient(124deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.12) 31%, transparent 32%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 48%);
+        linear-gradient(105deg, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.18) 26%, transparent 54%),
+        radial-gradient(circle at 76% 0%, rgba(255, 255, 255, 0.44), transparent 36%);
       mix-blend-mode: screen;
     }
 
     .product-liquid-card::after {
-      background: radial-gradient(ellipse at 50% 115%, rgba(255, 255, 255, 0.46), transparent 56%);
-      opacity: 0.86;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
+      height: 1px;
+      inset: 0 1.25rem auto;
+      opacity: 1;
     }
 
     .product-liquid-card > * {
@@ -635,9 +636,9 @@
 
     .product-liquid-media {
       background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(248, 240, 215, 0.43) 54%, rgba(255, 248, 232, 0.34)),
-        radial-gradient(circle at 22% 14%, rgba(255, 255, 255, 0.76), transparent 36%),
-        radial-gradient(circle at 82% 86%, rgba(183, 135, 45, 0.13), transparent 34%);
+        radial-gradient(circle at 84% 14%, rgba(183, 135, 45, 0.08), transparent 34%),
+        linear-gradient(120deg, rgba(255, 255, 255, 0.40), rgba(255, 248, 232, 0.18) 42%, rgba(255, 255, 255, 0.28)),
+        linear-gradient(180deg, rgba(251, 250, 247, 0.22), rgba(243, 238, 229, 0.12));
       border: 1px solid rgba(255, 255, 255, 0.82);
       border-radius: 0.95rem;
       box-shadow:
@@ -838,19 +839,18 @@
     }
 
     .offer-board-card {
-      background: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      -webkit-backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      border: 1px solid rgba(255, 255, 255, 0.70);
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.24)),
+        linear-gradient(180deg, rgba(251, 250, 247, 0.16), rgba(243, 238, 229, 0.08));
+      backdrop-filter: blur(34px) saturate(180%) contrast(104%);
+      -webkit-backdrop-filter: blur(34px) saturate(180%) contrast(104%);
+      border: 1px solid rgba(255, 255, 255, 0.78);
       border-radius: 1.25rem;
       box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -0.5px 0 rgba(255, 255, 255, 0.22),
-        inset 1px 0 0 rgba(255, 255, 255, 0.18),
-        inset -1px 0 0 rgba(255, 255, 255, 0.18),
-        0 36px 80px rgba(23, 23, 23, 0.16),
-        0 10px 28px rgba(23, 23, 23, 0.08),
-        0 2px 8px rgba(23, 23, 23, 0.04);
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.24),
+        inset 0 0 42px rgba(255, 255, 255, 0.12),
+        0 24px 54px rgba(80, 64, 42, 0.14);
       overflow: hidden;
       position: relative;
     }
@@ -892,7 +892,7 @@
 
     /* ── Section 1: Offer Board Text — ghost warm-gold tint ── */
     .offer-board-text-col {
-      background: rgba(255, 246, 215, 0.16);
+      background: transparent;
       position: relative;
     }
 
@@ -901,15 +901,15 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at 0% 0%, rgba(183, 135, 45, 0.10) 0%, transparent 55%),
-        radial-gradient(ellipse at 100% 100%, rgba(212, 166, 64, 0.06) 0%, transparent 50%);
+        radial-gradient(ellipse at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
 
     /* ── Section 2: Image Slider — ghost sage-mint tint ── */
     #offerImageSlider {
-      background: rgba(210, 242, 225, 0.13);
+      background: transparent;
       position: relative;
     }
 
@@ -918,15 +918,15 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at 100% 0%, rgba(45, 106, 79, 0.09) 0%, transparent 55%),
-        radial-gradient(ellipse at 0% 100%, rgba(183, 135, 45, 0.06) 0%, transparent 50%);
+        radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 0% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
 
     /* ── Section 3: Store Update — ghost cream tint ── */
     #announcementBoard {
-      background: rgba(255, 248, 232, 0.16);
+      background: transparent;
       position: relative;
     }
 
@@ -935,8 +935,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse at 20% 50%, rgba(183, 135, 45, 0.07) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 0%, rgba(168, 95, 61, 0.05) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
@@ -1585,8 +1585,10 @@
       }
 
       .offer-board-card {
-        background: rgba(255, 255, 255, 0.42) !important;
-        border-color: rgba(255, 255, 255, 0.45) !important;
+        background:
+          linear-gradient(120deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.24)),
+          linear-gradient(180deg, rgba(251, 250, 247, 0.16), rgba(243, 238, 229, 0.08)) !important;
+        border-color: rgba(255, 255, 255, 0.78) !important;
         color: #171717 !important;
       }
       #announcementOffer { color: #3b3329 !important; }
@@ -1632,20 +1634,20 @@
 
       .product-liquid-card {
         background:
-          linear-gradient(142deg, rgba(255, 250, 236, 0.78) 0%, rgba(247, 240, 219, 0.54) 48%, rgba(255, 248, 231, 0.72) 100%),
-          radial-gradient(circle at 14% 12%, rgba(255, 255, 255, 0.82), transparent 30%),
-          radial-gradient(circle at 88% 10%, rgba(183, 135, 45, 0.22), transparent 36%),
-          radial-gradient(circle at 10% 90%, rgba(183, 135, 45, 0.11), transparent 40%),
-          radial-gradient(circle at 84% 84%, rgba(168, 95, 61, 0.1), transparent 38%) !important;
-        border-color: rgba(255, 255, 255, 0.74) !important;
+          radial-gradient(circle at 88% 12%, rgba(183, 135, 45, 0.10), transparent 36%),
+          radial-gradient(circle at 12% 86%, rgba(212, 166, 64, 0.08), transparent 38%),
+          linear-gradient(120deg, rgba(255, 255, 255, 0.38), rgba(255, 248, 232, 0.16) 42%, rgba(255, 255, 255, 0.26)),
+          linear-gradient(180deg, rgba(251, 250, 247, 0.24), rgba(243, 238, 229, 0.14)) !important;
+        border-color: rgba(255, 255, 255, 0.78) !important;
         color: #171717 !important;
       }
 
       .product-liquid-media,
       .product-modal-media-frame {
         background:
-          linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(248, 240, 215, 0.43), rgba(255, 248, 232, 0.34)),
-          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 38%) !important;
+          radial-gradient(circle at 84% 14%, rgba(183, 135, 45, 0.08), transparent 34%),
+          linear-gradient(120deg, rgba(255, 255, 255, 0.40), rgba(255, 248, 232, 0.18) 42%, rgba(255, 255, 255, 0.28)),
+          linear-gradient(180deg, rgba(251, 250, 247, 0.22), rgba(243, 238, 229, 0.12)) !important;
         border-color: rgba(255, 255, 255, 0.82) !important;
       }
 
