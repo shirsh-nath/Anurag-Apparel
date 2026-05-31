@@ -577,6 +577,242 @@
       padding: 0.24rem 0.45rem;
     }
 
+    .product-liquid-card {
+      background:
+        linear-gradient(142deg, rgba(255, 250, 236, 0.78) 0%, rgba(247, 240, 219, 0.54) 48%, rgba(255, 248, 231, 0.72) 100%),
+        radial-gradient(circle at 14% 12%, rgba(255, 255, 255, 0.82), transparent 30%),
+        radial-gradient(circle at 88% 10%, rgba(183, 135, 45, 0.22), transparent 36%),
+        radial-gradient(circle at 10% 90%, rgba(183, 135, 45, 0.11), transparent 40%),
+        radial-gradient(circle at 84% 84%, rgba(168, 95, 61, 0.1), transparent 38%);
+      backdrop-filter: blur(30px) saturate(165%) brightness(104%);
+      -webkit-backdrop-filter: blur(30px) saturate(165%) brightness(104%);
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      border-radius: 1.15rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.28),
+        0 24px 58px rgba(80, 64, 42, 0.13),
+        0 8px 20px rgba(23, 23, 23, 0.07);
+      isolation: isolate;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-liquid-card::before,
+    .product-liquid-card::after {
+      content: "";
+      inset: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 0;
+    }
+
+    .product-liquid-card::before {
+      background:
+        linear-gradient(124deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.12) 31%, transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 48%);
+      mix-blend-mode: screen;
+    }
+
+    .product-liquid-card::after {
+      background: radial-gradient(ellipse at 50% 115%, rgba(255, 255, 255, 0.46), transparent 56%);
+      opacity: 0.86;
+    }
+
+    .product-liquid-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .product-liquid-card:hover {
+      border-color: rgba(183, 135, 45, 0.55);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.96),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.32),
+        0 34px 74px rgba(80, 64, 42, 0.2),
+        0 12px 26px rgba(23, 23, 23, 0.09);
+    }
+
+    .product-liquid-media {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(248, 240, 215, 0.43) 54%, rgba(255, 248, 232, 0.34)),
+        radial-gradient(circle at 22% 14%, rgba(255, 255, 255, 0.76), transparent 36%),
+        radial-gradient(circle at 82% 86%, rgba(183, 135, 45, 0.13), transparent 34%);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      border-radius: 0.95rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.32),
+        0 12px 26px rgba(80, 64, 42, 0.08);
+      margin: 0.55rem;
+    }
+
+    .product-liquid-badge {
+      background: rgba(255, 255, 255, 0.56);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(80, 64, 42, 0.1);
+    }
+
+    .product-liquid-action {
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(23, 23, 23, 0.94), rgba(45, 106, 79, 0.9)),
+        radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.32), transparent 32%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      color: #fff;
+      display: inline-flex;
+      min-height: 2rem;
+      padding: 0 0.8rem;
+      white-space: nowrap;
+    }
+
+    .product-liquid-divider {
+      border-color: rgba(184, 170, 150, 0.32);
+    }
+
+    .product-modal-panel {
+      background:
+        linear-gradient(138deg, rgba(251, 250, 247, 0.9) 0%, rgba(243, 238, 229, 0.58) 48%, rgba(255, 249, 240, 0.82) 100%),
+        radial-gradient(circle at 10% 6%, rgba(255, 255, 255, 0.88), transparent 30%),
+        radial-gradient(circle at 92% 12%, rgba(183, 135, 45, 0.22), transparent 36%),
+        radial-gradient(circle at 18% 94%, rgba(45, 106, 79, 0.16), transparent 40%),
+        radial-gradient(circle at 78% 82%, rgba(168, 95, 61, 0.14), transparent 35%);
+      backdrop-filter: blur(34px) saturate(170%);
+      -webkit-backdrop-filter: blur(34px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        0 36px 90px rgba(23, 23, 23, 0.26);
+    }
+
+    .product-modal-media-shell {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(243, 238, 229, 0.44) 54%, rgba(239, 246, 242, 0.36)),
+        radial-gradient(circle at 18% 10%, rgba(255, 255, 255, 0.78), transparent 34%),
+        radial-gradient(circle at 92% 86%, rgba(168, 95, 61, 0.12), transparent 34%);
+      border-right: 1px solid rgba(255, 255, 255, 0.56);
+    }
+
+    .product-modal-media-frame {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(243, 238, 229, 0.4), rgba(238, 245, 240, 0.32)),
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 38%);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      margin: 0 auto;
+      max-height: min(62vh, 30rem);
+      max-width: 25rem;
+      width: 100%;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.94),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.34),
+        0 16px 36px rgba(80, 64, 42, 0.1);
+    }
+
+    .product-modal-details-shell {
+      background:
+        linear-gradient(180deg, rgba(251, 250, 247, 0.98), rgba(243, 238, 229, 0.96)),
+        radial-gradient(circle at 100% 0%, rgba(183, 135, 45, 0.08), transparent 32%);
+      border-left: 1px solid rgba(231, 225, 216, 0.92);
+      box-shadow:
+        inset 1px 0 0 rgba(255, 255, 255, 0.72),
+        -18px 0 42px rgba(80, 64, 42, 0.05);
+      color: #171717;
+    }
+
+    .product-modal-kicker {
+      color: #b7872d;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .product-modal-title {
+      color: #171717;
+      font-size: clamp(1.8rem, 3.5vw, 2.55rem);
+      font-weight: 750;
+      letter-spacing: 0;
+      line-height: 1.04;
+      margin-top: 0.7rem;
+    }
+
+    .product-modal-price {
+      align-items: center;
+      background: rgba(45, 106, 79, 0.08);
+      border: 1px solid rgba(45, 106, 79, 0.14);
+      border-radius: 999px;
+      color: #2d6a4f;
+      display: inline-flex;
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-top: 1.35rem;
+      padding: 0.65rem 0.95rem;
+      width: fit-content;
+    }
+
+    .product-modal-price.hidden {
+      display: none;
+    }
+
+    .product-modal-description {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.72));
+      border: 1px solid rgba(231, 225, 216, 0.95);
+      border-radius: 0.85rem;
+      color: rgba(23, 23, 23, 0.7);
+      font-size: 0.96rem;
+      line-height: 1.75;
+      margin-top: 1.35rem;
+      padding: 1rem;
+      white-space: pre-line;
+    }
+
+    .product-modal-cta {
+      align-items: center;
+      background:
+        linear-gradient(135deg, #171717, #243f34);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 0.7rem;
+      box-shadow: 0 14px 30px rgba(23, 23, 23, 0.14);
+      color: #fff;
+      display: inline-flex;
+      font-size: 0.95rem;
+      font-weight: 800;
+      justify-content: center;
+      margin-top: 1.7rem;
+      min-height: 3.25rem;
+      padding: 0 1.35rem;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+      width: fit-content;
+    }
+
+    .product-modal-cta:hover {
+      background:
+        linear-gradient(135deg, #111, #2d6a4f);
+      box-shadow: 0 18px 36px rgba(23, 23, 23, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .product-modal-close {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 0.75rem;
+      box-shadow: 0 12px 26px rgba(23, 23, 23, 0.07);
+    }
+
+    @media (max-width: 1023px) {
+      .product-modal-details-shell {
+        border-left: 0;
+        border-top: 1px solid rgba(231, 225, 216, 0.92);
+      }
+    }
+
     .announcement-board {
       background:
         linear-gradient(135deg, rgba(23, 23, 23, 0.96), rgba(45, 106, 79, 0.92)),
@@ -1329,6 +1565,51 @@
         color: #171717 !important;
       }
 
+      .product-liquid-card {
+        background:
+          linear-gradient(142deg, rgba(255, 250, 236, 0.78) 0%, rgba(247, 240, 219, 0.54) 48%, rgba(255, 248, 231, 0.72) 100%),
+          radial-gradient(circle at 14% 12%, rgba(255, 255, 255, 0.82), transparent 30%),
+          radial-gradient(circle at 88% 10%, rgba(183, 135, 45, 0.22), transparent 36%),
+          radial-gradient(circle at 10% 90%, rgba(183, 135, 45, 0.11), transparent 40%),
+          radial-gradient(circle at 84% 84%, rgba(168, 95, 61, 0.1), transparent 38%) !important;
+        border-color: rgba(255, 255, 255, 0.74) !important;
+        color: #171717 !important;
+      }
+
+      .product-liquid-media,
+      .product-modal-media-frame {
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(248, 240, 215, 0.43), rgba(255, 248, 232, 0.34)),
+          radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 38%) !important;
+        border-color: rgba(255, 255, 255, 0.82) !important;
+      }
+
+      .product-modal-panel {
+        background:
+          linear-gradient(138deg, rgba(251, 250, 247, 0.9) 0%, rgba(243, 238, 229, 0.58) 48%, rgba(255, 249, 240, 0.82) 100%),
+          radial-gradient(circle at 10% 6%, rgba(255, 255, 255, 0.88), transparent 30%),
+          radial-gradient(circle at 92% 12%, rgba(183, 135, 45, 0.22), transparent 36%),
+          radial-gradient(circle at 18% 94%, rgba(45, 106, 79, 0.16), transparent 40%),
+          radial-gradient(circle at 78% 82%, rgba(168, 95, 61, 0.14), transparent 35%) !important;
+        border-color: rgba(255, 255, 255, 0.74) !important;
+        color: #171717 !important;
+      }
+
+      .product-modal-details-shell {
+        background:
+          linear-gradient(180deg, rgba(251, 250, 247, 0.98), rgba(243, 238, 229, 0.96)),
+          radial-gradient(circle at 100% 0%, rgba(183, 135, 45, 0.08), transparent 32%) !important;
+        border-color: rgba(231, 225, 216, 0.92) !important;
+        color: #171717 !important;
+      }
+
+      .product-modal-description {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(251, 250, 247, 0.72)) !important;
+        border-color: rgba(231, 225, 216, 0.95) !important;
+        color: rgba(23, 23, 23, 0.7) !important;
+      }
+
       /* Footer */
       footer {
         background: #171717 !important;
@@ -1337,7 +1618,7 @@
       }
 
       /* Modal */
-      .modal-panel {
+      .modal-panel:not(.product-modal-panel) {
         background: #fbfaf7 !important;
         color: #171717 !important;
       }
@@ -1625,23 +1906,23 @@
   <div id="productModal" class="pointer-events-none fixed inset-0 z-50" aria-hidden="true">
     <div class="modal-backdrop absolute inset-0 bg-ink/72"></div>
     <div class="relative z-10 flex min-h-full items-center justify-center p-4">
-      <article class="modal-panel max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-lg bg-paper shadow-soft">
+      <article class="modal-panel product-modal-panel max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[1.15rem] shadow-soft">
         <div class="grid lg:grid-cols-[1.08fr_0.92fr]">
-          <div class="bg-white p-4 sm:p-6">
-            <div id="modalMediaFrame" class="aspect-[4/5] overflow-hidden rounded-lg bg-line"></div>
+          <div class="product-modal-media-shell p-4 sm:p-6">
+            <div id="modalMediaFrame" class="product-modal-media-frame aspect-[4/5] overflow-hidden rounded-[0.95rem]"></div>
             <div id="modalThumbs" class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5"></div>
           </div>
-          <div class="flex flex-col p-6 sm:p-8">
+          <div class="product-modal-details-shell flex flex-col p-6 sm:p-8 lg:p-10">
             <div class="flex items-start justify-between gap-4">
-              <div>
-                <p class="text-sm font-semibold uppercase text-brass">Product details</p>
-                <h3 id="modalTitle" class="mt-2 text-3xl font-semibold"></h3>
+              <div class="min-w-0">
+                <p class="product-modal-kicker">Product details</p>
+                <h3 id="modalTitle" class="product-modal-title"></h3>
               </div>
-              <button id="closeModal" type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-line bg-white text-xl leading-none transition hover:bg-ink hover:text-white" aria-label="Close product details">&times;</button>
+              <button id="closeModal" type="button" class="product-modal-close grid h-11 w-11 shrink-0 place-items-center text-xl leading-none transition hover:bg-ink hover:text-white" aria-label="Close product details">&times;</button>
             </div>
-            <p id="modalPrice" class="mt-5 text-2xl font-semibold text-leaf"></p>
-            <p id="modalDescription" class="mt-5 whitespace-pre-line text-sm leading-7 text-ink/68"></p>
-            <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="mt-8 inline-flex w-fit rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Visit Store</a>
+            <p id="modalPrice" class="product-modal-price"></p>
+            <p id="modalDescription" class="product-modal-description"></p>
+            <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="product-modal-cta">Visit Store</a>
           </div>
         </div>
       </article>
@@ -2279,35 +2560,35 @@
       const mediaItems = getGalleryImages(product);
       const card = document.createElement("button");
       card.type = "button";
-      card.className = "group w-full overflow-hidden rounded-lg border border-line bg-white text-left shadow-crisp transition duration-300 hover:-translate-y-1 hover:border-brass/50 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-brass";
+      card.className = "product-liquid-card group w-full text-left transition duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brass/70 focus:ring-offset-2 focus:ring-offset-paper";
       card.addEventListener("click", () => openProductModal(product));
 
       const imageWrap = document.createElement("div");
-      imageWrap.className = "relative aspect-[4/5] overflow-hidden bg-linen";
+      imageWrap.className = "product-liquid-media relative aspect-[4/5] overflow-hidden";
 
-      imageWrap.appendChild(createMediaElement(mediaItems[0], product.title || "Anurag Apparel product", "h-full w-full object-contain p-1 transition duration-500 group-hover:scale-[1.02]"));
+      imageWrap.appendChild(createMediaElement(mediaItems[0], product.title || "Anurag Apparel product", "h-full w-full object-contain p-2 transition duration-500 group-hover:scale-[1.025] sm:p-3"));
 
       if (isVideoUrl(mediaItems[0])) {
         const mediaBadge = document.createElement("span");
-        mediaBadge.className = "absolute left-2 top-2 rounded bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-ink shadow-crisp backdrop-blur";
+        mediaBadge.className = "product-liquid-badge absolute left-2 top-2 px-2 py-0.5 text-[10px] font-semibold text-ink";
         mediaBadge.textContent = "Video";
         imageWrap.appendChild(mediaBadge);
       }
 
       if (mediaItems.length > 1) {
         const countBadge = document.createElement("span");
-        countBadge.className = "absolute bottom-2 right-2 rounded bg-ink/82 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur";
+        countBadge.className = "product-liquid-badge absolute bottom-2 right-2 px-2 py-0.5 text-[10px] font-semibold text-ink";
         countBadge.textContent = `${mediaItems.length} views`;
         imageWrap.appendChild(countBadge);
       }
 
       const content = document.createElement("div");
-      content.className = "p-2.5 sm:p-3.5";
+      content.className = "px-3 pb-3 pt-1 sm:px-4 sm:pb-4 sm:pt-1.5";
 
       const subcategoryName = getSubcategoryName(product.subcategory_id);
       if (subcategoryName) {
         const categoryBadge = document.createElement("p");
-        categoryBadge.className = "mb-1 inline-flex rounded-full bg-brass/10 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-brass sm:mb-1.5 sm:px-2.5 sm:py-0.5 sm:text-[10px] sm:tracking-[0.12em]";
+        categoryBadge.className = "mb-1.5 inline-flex rounded-full bg-brass/10 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-brass sm:mb-2 sm:px-2.5 sm:py-0.5 sm:text-[10px] sm:tracking-[0.12em]";
         categoryBadge.textContent = subcategoryName;
         content.appendChild(categoryBadge);
       }
@@ -2317,21 +2598,21 @@
       title.textContent = product.title || "Untitled product";
 
       const description = document.createElement("p");
-      description.className = "mt-1 text-[11px] leading-4 text-ink/60 sm:mt-1 sm:text-xs sm:leading-5";
+      description.className = "mt-1 text-[11px] leading-4 text-ink/60 sm:mt-1.5 sm:text-xs sm:leading-5";
       description.textContent = compactText(product.description || "Premium apparel from Anurag Apparel.", 64);
 
       const footer = document.createElement("div");
       const priceText = formatCurrency(product.price);
       footer.className = priceText
-        ? "mt-2.5 flex items-center justify-between gap-2 border-t border-line pt-2.5 sm:mt-3 sm:gap-3"
-        : "mt-2.5 flex items-center justify-end gap-2 border-t border-line pt-2.5 sm:mt-3 sm:gap-3";
+        ? "product-liquid-divider mt-3 flex items-center justify-between gap-2 border-t pt-3 sm:mt-4 sm:gap-3"
+        : "product-liquid-divider mt-3 flex items-center justify-end gap-2 border-t pt-3 sm:mt-4 sm:gap-3";
 
       const price = document.createElement("p");
-      price.className = "text-xs font-semibold text-leaf sm:text-base";
+      price.className = "text-sm font-semibold text-leaf sm:text-lg";
       price.textContent = priceText;
 
       const action = document.createElement("span");
-      action.className = "rounded bg-ink px-2 py-1 text-[9px] font-semibold text-white transition group-hover:bg-leaf sm:px-2.5 sm:py-1.5 sm:text-[11px]";
+      action.className = "product-liquid-action text-[9px] font-semibold transition group-hover:translate-x-0.5 sm:text-[11px]";
       action.textContent = "View Details";
 
       if (priceText) {
@@ -2364,7 +2645,7 @@
       const mediaItems = getGalleryImages(product);
       const activeMedia = mediaItems[state.activeImageIndex] || mediaItems[0];
 
-      dom.modalMediaFrame.replaceChildren(createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-cover", true));
+      dom.modalMediaFrame.replaceChildren(createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-contain p-2 sm:p-3", true));
       dom.modalTitle.textContent = product.title || "Untitled product";
       const priceText = formatCurrency(product.price);
       dom.modalPrice.textContent = priceText;
@@ -2385,7 +2666,7 @@
           renderModal();
         });
 
-        thumb.appendChild(createMediaElement(mediaUrl, "", "h-full w-full object-cover"));
+        thumb.appendChild(createMediaElement(mediaUrl, "", "h-full w-full object-contain p-1"));
         if (isVideoUrl(mediaUrl)) {
           const badge = document.createElement("span");
           badge.className = "absolute bottom-1 left-1 rounded-md bg-ink/82 px-2 py-1 text-[10px] font-semibold text-white";
