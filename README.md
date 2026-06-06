@@ -11,6 +11,8 @@ The storefront call button is powered by `public.site_settings.phone_number` and
 The available brands strip is powered by `public.brands`; transparent logo images are uploaded from `admin.html` and stored in the `product-images` bucket under `brands/`.
 The email campaign dashboard is `email_resend.html`. Brand logos are selected from `public.brands`, reusable campaign images are stored in `public.email_campaign_images`, and new campaign image files are uploaded to the public `product-images` bucket under `campaigns/`. Sending calls the Supabase Edge Function at `supabase/functions/send-email` to deliver branded Resend emails.
 
+Traffic monitoring is available at `analytics.html` and from the Admin Menu. Storefront visits and engagement events are stored in `public.website_analytics_events`; run the latest `supabase-schema.sql` before expecting live analytics data.
+
 The admin password is verified through Supabase RPC functions created by `supabase-schema.sql`; use the Security panel in `admin.html` to change it.
 
 ## Setup

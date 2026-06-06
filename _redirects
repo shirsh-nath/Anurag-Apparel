@@ -1,2 +1,6 @@
 /admin /admin.html 200
 /admin/* /admin.html 200
+/analytics /analytics.html 200
+/analytics/* /analytics.html 200
+/email /email_resend.html 200
+/email/* /email_resend.html 200

@@ -7,6 +7,22 @@
     {
       "source": "/admin/:path*",
       "destination": "/admin.html"
+    },
+    {
+      "source": "/analytics",
+      "destination": "/analytics.html"
+    },
+    {
+      "source": "/analytics/:path*",
+      "destination": "/analytics.html"
+    },
+    {
+      "source": "/email",
+      "destination": "/email_resend.html"
+    },
+    {
+      "source": "/email/:path*",
+      "destination": "/email_resend.html"
     }
   ]
 }

@@ -160,7 +160,40 @@ create trigger trg_email_campaign_images_updated_at
   before update on public.email_campaign_images
   for each row execute function public.set_email_campaign_images_updated_at();
 
--- ── 7. Admin credentials (private schema) ───────────────────
+-- ── 7. website_analytics_events ──────────────────────────────
+-- Stores anonymous storefront traffic and engagement events.
+create table if not exists public.website_analytics_events (
+  id              uuid        primary key default gen_random_uuid(),
+  event_name      text        not null,
+  page_path       text        not null default '',
+  page_title      text        not null default '',
+  visitor_id      text        not null,
+  session_id      text        not null,
+  referrer        text        not null default '',
+  user_agent      text        not null default '',
+  language        text        not null default '',
+  timezone        text        not null default '',
+  screen_width    integer,
+  screen_height   integer,
+  viewport_width  integer,
+  viewport_height integer,
+  metadata        jsonb       not null default '{}'::jsonb,
+  created_at      timestamptz not null default now(),
+  constraint website_analytics_event_name_not_blank check (length(trim(event_name)) > 0),
+  constraint website_analytics_visitor_id_not_blank check (length(trim(visitor_id)) > 0),
+  constraint website_analytics_session_id_not_blank check (length(trim(session_id)) > 0)
+);
+
+create index if not exists website_analytics_events_created_at_idx
+  on public.website_analytics_events (created_at desc);
+create index if not exists website_analytics_events_event_name_idx
+  on public.website_analytics_events (event_name);
+create index if not exists website_analytics_events_visitor_id_idx
+  on public.website_analytics_events (visitor_id);
+create index if not exists website_analytics_events_session_id_idx
+  on public.website_analytics_events (session_id);
+
+-- ── 8. Admin credentials (private schema) ───────────────────
 create table if not exists private.admin_credentials (
   id            text        primary key default 'dashboard',
   username      text        not null unique,
@@ -234,6 +267,7 @@ alter table public.site_announcements   enable row level security;
 alter table public.site_settings        enable row level security;
 alter table public.email_contacts       enable row level security;
 alter table public.email_campaign_images enable row level security;
+alter table public.website_analytics_events enable row level security;
 
 -- ── 11. Table grants ─────────────────────────────────────────
 grant select, insert, update, delete on table public.products              to anon;
@@ -243,6 +277,7 @@ grant select, insert, update         on table public.site_announcements    to an
 grant select, insert, update         on table public.site_settings         to anon;
 grant select, insert, update, delete on table public.email_contacts        to anon;
 grant select, insert, update, delete on table public.email_campaign_images to anon;
+grant select, insert, delete       on table public.website_analytics_events to anon;
 
 -- ── 12. RLS Policies ─────────────────────────────────────────
 
@@ -372,6 +407,24 @@ create policy "Anon can delete email campaign images"
   on public.email_campaign_images for delete to anon
   using (storage_path like 'campaigns/%');
 
+-- website_analytics_events
+drop policy if exists "Public can create website analytics events" on public.website_analytics_events;
+drop policy if exists "Static admin can read website analytics events" on public.website_analytics_events;
+drop policy if exists "Admin can delete own analytics events" on public.website_analytics_events;
+
+create policy "Public can create website analytics events"
+  on public.website_analytics_events for insert to anon
+  with check (
+    length(trim(event_name)) > 0
+    and length(trim(visitor_id)) > 0
+    and length(trim(session_id)) > 0
+  );
+create policy "Static admin can read website analytics events"
+  on public.website_analytics_events for select to anon using (true);
+create policy "Admin can delete own analytics events"
+  on public.website_analytics_events for delete to anon
+  using (length(trim(visitor_id)) > 0);
+
 -- ── 13. Storage bucket ───────────────────────────────────────
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
@@ -425,3 +478,32 @@ begin
     revoke all on function public.rls_auto_enable() from public, anon, authenticated;
   end if;
 end; $$;
+
+-- ── 16. Analytics auto-cleanup (pg_cron) ─────────────────────
+-- Deletes analytics events older than 90 days every day at 02:00 IST (20:30 UTC).
+-- Keeps the table lean and within Supabase free-tier storage limits.
+create extension if not exists pg_cron with schema extensions;
+
+create or replace function public.purge_old_analytics_events()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  delete from public.website_analytics_events
+  where created_at < now() - interval '90 days';
+end;
+$$;
+
+grant execute on function public.purge_old_analytics_events() to postgres;
+
+select cron.unschedule('purge-old-analytics-events')
+  from cron.job
+ where jobname = 'purge-old-analytics-events';
+
+select cron.schedule(
+  'purge-old-analytics-events',
+  '30 20 * * *',
+  $$ select public.purge_old_analytics_events(); $$
+);

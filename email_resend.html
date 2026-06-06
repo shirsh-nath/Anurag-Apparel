@@ -625,6 +625,20 @@
     async function loadSupabaseConfig() {
       const inline = { url: window.ANURAG_SUPABASE_URL, anonKey: window.ANURAG_SUPABASE_ANON_KEY };
       if (isConfigured(inline)) return inline;
+
+      try {
+        const response = await fetch('/api/config');
+        if (response.ok) {
+          const config = await response.json();
+          return {
+            url: config.supabaseUrl || "x",
+            anonKey: config.supabaseAnonKey || "x"
+          };
+        }
+      } catch (error) {
+        console.warn("API configuration endpoint not available, trying local .env file:", error);
+      }
+
       try {
         const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
         const res = await fetch(envPath, { cache: "no-store" });

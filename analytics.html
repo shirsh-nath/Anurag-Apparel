@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Traffic analytics dashboard for Anurag Apparel. View storefront visits, unique visitors, product interest, and customer engagement data.">
+  <title>Traffic Analytics | Anurag Apparel Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#171717",
+            paper: "#fbfaf7",
+            linen: "#f3eee5",
+            line: "#e7e1d8",
+            brass: "#b7872d",
+            leaf: "#2d6a4f",
+            wine: "#7f1d1d",
+            clay: "#a85f3d"
+          },
+          boxShadow: {
+            soft: "0 18px 60px rgba(23, 23, 23, 0.14)",
+            crisp: "0 10px 30px rgba(23, 23, 23, 0.08)"
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-browser-config.js"></script>
+  <style>
+    html { color-scheme: light dark; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(183, 135, 45, 0.12), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(45, 106, 79, 0.10), transparent 32%),
+        linear-gradient(180deg, #fbfaf7 0%, #f3eee5 54%, #fbfaf7 100%);
+    }
+    .auth-backdrop {
+      background:
+        linear-gradient(90deg, rgba(10,10,10,.82), rgba(10,10,10,.42)),
+        url("Images/Admin Background.jpg") center/cover;
+    }
+    .field {
+      width: 100%;
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      border-radius: 0.55rem;
+      background: rgba(255, 255, 255, 0.94);
+      color: #171717;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+    .field:focus {
+      border-color: rgba(45, 106, 79, 0.58);
+      box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.11);
+    }
+    .metric-card,
+    .panel-card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(231, 225, 216, 0.95);
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 30px rgba(23, 23, 23, 0.07);
+    }
+    .metric-card {
+      min-height: 8.75rem;
+      padding: 1rem;
+    }
+    .metric-label {
+      color: rgba(23, 23, 23, 0.56);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .metric-value {
+      color: #171717;
+      font-size: clamp(1.75rem, 4vw, 2.65rem);
+      font-weight: 800;
+      line-height: 1;
+      margin-top: 0.7rem;
+    }
+    .metric-note {
+      color: rgba(23, 23, 23, 0.58);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      margin-top: 0.7rem;
+    }
+    .bar-track {
+      background: #f3eee5;
+      border-radius: 999px;
+      height: 0.55rem;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: linear-gradient(90deg, #2d6a4f, #b7872d);
+      border-radius: 999px;
+      height: 100%;
+      min-width: 0.25rem;
+    }
+    .tiny-bar {
+      align-items: end;
+      display: flex;
+      gap: 0.35rem;
+      height: 9rem;
+    }
+    .tiny-bar span {
+      background: linear-gradient(180deg, #b7872d, #2d6a4f);
+      border-radius: 0.35rem 0.35rem 0 0;
+      flex: 1;
+      min-height: 0.25rem;
+    }
+    .data-table {
+      min-width: 840px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #fbfaf7 !important; color: #171717 !important; }
+      .metric-card, .panel-card, .field { background: rgba(255,255,255,0.94) !important; color: #171717 !important; }
+    }
+  </style>
+</head>
+<body class="bg-paper text-ink antialiased">
+  <section id="authGate" class="auth-backdrop fixed inset-0 z-50 flex items-center justify-center px-4">
+    <form id="loginForm" class="w-full max-w-md rounded-lg border border-white/20 bg-paper/95 p-6 shadow-soft backdrop-blur sm:p-8">
+      <a href="admin.html" class="mb-8 inline-flex items-center gap-3 text-sm font-semibold text-ink transition hover:text-leaf">
+        <span class="grid h-9 w-9 place-items-center rounded-md bg-ink text-xs text-white">AA</span>
+        Anurag Apparel
+      </a>
+      <p class="text-sm font-semibold uppercase text-leaf">Admin access</p>
+      <h1 class="mt-2 text-3xl font-semibold">Traffic Analytics</h1>
+      <p class="mt-3 text-sm leading-6 text-ink/62">View anonymous storefront traffic, repeat visits, product interest, and customer actions.</p>
+      <div class="mt-7 space-y-4">
+        <label class="block">
+          <span class="text-sm font-medium text-ink/70">Username</span>
+          <input id="username" class="field mt-2 px-4 py-3" type="text" autocomplete="username" required>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium text-ink/70">Password</span>
+          <input id="password" class="field mt-2 px-4 py-3" type="password" autocomplete="current-password" required>
+        </label>
+      </div>
+      <p id="authError" class="mt-4 hidden rounded-md border border-wine/30 bg-wine/5 px-3 py-2 text-sm text-wine"></p>
+      <button type="submit" class="mt-6 w-full rounded-md bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-black">Unlock Dashboard</button>
+    </form>
+  </section>
+
+  <div id="dashboard" class="hidden min-h-screen">
+    <header class="sticky top-0 z-30 border-b border-line bg-paper/88 shadow-crisp backdrop-blur-xl">
+      <nav class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div>
+          <a href="admin.html" class="inline-flex items-center gap-2 text-sm font-semibold text-ink/62 transition hover:text-ink">
+            <span class="grid h-7 w-7 place-items-center rounded-md bg-ink text-[10px] text-white">AA</span>
+            Admin Portal
+          </a>
+          <h1 class="mt-2 text-2xl font-semibold">Traffic Analytics</h1>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <select id="periodSelect" class="field w-auto px-3 py-2 text-sm font-semibold">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All time</option>
+          </select>
+          <button id="refreshAnalytics" type="button" class="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold transition hover:border-ink">Refresh</button>
+          <button id="logout" type="button" class="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-black">Lock</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+      <div id="statusMessage" class="rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink/68 shadow-crisp" role="status">Unlock complete. Loading analytics...</div>
+
+      <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="metric-card">
+          <p class="metric-label">Website Visits</p>
+          <p id="statPageViews" class="metric-value">0</p>
+          <p id="notePageViews" class="metric-note">Homepage page views</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Unique Visitors</p>
+          <p id="statVisitors" class="metric-value">0</p>
+          <p id="noteVisitors" class="metric-note">Anonymous browser IDs</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Repeat Visitors</p>
+          <p id="statRepeatVisitors" class="metric-value">0</p>
+          <p id="noteRepeatVisitors" class="metric-note">Visitors with multiple visits</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Engagements</p>
+          <p id="statEngagements" class="metric-value">0</p>
+          <p id="noteEngagements" class="metric-note">Products, calls, directions, filters</p>
+        </article>
+      </section>
+
+      <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="metric-card">
+          <p class="metric-label">Sessions</p>
+          <p id="statSessions" class="metric-value">0</p>
+          <p id="noteSessions" class="metric-note">Browser sessions</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Views / Session</p>
+          <p id="statViewsPerSession" class="metric-value">0</p>
+          <p class="metric-note">Page views divided by sessions</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Product Opens</p>
+          <p id="statProductOpens" class="metric-value">0</p>
+          <p class="metric-note">Product popup views</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Store Intent</p>
+          <p id="statStoreIntent" class="metric-value">0</p>
+          <p class="metric-note">Call and directions clicks</p>
+        </article>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <article class="panel-card p-5">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase text-leaf">Traffic Trend</p>
+              <h2 class="mt-1 text-xl font-semibold">Daily Visits</h2>
+            </div>
+            <span id="trendTotal" class="rounded-md bg-leaf/10 px-3 py-1 text-xs font-semibold text-leaf">0 views</span>
+          </div>
+          <div id="dailyBars" class="tiny-bar mt-6" aria-label="Daily page view chart"></div>
+          <div id="dailyLabels" class="mt-3 grid text-[10px] font-semibold uppercase text-ink/42"></div>
+        </article>
+
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-brass">Customer Actions</p>
+          <h2 class="mt-1 text-xl font-semibold">Action Breakdown</h2>
+          <div id="eventBreakdown" class="mt-5 space-y-4"></div>
+        </article>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-3">
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-leaf">Top Products</p>
+          <h2 class="mt-1 text-xl font-semibold">Most Opened Items</h2>
+          <div id="topProducts" class="mt-5 space-y-4"></div>
+        </article>
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-brass">Traffic Sources</p>
+          <h2 class="mt-1 text-xl font-semibold">Referrers</h2>
+          <div id="topReferrers" class="mt-5 space-y-4"></div>
+        </article>
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-clay">Devices</p>
+          <h2 class="mt-1 text-xl font-semibold">Device Mix</h2>
+          <div id="deviceBreakdown" class="mt-5 space-y-4"></div>
+        </article>
+      </section>
+
+      <section class="grid gap-6 lg:grid-cols-3">
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-leaf">Pages</p>
+          <h2 class="mt-1 text-xl font-semibold">Most Viewed Paths</h2>
+          <div id="topPages" class="mt-5 space-y-4"></div>
+        </article>
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-brass">Categories</p>
+          <h2 class="mt-1 text-xl font-semibold">Filter Interest</h2>
+          <div id="topCategories" class="mt-5 space-y-4"></div>
+        </article>
+        <article class="panel-card p-5">
+          <p class="text-sm font-semibold uppercase text-clay">Browsers</p>
+          <h2 class="mt-1 text-xl font-semibold">Browser Mix</h2>
+          <div id="browserBreakdown" class="mt-5 space-y-4"></div>
+        </article>
+      </section>
+
+      <section class="panel-card overflow-hidden">
+        <div class="flex flex-col gap-2 border-b border-line px-5 py-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase text-leaf">Recent Activity</p>
+            <h2 class="mt-1 text-xl font-semibold">Recent Sessions</h2>
+          </div>
+          <p id="rowCount" class="text-sm text-ink/54">0 sessions</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table w-full text-left text-sm">
+            <thead class="bg-linen/60 text-xs uppercase text-ink/48">
+              <tr>
+                <th class="px-5 py-3 font-semibold">Last seen</th>
+                <th class="px-5 py-3 font-semibold">Visitor</th>
+                <th class="px-5 py-3 font-semibold">Events</th>
+                <th class="px-5 py-3 font-semibold">Pages</th>
+                <th class="px-5 py-3 font-semibold">Device</th>
+                <th class="px-5 py-3 font-semibold">Source</th>
+              </tr>
+            </thead>
+            <tbody id="recentSessions" class="divide-y divide-line"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="hidden px-6 py-14 text-center">
+          <p class="text-lg font-semibold">No analytics events yet.</p>
+          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Run the analytics SQL in Supabase, then visit the storefront to start collecting traffic data.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    const AUTH_SESSION_KEY = "anurag-apparel-admin-unlocked";
+    const ADMIN_USERNAME = "anurag";
+    const MAX_ROWS = 5000;
+
+    const state = {
+      client: null,
+      events: [],
+      period: "30",
+      refreshTimer: null,
+      isLoading: false
+    };
+
+    const dom = {};
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      cacheDom();
+      bindAuth();
+      bindDashboard();
+      if (sessionStorage.getItem(AUTH_SESSION_KEY) === "true") {
+        unlockDashboard();
+      }
+    }
+
+    function cacheDom() {
+      dom.authGate = document.querySelector("#authGate");
+      dom.loginForm = document.querySelector("#loginForm");
+      dom.username = document.querySelector("#username");
+      dom.password = document.querySelector("#password");
+      dom.authError = document.querySelector("#authError");
+      dom.dashboard = document.querySelector("#dashboard");
+      dom.logout = document.querySelector("#logout");
+      dom.refreshAnalytics = document.querySelector("#refreshAnalytics");
+      dom.periodSelect = document.querySelector("#periodSelect");
+      dom.statusMessage = document.querySelector("#statusMessage");
+      dom.statPageViews = document.querySelector("#statPageViews");
+      dom.statVisitors = document.querySelector("#statVisitors");
+      dom.statRepeatVisitors = document.querySelector("#statRepeatVisitors");
+      dom.statEngagements = document.querySelector("#statEngagements");
+      dom.statSessions = document.querySelector("#statSessions");
+      dom.statViewsPerSession = document.querySelector("#statViewsPerSession");
+      dom.statProductOpens = document.querySelector("#statProductOpens");
+      dom.statStoreIntent = document.querySelector("#statStoreIntent");
+      dom.notePageViews = document.querySelector("#notePageViews");
+      dom.noteVisitors = document.querySelector("#noteVisitors");
+      dom.noteRepeatVisitors = document.querySelector("#noteRepeatVisitors");
+      dom.noteEngagements = document.querySelector("#noteEngagements");
+      dom.noteSessions = document.querySelector("#noteSessions");
+      dom.trendTotal = document.querySelector("#trendTotal");
+      dom.dailyBars = document.querySelector("#dailyBars");
+      dom.dailyLabels = document.querySelector("#dailyLabels");
+      dom.eventBreakdown = document.querySelector("#eventBreakdown");
+      dom.topProducts = document.querySelector("#topProducts");
+      dom.topReferrers = document.querySelector("#topReferrers");
+      dom.deviceBreakdown = document.querySelector("#deviceBreakdown");
+      dom.topPages = document.querySelector("#topPages");
+      dom.topCategories = document.querySelector("#topCategories");
+      dom.browserBreakdown = document.querySelector("#browserBreakdown");
+      dom.recentSessions = document.querySelector("#recentSessions");
+      dom.rowCount = document.querySelector("#rowCount");
+      dom.emptyState = document.querySelector("#emptyState");
+    }
+
+    function bindAuth() {
+      dom.loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = dom.loginForm.querySelector("button[type='submit']");
+        button.disabled = true;
+        button.textContent = "Checking...";
+        dom.authError.classList.add("hidden");
+
+        try {
+          const client = await createSupabaseClient();
+          if (!client) {
+            throw new Error("Supabase credentials are missing.");
+          }
+          const ok = await verifyAdminLogin(client, dom.username.value.trim(), dom.password.value);
+          if (!ok) {
+            showAuthError("Invalid username or password.");
+            return;
+          }
+          state.client = client;
+          sessionStorage.setItem(AUTH_SESSION_KEY, "true");
+          await unlockDashboard(client);
+        } catch (error) {
+          showAuthError(error.message || "Unable to verify admin access.");
+        } finally {
+          button.disabled = false;
+          button.textContent = "Unlock Dashboard";
+        }
+      });
+    }
+
+    function bindDashboard() {
+      dom.logout.addEventListener("click", lockDashboard);
+      dom.refreshAnalytics.addEventListener("click", loadAnalytics);
+      dom.periodSelect.addEventListener("change", () => {
+        state.period = dom.periodSelect.value;
+        loadAnalytics();
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && state.client) {
+          loadAnalytics();
+        }
+      });
+      window.addEventListener("focus", () => {
+        if (state.client) {
+          loadAnalytics();
+        }
+      });
+    }
+
+    async function unlockDashboard(existingClient = null) {
+      localStorage.setItem("anurag-apparel-is-admin", "true");
+      dom.authGate.classList.add("hidden");
+      dom.dashboard.classList.remove("hidden");
+      state.client = existingClient || await createSupabaseClient();
+      if (!state.client) {
+        setStatus("Supabase credentials are missing. Check supabase-browser-config.js or .env.", "error");
+        return;
+      }
+      await loadAnalytics();
+      startAutoRefresh();
+    }
+
+    function lockDashboard() {
+      localStorage.removeItem("anurag-apparel-is-admin");
+      stopAutoRefresh();
+      sessionStorage.removeItem(AUTH_SESSION_KEY);
+      state.client = null;
+      state.events = [];
+      dom.dashboard.classList.add("hidden");
+      dom.authGate.classList.remove("hidden");
+      dom.password.value = "";
+    }
+
+    async function createSupabaseClient() {
+      const config = await loadSupabaseConfig();
+      if (!isConfigured(config) || !window.supabase?.createClient) {
+        return null;
+      }
+      return window.supabase.createClient(config.url, config.anonKey);
+    }
+
+    async function verifyAdminLogin(client, username, password) {
+      const { data, error } = await client.rpc("verify_admin_login", {
+        input_username: username || ADMIN_USERNAME,
+        input_password: password
+      });
+      if (error) {
+        throw error;
+      }
+      return data === true;
+    }
+
+    async function loadAnalytics() {
+      if (!state.client) {
+        return;
+      }
+      if (state.isLoading) {
+        return;
+      }
+
+      setStatus("Loading traffic analytics...", "info");
+      state.isLoading = true;
+      dom.refreshAnalytics.disabled = true;
+
+      try {
+        let query = state.client
+          .from("website_analytics_events")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .range(0, MAX_ROWS - 1);
+
+        const since = getPeriodStart();
+        if (since) {
+          query = query.gte("created_at", since.toISOString());
+        }
+
+        const { data, error } = await query;
+        if (error) {
+          throw error;
+        }
+
+        state.events = data || [];
+        renderAnalytics();
+        setStatus(`Loaded ${formatNumber(state.events.length)} analytics event${state.events.length === 1 ? "" : "s"}.`, "success");
+      } catch (error) {
+        console.error(error);
+        state.events = [];
+        renderAnalytics();
+        setStatus(error.message || "Unable to load analytics. Run the updated Supabase schema first.", "error");
+      } finally {
+        state.isLoading = false;
+        dom.refreshAnalytics.disabled = false;
+      }
+    }
+
+    function startAutoRefresh() {
+      stopAutoRefresh();
+      state.refreshTimer = window.setInterval(() => {
+        if (!document.hidden && state.client) {
+          loadAnalytics();
+        }
+      }, 30000);
+    }
+
+    function stopAutoRefresh() {
+      if (state.refreshTimer) {
+        window.clearInterval(state.refreshTimer);
+        state.refreshTimer = null;
+      }
+    }
+
+    function renderAnalytics() {
+      const events = state.events;
+      const pageViews = events.filter((event) => event.event_name === "page_view");
+      const engagements = events.filter((event) => event.event_name !== "page_view" && event.event_name !== "session_start" && event.event_name !== "page_hide");
+      const visitors = unique(events.map((event) => event.visitor_id).filter(Boolean));
+      const sessions = unique(events.map((event) => event.session_id).filter(Boolean));
+      const visitorPageViews = countBy(pageViews, (event) => event.visitor_id || "Unknown");
+      const repeatVisitors = Object.values(visitorPageViews).filter((count) => count > 1).length;
+      const productOpens = events.filter((event) => event.event_name === "product_open");
+      const storeIntent = events.filter((event) => event.event_name === "call_click" || event.event_name === "directions_click");
+
+      dom.statPageViews.textContent = formatNumber(pageViews.length);
+      dom.statVisitors.textContent = formatNumber(visitors.length);
+      dom.statRepeatVisitors.textContent = formatNumber(repeatVisitors);
+      dom.statEngagements.textContent = formatNumber(engagements.length);
+      dom.statSessions.textContent = formatNumber(sessions.length);
+      dom.statViewsPerSession.textContent = sessions.length ? (pageViews.length / sessions.length).toFixed(1) : "0";
+      dom.statProductOpens.textContent = formatNumber(productOpens.length);
+      dom.statStoreIntent.textContent = formatNumber(storeIntent.length);
+
+      dom.notePageViews.textContent = `${formatNumber(pageViews.length)} page view${pageViews.length === 1 ? "" : "s"} in ${periodLabel()}`;
+      dom.noteVisitors.textContent = `${formatNumber(visitors.length)} anonymous browser${visitors.length === 1 ? "" : "s"}`;
+      dom.noteRepeatVisitors.textContent = `${visitors.length ? Math.round((repeatVisitors / visitors.length) * 100) : 0}% repeat visitor rate`;
+      dom.noteEngagements.textContent = `${formatNumber(engagements.length)} tracked customer action${engagements.length === 1 ? "" : "s"}`;
+      dom.noteSessions.textContent = `${formatNumber(sessions.length)} session${sessions.length === 1 ? "" : "s"} captured`;
+
+      renderDailyBars(pageViews);
+      renderList(dom.eventBreakdown, actionRows(events), "No customer actions yet.");
+      renderList(dom.topProducts, rankedRows(productOpens, (event) => event.metadata?.product_title || "Untitled product"), "No product opens yet.");
+      renderList(dom.topReferrers, rankedRows(pageViews, readableReferrer), "No referrer data yet.");
+      renderList(dom.deviceBreakdown, rankedRows(events, deviceFromUserAgent), "No device data yet.");
+      renderList(dom.topPages, rankedRows(pageViews, (event) => cleanPath(event.page_path)), "No page views yet.");
+      renderList(dom.topCategories, rankedRows(events.filter((event) => event.event_name === "category_select"), (event) => event.metadata?.category_name || "Unknown category"), "No category selections yet.");
+      renderList(dom.browserBreakdown, rankedRows(events, browserFromUserAgent), "No browser data yet.");
+      renderRecentSessions(events);
+      dom.emptyState.classList.toggle("hidden", events.length > 0);
+    }
+
+    function renderDailyBars(pageViews) {
+      const days = getTimelineDays();
+      const counts = new Map(days.map((day) => [day.key, 0]));
+      pageViews.forEach((event) => {
+        const key = dateKey(new Date(event.created_at));
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+
+      const values = days.map((day) => counts.get(day.key) || 0);
+      const max = Math.max(...values, 1);
+      dom.dailyBars.replaceChildren();
+      values.forEach((value) => {
+        const bar = document.createElement("span");
+        bar.style.height = `${Math.max(4, (value / max) * 100)}%`;
+        bar.title = `${value} view${value === 1 ? "" : "s"}`;
+        dom.dailyBars.appendChild(bar);
+      });
+
+      dom.dailyLabels.style.gridTemplateColumns = `repeat(${days.length}, minmax(0, 1fr))`;
+      dom.dailyLabels.replaceChildren();
+      days.forEach((day, index) => {
+        const label = document.createElement("span");
+        label.className = index % Math.ceil(days.length / 6) === 0 ? "text-center" : "text-center opacity-0";
+        label.textContent = day.label;
+        dom.dailyLabels.appendChild(label);
+      });
+
+      dom.trendTotal.textContent = `${formatNumber(pageViews.length)} view${pageViews.length === 1 ? "" : "s"}`;
+    }
+
+    function renderList(container, rows, emptyText) {
+      container.replaceChildren();
+      if (!rows.length) {
+        const empty = document.createElement("p");
+        empty.className = "text-sm text-ink/54";
+        empty.textContent = emptyText;
+        container.appendChild(empty);
+        return;
+      }
+
+      const max = Math.max(...rows.map((row) => row.value), 1);
+      rows.slice(0, 7).forEach((row) => {
+        const item = document.createElement("div");
+        item.innerHTML = `
+          <div class="flex items-center justify-between gap-3 text-sm">
+            <span class="truncate font-semibold text-ink">${escapeHtml(row.label)}</span>
+            <span class="shrink-0 text-ink/58">${formatNumber(row.value)}</span>
+          </div>
+          <div class="bar-track mt-2"><div class="bar-fill" style="width:${Math.max(4, (row.value / max) * 100)}%"></div></div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderRecentSessions(events) {
+      const grouped = new Map();
+      events.forEach((event) => {
+        const key = event.session_id || "Unknown";
+        const current = grouped.get(key) || {
+          session_id: key,
+          visitor_id: event.visitor_id || "",
+          events: [],
+          pages: new Set(),
+          last_seen: event.created_at,
+          user_agent: event.user_agent || "",
+          referrer: event.referrer || ""
+        };
+        current.events.push(event);
+        if (event.event_name === "page_view") {
+          current.pages.add(cleanPath(event.page_path));
+        }
+        if (new Date(event.created_at) > new Date(current.last_seen)) {
+          current.last_seen = event.created_at;
+          current.user_agent = event.user_agent || current.user_agent;
+          current.referrer = event.referrer || current.referrer;
+        }
+        grouped.set(key, current);
+      });
+
+      const rows = Array.from(grouped.values())
+        .sort((a, b) => new Date(b.last_seen) - new Date(a.last_seen))
+        .slice(0, 20);
+
+      dom.recentSessions.replaceChildren();
+      dom.rowCount.textContent = `${formatNumber(rows.length)} session${rows.length === 1 ? "" : "s"}`;
+
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.className = "bg-white/64";
+        tr.innerHTML = `
+          <td class="px-5 py-4 text-ink/70">${escapeHtml(formatDateTime(row.last_seen))}</td>
+          <td class="px-5 py-4 font-semibold">${escapeHtml(shortId(row.visitor_id))}</td>
+          <td class="px-5 py-4">${formatNumber(row.events.length)}</td>
+          <td class="px-5 py-4">${formatNumber(row.pages.size)}</td>
+          <td class="px-5 py-4">${escapeHtml(deviceFromUserAgent({ user_agent: row.user_agent }))}</td>
+          <td class="px-5 py-4 text-ink/62">${escapeHtml(readableReferrer({ referrer: row.referrer }))}</td>
+        `;
+        dom.recentSessions.appendChild(tr);
+      });
+    }
+
+    function actionRows(events) {
+      const labels = {
+        product_open: "Product popup opens",
+        product_media_select: "Product media views",
+        category_select: "Category filters",
+        directions_click: "Directions clicks",
+        call_click: "Call clicks",
+        session_start: "New sessions"
+      };
+      return rankedRows(events.filter((event) => labels[event.event_name]), (event) => labels[event.event_name] || event.event_name);
+    }
+
+    function rankedRows(events, getLabel) {
+      return Object.entries(countBy(events, getLabel))
+        .map(([label, value]) => ({ label, value }))
+        .filter((row) => row.label)
+        .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+    }
+
+    function countBy(items, getKey) {
+      return items.reduce((counts, item) => {
+        const key = getKey(item) || "Unknown";
+        counts[key] = (counts[key] || 0) + 1;
+        return counts;
+      }, {});
+    }
+
+    function getPeriodStart() {
+      if (state.period === "all") {
+        return null;
+      }
+      const date = new Date();
+      date.setDate(date.getDate() - Number(state.period || 30));
+      return date;
+    }
+
+    function getTimelineDays() {
+      const dayCount = state.period === "all" ? 30 : Math.min(Number(state.period || 30), 30);
+      const days = [];
+      for (let index = dayCount - 1; index >= 0; index -= 1) {
+        const date = new Date();
+        date.setDate(date.getDate() - index);
+        days.push({
+          key: dateKey(date),
+          label: date.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })
+        });
+      }
+      return days;
+    }
+
+    async function loadSupabaseConfig() {
+      const inline = {
+        url: window.ANURAG_SUPABASE_URL,
+        anonKey: window.ANURAG_SUPABASE_ANON_KEY
+      };
+      if (isConfigured(inline)) {
+        return inline;
+      }
+
+      try {
+        const response = await fetch('/api/config');
+        if (response.ok) {
+          const config = await response.json();
+          return {
+            url: config.supabaseUrl || "your_supabase_project_url",
+            anonKey: config.supabaseAnonKey || "your_supabase_anon_key"
+          };
+        }
+      } catch (error) {
+        console.warn("API configuration endpoint not available, trying local .env file:", error);
+      }
+
+      try {
+        const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
+        const response = await fetch(envPath, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("No env file");
+        }
+        const env = parseEnv(await response.text());
+        return {
+          url: env.SUPABASE_URL || "your_supabase_project_url",
+          anonKey: env.SUPABASE_ANON_KEY || "your_supabase_anon_key"
+        };
+      } catch (error) {
+        return {
+          url: "your_supabase_project_url",
+          anonKey: "your_supabase_anon_key"
+        };
+      }
+    }
+
+    function parseEnv(text) {
+      return text.split(/\r?\n/).reduce((values, line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) {
+          return values;
+        }
+        const separatorIndex = trimmed.indexOf("=");
+        if (separatorIndex === -1) {
+          return values;
+        }
+        values[trimmed.slice(0, separatorIndex).trim()] = trimmed.slice(separatorIndex + 1).trim().replace(/^["']|["']$/g, "");
+        return values;
+      }, {});
+    }
+
+    function isConfigured(config) {
+      return Boolean(
+        config.url &&
+        config.anonKey &&
+        !config.url.includes("your_supabase") &&
+        !config.anonKey.includes("your_supabase") &&
+        config.url !== "x" &&
+        config.anonKey !== "x"
+      );
+    }
+
+    function browserFromUserAgent(event) {
+      const ua = event.user_agent || "";
+      if (/Edg\//i.test(ua)) return "Edge";
+      if (/Chrome\//i.test(ua) && !/Chromium/i.test(ua)) return "Chrome";
+      if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) return "Safari";
+      if (/Firefox\//i.test(ua)) return "Firefox";
+      if (/OPR\//i.test(ua) || /Opera/i.test(ua)) return "Opera";
+      return "Unknown";
+    }
+
+    function deviceFromUserAgent(event) {
+      const ua = event.user_agent || "";
+      if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) return "Tablet";
+      if (/Mobi|Android|iPhone|iPod|Windows Phone/i.test(ua)) return "Mobile";
+      return "Desktop";
+    }
+
+    function readableReferrer(event) {
+      const referrer = event.referrer || "";
+      if (!referrer) {
+        return "Direct / unknown";
+      }
+      try {
+        const host = new URL(referrer).hostname.replace(/^www\./, "");
+        return host || "Direct / unknown";
+      } catch (error) {
+        return referrer;
+      }
+    }
+
+    function cleanPath(path) {
+      const value = path || "/";
+      return value === "/" ? "Homepage" : value;
+    }
+
+    function dateKey(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function unique(values) {
+      return Array.from(new Set(values));
+    }
+
+    function periodLabel() {
+      return state.period === "all" ? "all time" : `the last ${state.period} days`;
+    }
+
+    function showAuthError(message) {
+      dom.authError.textContent = message;
+      dom.authError.classList.remove("hidden");
+    }
+
+    function setStatus(message, type = "info") {
+      const classes = {
+        info: "rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink/68 shadow-crisp",
+        success: "rounded-lg border border-leaf/25 bg-leaf/5 px-4 py-3 text-sm text-leaf shadow-crisp",
+        error: "rounded-lg border border-wine/25 bg-wine/5 px-4 py-3 text-sm text-wine shadow-crisp"
+      };
+      dom.statusMessage.className = classes[type] || classes.info;
+      dom.statusMessage.textContent = message;
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-IN").format(Number(value || 0));
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "No date";
+      }
+      return new Intl.DateTimeFormat("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(value));
+    }
+
+    function shortId(value) {
+      return value ? `${value.slice(0, 8)}...` : "Unknown";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+  </script>
+</body>
+</html>

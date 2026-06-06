@@ -1976,7 +1976,7 @@
       <article class="modal-panel product-modal-panel max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[1.15rem] shadow-soft">
         <div class="grid lg:grid-cols-[1.08fr_0.92fr]">
           <div class="product-modal-media-shell p-4 sm:p-6">
-            <div id="modalMediaFrame" class="product-modal-media-frame aspect-[4/5] overflow-hidden rounded-[0.95rem]"></div>
+            <div id="modalMediaFrame" class="product-modal-media-frame overflow-hidden rounded-[0.95rem]" style="aspect-ratio: 4 / 5;"></div>
             <div id="modalThumbs" class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5"></div>
           </div>
           <div class="product-modal-details-shell flex flex-col p-6 sm:p-8 lg:p-10">
@@ -2091,6 +2091,11 @@
       bindEvents();
       dom.year.textContent = new Date().getFullYear();
       state.client = await createSupabaseClient();
+      try {
+        await initAnalyticsTracking();
+      } catch (analyticsError) {
+        console.warn("Analytics initialization failed:", analyticsError);
+      }
       await loadSiteSettings();
       await loadAnnouncementBoard();
       await loadBrands();
@@ -2133,6 +2138,7 @@
 
     function bindEvents() {
       dom.callUsButton?.addEventListener("click", handleCallButtonClick);
+      document.addEventListener("click", handleTrackedOutboundClick);
       dom.categoryPrev?.addEventListener("click", () => scrollCategoryTrack(-1));
       dom.categoryNext?.addEventListener("click", () => scrollCategoryTrack(1));
       dom.categoryTrack?.addEventListener("scroll", updateCategoryNavState, { passive: true });
@@ -2574,9 +2580,17 @@
       button.setAttribute("aria-selected", isActive ? "true" : "false");
       button.textContent = category.name;
       button.addEventListener("click", () => {
+        const previousCategoryId = state.activeSubcategoryId;
         state.activeSubcategoryId = category.id;
         renderCategorySlider();
         renderProducts();
+        if (previousCategoryId !== category.id) {
+          trackAnalyticsEvent("category_select", {
+            category_id: category.id,
+            category_name: category.name,
+            product_count: category.count || 0
+          });
+        }
       });
 
       const count = document.createElement("span");
@@ -2699,12 +2713,21 @@
       dom.productModal.classList.add("is-open");
       dom.productModal.setAttribute("aria-hidden", "false");
       document.body.classList.add("overflow-hidden");
+      trackAnalyticsEvent("product_open", productAnalyticsMetadata(product));
     }
 
     function closeProductModal() {
       dom.productModal.classList.remove("is-open");
       dom.productModal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("overflow-hidden");
+
+      const video = dom.modalMediaFrame.querySelector("video");
+      if (video) {
+        video.pause();
+        video.src = "";
+        video.load();
+      }
+      dom.modalMediaFrame.replaceChildren();
     }
 
     function renderModal() {
@@ -2712,7 +2735,31 @@
       const mediaItems = getGalleryImages(product);
       const activeMedia = mediaItems[state.activeImageIndex] || mediaItems[0];
 
-      dom.modalMediaFrame.replaceChildren(createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-contain p-2 sm:p-3", true));
+      const mediaElement = createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-contain block", true);
+      dom.modalMediaFrame.replaceChildren(mediaElement);
+
+      dom.modalMediaFrame.style.aspectRatio = "4 / 5";
+
+      if (isVideoUrl(activeMedia)) {
+        mediaElement.addEventListener("loadedmetadata", () => {
+          if (mediaElement.videoWidth && mediaElement.videoHeight) {
+            dom.modalMediaFrame.style.aspectRatio = `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`;
+          }
+        });
+        if (mediaElement.videoWidth && mediaElement.videoHeight) {
+          dom.modalMediaFrame.style.aspectRatio = `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`;
+        }
+      } else {
+        mediaElement.addEventListener("load", () => {
+          if (mediaElement.naturalWidth && mediaElement.naturalHeight) {
+            dom.modalMediaFrame.style.aspectRatio = `${mediaElement.naturalWidth} / ${mediaElement.naturalHeight}`;
+          }
+        });
+        if (mediaElement.complete && mediaElement.naturalWidth && mediaElement.naturalHeight) {
+          dom.modalMediaFrame.style.aspectRatio = `${mediaElement.naturalWidth} / ${mediaElement.naturalHeight}`;
+        }
+      }
+
       dom.modalTitle.textContent = product.title || "Untitled product";
       const priceText = formatCurrency(product.price);
       dom.modalPrice.textContent = priceText;
@@ -2729,8 +2776,16 @@
         ].join(" ");
         thumb.setAttribute("aria-label", `Show media ${index + 1}`);
         thumb.addEventListener("click", () => {
+          const changedMedia = state.activeImageIndex !== index;
           state.activeImageIndex = index;
           renderModal();
+          if (changedMedia) {
+            trackAnalyticsEvent("product_media_select", {
+              ...productAnalyticsMetadata(product),
+              media_index: index,
+              media_type: isVideoUrl(mediaUrl) ? "video" : "image"
+            });
+          }
         });
 
         thumb.appendChild(createMediaElement(mediaUrl, "", "h-full w-full object-contain p-1"));
@@ -2837,6 +2892,130 @@
       });
       
       return `<ul class="offer-clean-list">${listItems.join("")}</ul>`;
+    }
+
+    /* ─── Storefront Analytics Tracking ─── */
+    const ANALYTICS_VISITOR_KEY = "anurag-apparel-visitor-id";
+    const ANALYTICS_SESSION_KEY = "anurag-apparel-session-id";
+    const ADMIN_FLAG_KEY = "anurag-apparel-is-admin";
+
+    function generateShortId() {
+      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    function getVisitorId() {
+      let id = localStorage.getItem(ANALYTICS_VISITOR_KEY);
+      if (!id) {
+        id = 'v-' + generateShortId();
+        localStorage.setItem(ANALYTICS_VISITOR_KEY, id);
+      }
+      return id;
+    }
+
+    function getSessionId() {
+      let id = sessionStorage.getItem(ANALYTICS_SESSION_KEY);
+      let isNew = false;
+      if (!id) {
+        id = 's-' + generateShortId();
+        sessionStorage.setItem(ANALYTICS_SESSION_KEY, id);
+        isNew = true;
+      }
+      return { id, isNew };
+    }
+
+    async function initAnalyticsTracking() {
+      if (localStorage.getItem(ADMIN_FLAG_KEY) === "true") {
+        console.log("Analytics: Admin browser detected, tracking disabled.");
+        return;
+      }
+
+      const { id: sessionId, isNew } = getSessionId();
+      const visitorId = getVisitorId();
+
+      if (isNew) {
+        await trackAnalyticsEvent("session_start");
+      }
+      await trackAnalyticsEvent("page_view");
+
+      window.addEventListener("pagehide", () => {
+        trackAnalyticsEvent("page_hide");
+      });
+    }
+
+    async function trackAnalyticsEvent(eventName, metadata = {}) {
+      if (localStorage.getItem(ADMIN_FLAG_KEY) === "true") {
+        return;
+      }
+      if (!state.client) {
+        return;
+      }
+
+      try {
+        const visitorId = getVisitorId();
+        const { id: sessionId } = getSessionId();
+
+        const payload = {
+          event_name: eventName,
+          page_path: window.location.pathname || "/",
+          page_title: document.title || "",
+          visitor_id: visitorId,
+          session_id: sessionId,
+          referrer: document.referrer || "",
+          user_agent: navigator.userAgent || "",
+          language: navigator.language || "",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+          screen_width: window.screen.width || null,
+          screen_height: window.screen.height || null,
+          viewport_width: window.innerWidth || null,
+          viewport_height: window.innerHeight || null,
+          metadata: metadata
+        };
+
+        const { error } = await state.client
+          .from("website_analytics_events")
+          .insert(payload);
+
+        if (error) {
+          console.warn("Analytics Error:", error.message);
+        }
+      } catch (err) {
+        console.warn("Analytics Failed:", err);
+      }
+    }
+
+    function productAnalyticsMetadata(product) {
+      return {
+        product_id: product?.id || "",
+        product_title: product?.title || "Untitled product",
+        product_price: product?.price ?? null,
+        subcategory_id: product?.subcategory_id || "",
+        subcategory_name: getSubcategoryName(product?.subcategory_id)
+      };
+    }
+
+    function handleTrackedOutboundClick(event) {
+      const link = event.target.closest?.("a");
+      if (!link) {
+        return;
+      }
+
+      const href = link.getAttribute("href") || "";
+      const metadata = {
+        label: link.textContent.trim().replace(/\s+/g, " ").slice(0, 80),
+        href
+      };
+
+      if (href.startsWith("tel:")) {
+        trackAnalyticsEvent("call_click", {
+          ...metadata,
+          phone_number: dom.callUsButton?.dataset.phoneNumber || href.replace(/^tel:/, "")
+        });
+        return;
+      }
+
+      if (href === MAP_URL || /maps\.app\.goo\.gl|google\.com\/maps/i.test(href)) {
+        trackAnalyticsEvent("directions_click", metadata);
+      }
     }
   </script>
 </body>
