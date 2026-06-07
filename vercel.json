@@ -24,5 +24,11 @@
       "source": "/email/:path*",
       "destination": "/email_resend.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/purge-analytics",
+      "schedule": "30 20 * * *"
+    }
   ]
 }

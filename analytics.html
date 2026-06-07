@@ -477,16 +477,23 @@
       dom.refreshAnalytics.disabled = true;
 
       try {
+        // Hard 90-day cap: analytics data older than this is purged from the DB
+        // and should never be shown in the UI even if still present.
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
         let query = state.client
           .from("website_analytics_events")
           .select("*")
           .order("created_at", { ascending: false })
+          .gte("created_at", ninetyDaysAgo.toISOString())
           .range(0, MAX_ROWS - 1);
 
         const since = getPeriodStart();
         if (since) {
           query = query.gte("created_at", since.toISOString());
         }
+
 
         const { data, error } = await query;
         if (error) {

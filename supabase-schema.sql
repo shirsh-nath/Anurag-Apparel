@@ -479,31 +479,61 @@ begin
   end if;
 end; $$;
 
--- ── 16. Analytics auto-cleanup (pg_cron) ─────────────────────
--- Deletes analytics events older than 90 days every day at 02:00 IST (20:30 UTC).
--- Keeps the table lean and within Supabase free-tier storage limits.
-create extension if not exists pg_cron with schema extensions;
+-- ── 16. Analytics auto-cleanup ───────────────────────────────
+-- Deletes analytics events older than 90 days.
+-- Runs daily via pg_cron (if enabled) AND can be called from the
+-- Vercel daily cron API route (/api/purge-analytics) as a fallback.
 
+-- Internal implementation (security definer so it can bypass RLS)
 create or replace function public.purge_old_analytics_events()
-returns void
+returns integer
 language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  deleted_count integer;
 begin
   delete from public.website_analytics_events
   where created_at < now() - interval '90 days';
+  get diagnostics deleted_count = row_count;
+  return deleted_count;
 end;
 $$;
 
-grant execute on function public.purge_old_analytics_events() to postgres;
+-- Public callable wrapper (invoked by Vercel cron API with anon key)
+create or replace function public.purge_old_analytics_events_rpc()
+returns integer
+language sql
+security invoker
+set search_path = ''
+as $$
+  select public.purge_old_analytics_events();
+$$;
 
-select cron.unschedule('purge-old-analytics-events')
-  from cron.job
- where jobname = 'purge-old-analytics-events';
+grant execute on function public.purge_old_analytics_events()     to postgres;
+grant execute on function public.purge_old_analytics_events_rpc() to anon;
 
-select cron.schedule(
-  'purge-old-analytics-events',
-  '30 20 * * *',
-  $$ select public.purge_old_analytics_events(); $$
-);
+-- pg_cron schedule (runs daily at 02:00 IST = 20:30 UTC).
+-- This only works if pg_cron is enabled in the Supabase Dashboard under
+-- Database → Extensions. Safe to run even if pg_cron is not enabled;
+-- the DO block will skip silently.
+do $$
+begin
+  if exists (
+    select 1 from pg_extension where extname = 'pg_cron'
+  ) then
+    -- Remove any existing schedule first (safe: ignores if not found)
+    perform cron.unschedule('purge-old-analytics-events')
+      from cron.job
+     where jobname = 'purge-old-analytics-events';
+
+    -- Register the daily cleanup job
+    perform cron.schedule(
+      'purge-old-analytics-events',
+      '30 20 * * *',
+      $cron$ select public.purge_old_analytics_events(); $cron$
+    );
+  end if;
+end;
+$$;
