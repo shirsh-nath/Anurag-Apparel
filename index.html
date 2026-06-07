@@ -30,7 +30,6 @@
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-browser-config.js"></script>
   <style>
     html {
       color-scheme: light dark;
@@ -2243,6 +2242,21 @@
         return inlineConfig;
       }
 
+      // Primary: Vercel serverless function reads env vars
+      try {
+        const response = await fetch('/api/config');
+        if (response.ok) {
+          const config = await response.json();
+          return {
+            url: config.supabaseUrl || "your_supabase_project_url",
+            anonKey: config.supabaseAnonKey || "your_supabase_anon_key"
+          };
+        }
+      } catch (error) {
+        console.warn("API config endpoint not available, trying local .env:", error);
+      }
+
+      // Fallback: local .env file (development only)
       try {
         const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
         const response = await fetch(envPath, { cache: "no-store" });

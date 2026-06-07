@@ -5,5 +5,7 @@ export default function handler(req, res) {
   res.status(200).json({
     supabaseUrl: process.env.SUPABASE_URL || null,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY || null,
+    maxVideoMb: process.env.MAX_VIDEO_MB ? Number(process.env.MAX_VIDEO_MB) : 50,
   });
 }
+
