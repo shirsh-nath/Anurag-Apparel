@@ -703,14 +703,32 @@
         linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(243, 238, 229, 0.4), rgba(238, 245, 240, 0.32)),
         radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.72), transparent 38%);
       border: 1px solid rgba(255, 255, 255, 0.82);
+      /* fit-content: frame is exactly as wide as the media inside — no dead space */
+      width: fit-content;
+      max-width: 100%;
       margin: 0 auto;
-      max-height: min(62vh, 30rem);
-      max-width: 25rem;
-      width: 100%;
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.94),
         inset 0 -1px 0 rgba(255, 255, 255, 0.34),
         0 16px 36px rgba(80, 64, 42, 0.1);
+    }
+
+    /* Video: fixed height, width auto — browser calculates proportional width
+       from the video's intrinsic aspect ratio. No object-fit, no letterboxing. */
+    .product-modal-media-frame video {
+      display: block;
+      height: min(65vh, 38rem);
+      width: auto;
+      max-width: 100%;
+    }
+
+    /* Image: natural width up to parent, height proportional — same idea. */
+    .product-modal-media-frame img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: min(65vh, 38rem);
     }
 
     .product-modal-details-shell {
@@ -1690,6 +1708,44 @@
         color: #171717 !important;
       }
     }
+
+    /* ─── iOS Safari: remove backdrop-filter double-layer effect ───
+       On iOS, the semi-transparent glass cards render with a visible
+       "bottom layer" beneath them due to how WebKit composites
+       backdrop-filter. We replace them with a solid opaque background
+       so only a single, clean card layer is visible — matching desktop.
+    ──────────────────────────────────────────────────────────────── */
+    @supports (-webkit-touch-callout: none) {
+      .offer-board-card {
+        background:
+          linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(251, 250, 247, 0.96) 42%, rgba(255, 255, 255, 0.96)),
+          linear-gradient(180deg, rgba(251, 250, 247, 0.98), rgba(243, 238, 229, 0.96)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-color: rgba(231, 225, 216, 0.95) !important;
+      }
+
+      .offer-board-card::before,
+      .offer-board-card::after {
+        display: none !important;
+      }
+
+      .visit-glass-card {
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(251, 250, 247, 0.97)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-color: rgba(231, 225, 216, 0.95) !important;
+        box-shadow:
+          0 10px 28px rgba(23, 23, 23, 0.08),
+          0 2px 8px rgba(23, 23, 23, 0.04) !important;
+      }
+
+      .visit-glass-card::before,
+      .visit-glass-card::after {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-paper text-ink antialiased">
@@ -1976,7 +2032,7 @@
       <article class="modal-panel product-modal-panel max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[1.15rem] shadow-soft">
         <div class="grid lg:grid-cols-[1.08fr_0.92fr]">
           <div class="product-modal-media-shell p-4 sm:p-6">
-            <div id="modalMediaFrame" class="product-modal-media-frame overflow-hidden rounded-[0.95rem]" style="aspect-ratio: 4 / 5;"></div>
+            <div id="modalMediaFrame" class="product-modal-media-frame overflow-hidden rounded-[0.95rem]"></div>
             <div id="modalThumbs" class="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-5"></div>
           </div>
           <div class="product-modal-details-shell flex flex-col p-6 sm:p-8 lg:p-10">
@@ -2735,30 +2791,9 @@
       const mediaItems = getGalleryImages(product);
       const activeMedia = mediaItems[state.activeImageIndex] || mediaItems[0];
 
-      const mediaElement = createMediaElement(activeMedia, product.title || "Anurag Apparel product", "h-full w-full object-contain block", true);
+      const mediaElement = createMediaElement(activeMedia, product.title || "Anurag Apparel product", "", true);
       dom.modalMediaFrame.replaceChildren(mediaElement);
-
-      dom.modalMediaFrame.style.aspectRatio = "4 / 5";
-
-      if (isVideoUrl(activeMedia)) {
-        mediaElement.addEventListener("loadedmetadata", () => {
-          if (mediaElement.videoWidth && mediaElement.videoHeight) {
-            dom.modalMediaFrame.style.aspectRatio = `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`;
-          }
-        });
-        if (mediaElement.videoWidth && mediaElement.videoHeight) {
-          dom.modalMediaFrame.style.aspectRatio = `${mediaElement.videoWidth} / ${mediaElement.videoHeight}`;
-        }
-      } else {
-        mediaElement.addEventListener("load", () => {
-          if (mediaElement.naturalWidth && mediaElement.naturalHeight) {
-            dom.modalMediaFrame.style.aspectRatio = `${mediaElement.naturalWidth} / ${mediaElement.naturalHeight}`;
-          }
-        });
-        if (mediaElement.complete && mediaElement.naturalWidth && mediaElement.naturalHeight) {
-          dom.modalMediaFrame.style.aspectRatio = `${mediaElement.naturalWidth} / ${mediaElement.naturalHeight}`;
-        }
-      }
+      dom.modalMediaFrame.style.aspectRatio = "";
 
       dom.modalTitle.textContent = product.title || "Untitled product";
       const priceText = formatCurrency(product.price);
