@@ -331,7 +331,6 @@
           <span id="sendCampaignImagePreview" class="campaign-upload-preview is-cover"></span>
           <span id="sendCampaignImageActions" class="campaign-asset-actions">
             <button id="renameCampaignImage" type="button" class="mini-action">Rename</button>
-            <button id="removeCampaignImage" type="button" class="mini-action danger">Remove</button>
           </span>
 
           <div class="mt-4 border-t border-line pt-4">
@@ -358,7 +357,7 @@
   <div id="dashboard" class="hidden min-h-screen">
 
     <!-- Header -->
-    <header class="sticky top-0 z-30 border-b border-line bg-paper/88 shadow-crisp backdrop-blur-xl">
+    <header class="sticky top-0 z-30 border-b border-line bg-paper/88 backdrop-blur-xl">
       <nav class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <div>
           <a href="admin.html" class="inline-flex items-center gap-2 text-sm font-semibold text-ink/62 transition hover:text-ink">
@@ -521,7 +520,6 @@
       sendCampaignImagePreview: q("sendCampaignImagePreview"),
       sendCampaignImageActions: q("sendCampaignImageActions"),
       renameCampaignImage: q("renameCampaignImage"),
-      removeCampaignImage: q("removeCampaignImage"),
       sendCampaignImageName: q("sendCampaignImageName"),
       sendCampaignImageUpload: q("sendCampaignImageUpload"),
       sendPendingCampaignPreview: q("sendPendingCampaignPreview"),
@@ -689,7 +687,6 @@
       dom.sendCampaignImageUpload.addEventListener("change", handleCampaignImageSelection);
       dom.saveCampaignImage.addEventListener("click", savePendingCampaignImage);
       dom.renameCampaignImage.addEventListener("click", renameSelectedCampaignImage);
-      dom.removeCampaignImage.addEventListener("click", removeSelectedCampaignImage);
       dom.sendForm.addEventListener("submit", sendEmailHandler);
 
       // Backdrop closes all modals
@@ -1015,33 +1012,7 @@
       }
     }
 
-    async function removeSelectedCampaignImage() {
-      const image = selectedCampaignImage();
-      if (!image) return;
 
-      if (!confirm(`Remove "${image.name}" from saved campaign images?`)) return;
-
-      try {
-        const { error } = await state.client
-          .from("email_campaign_images")
-          .delete()
-          .eq("id", image.id);
-
-        if (error) throw error;
-
-        if (image.storage_path) {
-          await state.client.storage.from(STORAGE_BUCKET).remove([image.storage_path]);
-        }
-
-        await loadCampaignImages();
-        populateCampaignImageSelect();
-        updateCampaignImagePreview();
-        setStatus("Campaign image removed.", "success");
-      } catch (err) {
-        console.error(err);
-        setStatus(err.message || "Unable to remove campaign image.", "error");
-      }
-    }
 
     function renderCampaignAssetPreview(preview, imageUrl, file) {
       preview.classList.add("is-visible");
