@@ -578,6 +578,8 @@ Same rewrites as Vercel with `200` status (rewrite, not redirect).
 
 | Date       | Change Description                                 |
 | ---------- | -------------------------------------------------- |
+| 2026-06-28 | 🐛 Fixed email send endpoint in `email_resend.html` on deployed sites by calling dynamic config (`state.supabaseConfig`) instead of global script window variables (which are undefined in production). |
+| 2026-06-28 | ✨ Tinted the outer `visit-glass-card` with a warm yellow/cream overlay in all views (light, dark, and iOS `@supports` compatibility blocks) to match the surrounding gold/paper theme. |
 | 2026-06-28 | 🗑️ Removed "Video" and "X views" badges from product cards in `index.html`. Modal thumbnails still show Video badges. |
 | 2026-06-28 | ✨ Enhanced Visit Us address card glassmorphism — warm-tinted frosted glass, brass left accent border, shimmer reflection `::before`, hover lift animation, pin icon with warm tint + interactive glow |
 | 2026-06-28 | ✨ Redesigned Offer Board header in `index.html` with glassmorphism — frosted `backdrop-blur`, translucent white fills, subtle shadows, green Live dot. Removed heavy color gradients. |

@@ -1124,13 +1124,13 @@
         setStatus(`Sending to ${recipients.length} recipients in Group ${gi}...`, "info");
 
         // Call the Supabase Edge Function. The function builds the final Resend HTML.
-        const edgeFnUrl = `${window.ANURAG_SUPABASE_URL}/functions/v1/send-email`;
+        const edgeFnUrl = `${state.supabaseConfig.url}/functions/v1/send-email`;
         const res = await fetch(edgeFnUrl, {
           method: "POST",
           headers: {
             "Content-Type":  "application/json",
-            "apikey":        window.ANURAG_SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${window.ANURAG_SUPABASE_ANON_KEY}`
+            "apikey":        state.supabaseConfig.anonKey,
+            "Authorization": `Bearer ${state.supabaseConfig.anonKey}`
           },
           body: JSON.stringify({
             to,
