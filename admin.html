@@ -414,6 +414,18 @@
               </span>
             </a>
 
+            <button type="button" data-admin-panel-target="reviews" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf">
+                <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.5a.6.6 0 0 1 1.04 0l2.18 4.42 4.88.71a.6.6 0 0 1 .33 1.02l-3.53 3.44.83 4.86a.6.6 0 0 1-.87.63L12 16.3l-4.36 2.29a.6.6 0 0 1-.87-.63l.83-4.86-3.53-3.44a.6.6 0 0 1 .33-1.02l4.88-.71 2.2-4.42Z"/>
+                </svg>
+              </span>
+              <span>
+                <span class="block text-sm font-semibold text-ink">Reviews</span>
+                <span class="block text-xs leading-5 text-ink/54">Homepage review display</span>
+              </span>
+            </button>
+
             <button type="button" data-admin-panel-target="password" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
               <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-clay/10 text-clay">
                 <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -529,6 +541,44 @@
           </div>
 
           <button id="saveSocialLinks" type="submit" class="mt-6 w-full rounded-md bg-brass px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Social Links</button>
+        </form>
+
+        <form id="reviewsForm" data-admin-panel="reviews" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
+          <div>
+            <p class="text-sm font-semibold uppercase text-leaf">Google Reviews</p>
+            <h2 class="mt-1 text-2xl font-semibold">Review Display</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/58">Control how scraped Google reviews appear below the product collection.</p>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <label class="flex items-center justify-between rounded-lg border border-line bg-paper/70 px-4 py-3">
+              <span>
+                <span class="block text-sm font-semibold">Show Reviews</span>
+                <span class="block text-xs text-ink/54">Visible on homepage</span>
+              </span>
+              <input id="reviewsEnabled" type="checkbox" class="h-5 w-5 accent-leaf" checked>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Reviews To Show</span>
+              <input id="reviewDisplayLimit" class="field mt-2 px-4 py-3" type="number" min="1" max="12" step="1" value="6">
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Sort Reviews By</span>
+              <select id="reviewSortMode" class="field mt-2 px-4 py-3">
+                <option value="latest">Latest reviews</option>
+                <option value="highest_rated">Highest rated</option>
+                <option value="featured">Featured first</option>
+                <option value="longest">Most detailed</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            <button id="syncGoogleReviews" type="button" class="rounded-md border border-leaf px-5 py-3 text-sm font-semibold text-leaf transition hover:border-ink hover:text-ink disabled:cursor-not-allowed disabled:border-ink/20 disabled:text-ink/40">Sync Reviews Now</button>
+            <button id="saveReviewsSettings" type="submit" class="rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Review Settings</button>
+          </div>
         </form>
 
         <form id="passwordForm" data-admin-panel="password" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
@@ -671,6 +721,7 @@
           <button type="button" data-admin-view-target="subcategories" class="admin-view-tab" role="tab" aria-selected="false">Subcategories</button>
           <button type="button" data-admin-view-target="brands" class="admin-view-tab" role="tab" aria-selected="false">Brands</button>
           <button type="button" data-admin-view-target="campaign-images" class="admin-view-tab" role="tab" aria-selected="false">Campaign Images</button>
+          <button type="button" data-admin-view-target="reviews" class="admin-view-tab" role="tab" aria-selected="false">Reviews</button>
         </div>
 
         <div data-admin-view="products" class="rounded-lg border border-line bg-white/94 shadow-crisp backdrop-blur">
@@ -733,6 +784,21 @@
           <div id="campaignImagesEmptyState" class="hidden px-6 py-14 text-center">
             <p class="text-lg font-semibold">No campaign images yet.</p>
             <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Add campaign images from the Email Customers page to use them in email campaigns.</p>
+          </div>
+        </div>
+
+        <div data-admin-view="reviews" class="hidden rounded-lg border border-line bg-white/94 shadow-crisp backdrop-blur">
+          <div class="flex flex-col gap-2 border-b border-line bg-paper/52 p-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-sm font-semibold uppercase text-leaf">Google</p>
+              <h2 class="mt-1 text-2xl font-semibold">Store Reviews</h2>
+            </div>
+            <p id="reviewsCount" class="text-sm text-ink/56">0 reviews</p>
+          </div>
+          <div id="reviewsList" class="divide-y divide-line"></div>
+          <div id="reviewsEmptyState" class="hidden px-6 py-14 text-center">
+            <p class="text-lg font-semibold">No reviews synced yet.</p>
+            <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-ink/60">Use Sync Reviews Now from the Reviews menu to fetch Google Maps reviews through the Apify API.</p>
           </div>
         </div>
       </section>
@@ -814,7 +880,10 @@
       id: "storefront",
       phone_number: "",
       instagram_url: "",
-      facebook_url: ""
+      facebook_url: "",
+      reviews_section_enabled: true,
+      review_sort_mode: "latest",
+      review_display_limit: 6
     };
 
     const state = {
@@ -825,6 +894,7 @@
       brands: [],
       subcategories: [],
       campaignImages: [],
+      googleReviews: [],
       board: DEFAULT_BOARD,
       settings: DEFAULT_SETTINGS,
       activePanel: null,
@@ -901,6 +971,12 @@
       dom.instagramUrl = document.querySelector("#instagramUrl");
       dom.facebookUrl = document.querySelector("#facebookUrl");
       dom.saveSocialLinks = document.querySelector("#saveSocialLinks");
+      dom.reviewsForm = document.querySelector("#reviewsForm");
+      dom.reviewsEnabled = document.querySelector("#reviewsEnabled");
+      dom.reviewDisplayLimit = document.querySelector("#reviewDisplayLimit");
+      dom.reviewSortMode = document.querySelector("#reviewSortMode");
+      dom.syncGoogleReviews = document.querySelector("#syncGoogleReviews");
+      dom.saveReviewsSettings = document.querySelector("#saveReviewsSettings");
       dom.productForm = document.querySelector("#productForm");
       dom.formTitle = document.querySelector("#formTitle");
       dom.cancelEdit = document.querySelector("#cancelEdit");
@@ -939,6 +1015,9 @@
       dom.campaignImagesCount = document.querySelector("#campaignImagesCount");
       dom.campaignImagesList = document.querySelector("#campaignImagesList");
       dom.campaignImagesEmptyState = document.querySelector("#campaignImagesEmptyState");
+      dom.reviewsCount = document.querySelector("#reviewsCount");
+      dom.reviewsList = document.querySelector("#reviewsList");
+      dom.reviewsEmptyState = document.querySelector("#reviewsEmptyState");
     }
 
     function setupAdminPanelModals() {
@@ -1034,6 +1113,8 @@
           } else if (panelName === "brand") {
             resetBrandForm();
             showAdminView("brands");
+          } else if (panelName === "reviews") {
+            showAdminView("reviews");
           }
           showAdminPanel(panelName);
         });
@@ -1042,6 +1123,8 @@
       dom.boardForm.addEventListener("submit", saveAnnouncementBoard);
       dom.contactForm.addEventListener("submit", saveSiteSettings);
       dom.socialForm.addEventListener("submit", saveSocialSettings);
+      dom.reviewsForm.addEventListener("submit", saveReviewsSettings);
+      dom.syncGoogleReviews.addEventListener("click", syncGoogleReviews);
       dom.productForm.addEventListener("submit", saveProduct);
       dom.subcategoryForm.addEventListener("submit", saveSubcategory);
       dom.brandForm.addEventListener("submit", saveBrand);
@@ -1081,6 +1164,7 @@
       await loadBrands();
       await loadProducts();
       await loadCampaignImages();
+      await loadGoogleReviews();
     }
 
     function lockDashboard() {
@@ -1095,6 +1179,7 @@
       state.products = [];
       state.brands = [];
       state.subcategories = [];
+      state.googleReviews = [];
       state.board = DEFAULT_BOARD;
       state.settings = DEFAULT_SETTINGS;
       showAdminPanel(null);
@@ -1104,6 +1189,7 @@
       renderSubcategories();
       resetBrandForm();
       renderBrands();
+      renderGoogleReviews([]);
     }
 
     // Removes any storefront analytics events generated by this browser before
@@ -1229,6 +1315,7 @@
       await loadBrands();
       await loadProducts();
       await loadCampaignImages();
+      await loadGoogleReviews();
     }
 
     async function loadCampaignImages() {
@@ -1342,6 +1429,168 @@
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Unable to remove campaign image.", "error");
+      }
+    }
+
+    async function loadGoogleReviews() {
+      if (!state.client) {
+        renderGoogleReviews([]);
+        return;
+      }
+
+      try {
+        const { data, error } = await state.client
+          .from("google_reviews")
+          .select("id,google_review_id,author_name,rating,review_text,review_url,relative_time_description,reviewed_at,scraped_at,is_active,is_featured")
+          .order("reviewed_at", { ascending: false, nullsFirst: false });
+
+        if (error) {
+          throw error;
+        }
+
+        state.googleReviews = data || [];
+        renderGoogleReviews(state.googleReviews);
+      } catch (error) {
+        console.error(error);
+        renderGoogleReviews([]);
+        setStatus(error.message || "Unable to load Google reviews.", "error");
+      }
+    }
+
+    function renderGoogleReviews(reviews) {
+      const count = reviews.length;
+      dom.reviewsCount.textContent = `${count} review${count === 1 ? "" : "s"}`;
+      dom.reviewsList.replaceChildren();
+      dom.reviewsEmptyState.classList.toggle("hidden", count > 0);
+
+      reviews.forEach((review) => {
+        dom.reviewsList.appendChild(createReviewRow(review));
+      });
+    }
+
+    function createReviewRow(review) {
+      const row = document.createElement("article");
+      row.className = "grid gap-4 p-5 transition hover:bg-linen/45 sm:grid-cols-[1fr_auto] sm:items-center";
+
+      const details = document.createElement("div");
+      const titleLine = document.createElement("div");
+      titleLine.className = "flex flex-wrap items-center gap-2";
+
+      const title = document.createElement("h3");
+      title.className = "text-lg font-semibold";
+      title.textContent = review.author_name || "Google reviewer";
+
+      const status = document.createElement("span");
+      status.className = review.is_active
+        ? "rounded-md bg-leaf/10 px-2 py-1 text-xs font-semibold text-leaf"
+        : "rounded-md bg-wine/10 px-2 py-1 text-xs font-semibold text-wine";
+      status.textContent = review.is_active ? "Visible" : "Hidden";
+
+      const featured = document.createElement("span");
+      featured.className = review.is_featured
+        ? "rounded-md bg-brass/10 px-2 py-1 text-xs font-semibold text-brass"
+        : "rounded-md bg-ink/5 px-2 py-1 text-xs font-semibold text-ink/50";
+      featured.textContent = review.is_featured ? "Featured" : "Standard";
+
+      titleLine.append(title, status, featured);
+
+      const meta = document.createElement("p");
+      meta.className = "mt-2 text-sm text-ink/58";
+      meta.textContent = [
+        `${Number(review.rating || 0).toFixed(1)} stars`,
+        review.relative_time_description || formatDate(review.reviewed_at),
+        `Synced ${formatDate(review.scraped_at)}`
+      ].filter(Boolean).join(" | ");
+
+      const body = document.createElement("p");
+      body.className = "mt-2 text-sm leading-6 text-ink/62";
+      body.textContent = compactText(review.review_text || "No written review text.", 220);
+
+      details.append(titleLine, meta, body);
+
+      const actions = document.createElement("div");
+      actions.className = "flex flex-wrap gap-2 sm:justify-end";
+
+      const visibilityButton = createActionButton(review.is_active ? "Hide" : "Show", () => updateReview(review.id, { is_active: !review.is_active }));
+      const featureButton = createActionButton(review.is_featured ? "Unfeature" : "Feature", () => updateReview(review.id, { is_featured: !review.is_featured }));
+      const deleteButton = createActionButton("Delete", () => deleteReview(review), true);
+
+      actions.append(visibilityButton, featureButton, deleteButton);
+      row.append(details, actions);
+      return row;
+    }
+
+    async function updateReview(reviewId, patch) {
+      setStatus("Updating review...", "info");
+      try {
+        const { error } = await state.client
+          .from("google_reviews")
+          .update(patch)
+          .eq("id", reviewId);
+
+        if (error) {
+          throw error;
+        }
+
+        await loadGoogleReviews();
+        setStatus("Review updated.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to update review.", "error");
+      }
+    }
+
+    async function deleteReview(review) {
+      if (!confirm(`Delete the review from "${review.author_name || "Google reviewer"}"?`)) {
+        return;
+      }
+
+      setStatus("Deleting review...", "info");
+      try {
+        const { error } = await state.client
+          .from("google_reviews")
+          .delete()
+          .eq("id", review.id);
+
+        if (error) {
+          throw error;
+        }
+
+        await loadGoogleReviews();
+        setStatus("Review deleted.", "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to delete review.", "error");
+      }
+    }
+
+    async function syncGoogleReviews() {
+      setReviewsSyncing(true);
+      setStatus("Syncing Google reviews from Apify...", "info");
+
+      try {
+        const response = await fetch("/api/sync-google-reviews", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result.ok === false) {
+          throw new Error(result.error || "Unable to sync Google reviews.");
+        }
+
+        await loadGoogleReviews();
+        const upserted = Number(result.upserted || 0);
+        const fetched = Number(result.fetched || 0);
+        const deleted = Number(result.deleted || 0);
+        setStatus(`Google reviews synced. ${upserted} of ${fetched} fetched reviews were saved, and ${deleted} stale reviews were removed.`, "success");
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to sync Google reviews.", "error");
+      } finally {
+        setReviewsSyncing(false);
       }
     }
 
@@ -1675,7 +1924,7 @@
       try {
         const { data, error } = await state.client
           .from("site_settings")
-          .select("id,phone_number,instagram_url,facebook_url,updated_at")
+          .select("id,phone_number,instagram_url,facebook_url,reviews_section_enabled,review_sort_mode,review_display_limit,updated_at")
           .eq("id", "storefront")
           .maybeSingle();
 
@@ -1696,6 +1945,9 @@
       dom.contactPhone.value = settings.phone_number || DEFAULT_SETTINGS.phone_number;
       dom.instagramUrl.value = settings.instagram_url || DEFAULT_SETTINGS.instagram_url;
       dom.facebookUrl.value = settings.facebook_url || DEFAULT_SETTINGS.facebook_url;
+      dom.reviewsEnabled.checked = settings.reviews_section_enabled !== false;
+      dom.reviewDisplayLimit.value = Number(settings.review_display_limit || DEFAULT_SETTINGS.review_display_limit);
+      dom.reviewSortMode.value = settings.review_sort_mode || DEFAULT_SETTINGS.review_sort_mode;
     }
 
     async function saveSiteSettings(event) {
@@ -1770,6 +2022,42 @@
       }
     }
 
+    async function saveReviewsSettings(event) {
+      event.preventDefault();
+
+      if (!state.client) {
+        setStatus("Supabase is not configured yet.", "error");
+        return;
+      }
+
+      const payload = readReviewsSettingsPayload();
+      if (!payload) {
+        return;
+      }
+
+      setReviewsSaving(true);
+      setStatus("Saving review display settings...", "info");
+
+      try {
+        const { error } = await state.client
+          .from("site_settings")
+          .upsert(payload, { onConflict: "id" });
+
+        if (error) {
+          throw error;
+        }
+
+        state.settings = payload;
+        setStatus("Review display settings updated.", "success");
+        closeActivePanelAfterSave();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Unable to save review settings.", "error");
+      } finally {
+        setReviewsSaving(false);
+      }
+    }
+
     function readSettingsPayload() {
       const phoneNumber = dom.contactPhone.value.trim();
       const dialableNumber = normalizePhoneNumber(phoneNumber);
@@ -1784,7 +2072,10 @@
         id: "storefront",
         phone_number: phoneNumber,
         instagram_url: state.settings?.instagram_url || DEFAULT_SETTINGS.instagram_url,
-        facebook_url: state.settings?.facebook_url || DEFAULT_SETTINGS.facebook_url
+        facebook_url: state.settings?.facebook_url || DEFAULT_SETTINGS.facebook_url,
+        reviews_section_enabled: state.settings?.reviews_section_enabled ?? DEFAULT_SETTINGS.reviews_section_enabled,
+        review_sort_mode: state.settings?.review_sort_mode || DEFAULT_SETTINGS.review_sort_mode,
+        review_display_limit: Number(state.settings?.review_display_limit || DEFAULT_SETTINGS.review_display_limit)
       };
     }
 
@@ -1801,7 +2092,31 @@
         id: "storefront",
         phone_number: state.settings?.phone_number || DEFAULT_SETTINGS.phone_number,
         instagram_url: instagramUrl,
-        facebook_url: facebookUrl
+        facebook_url: facebookUrl,
+        reviews_section_enabled: state.settings?.reviews_section_enabled ?? DEFAULT_SETTINGS.reviews_section_enabled,
+        review_sort_mode: state.settings?.review_sort_mode || DEFAULT_SETTINGS.review_sort_mode,
+        review_display_limit: Number(state.settings?.review_display_limit || DEFAULT_SETTINGS.review_display_limit)
+      };
+    }
+
+    function readReviewsSettingsPayload() {
+      const displayLimit = Number(dom.reviewDisplayLimit.value || DEFAULT_SETTINGS.review_display_limit);
+      const sortMode = dom.reviewSortMode.value || DEFAULT_SETTINGS.review_sort_mode;
+      const allowedSortModes = new Set(["latest", "highest_rated", "featured", "longest"]);
+
+      if (!Number.isFinite(displayLimit) || displayLimit < 1 || displayLimit > 12 || !allowedSortModes.has(sortMode)) {
+        setStatus("Choose 1 to 12 reviews and a valid sort option.", "error");
+        return null;
+      }
+
+      return {
+        id: "storefront",
+        phone_number: state.settings?.phone_number || DEFAULT_SETTINGS.phone_number,
+        instagram_url: state.settings?.instagram_url || DEFAULT_SETTINGS.instagram_url,
+        facebook_url: state.settings?.facebook_url || DEFAULT_SETTINGS.facebook_url,
+        reviews_section_enabled: dom.reviewsEnabled.checked,
+        review_sort_mode: sortMode,
+        review_display_limit: Math.trunc(displayLimit)
       };
     }
 
@@ -2921,6 +3236,16 @@
     function setSocialSaving(isSaving) {
       dom.saveSocialLinks.disabled = isSaving;
       dom.saveSocialLinks.textContent = isSaving ? "Saving..." : "Save Social Links";
+    }
+
+    function setReviewsSaving(isSaving) {
+      dom.saveReviewsSettings.disabled = isSaving;
+      dom.saveReviewsSettings.textContent = isSaving ? "Saving..." : "Save Review Settings";
+    }
+
+    function setReviewsSyncing(isSyncing) {
+      dom.syncGoogleReviews.disabled = isSyncing;
+      dom.syncGoogleReviews.textContent = isSyncing ? "Syncing..." : "Sync Reviews Now";
     }
 
     function setSubcategorySaving(isSaving) {

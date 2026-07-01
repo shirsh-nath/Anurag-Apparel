@@ -1,6 +1,12 @@
 # Local environment variables
 .env
 .env*.local
+supabase/.env
+supabase/.env*.local
 
 # Local Supabase credentials configuration for Live Server
 supabase-browser-config.js
+
+# Local API credentials
+credential.txt
+SUPABASE_SECRETS_SETUP.txt

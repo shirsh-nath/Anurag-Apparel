@@ -89,6 +89,36 @@ For local testing, serve the function with the same secrets:
 supabase functions serve send-email --env-file .env
 ```
 
+## Google Reviews Sync
+
+Google review scraping runs in the `sync-google-reviews` Supabase Edge Function so the Apify key is stored as a Supabase secret, not in browser code or the Vercel API route. Vercel Cron still calls `/api/sync-google-reviews`; that route only proxies to the Supabase function.
+
+Required Supabase Edge Function secret:
+
+```env
+APIFY_API_KEY=your_apify_api_key
+```
+
+Recommended Supabase Edge Function secret:
+
+```env
+CRON_SECRET=your_cron_secret
+```
+
+These review sync values are hardcoded in `supabase/functions/sync-google-reviews/index.ts`:
+
+```env
+GOOGLE_MAPS_REVIEWS_URL=https://maps.app.goo.gl/6uggTtXDuTrEZQDY8
+REVIEW_SYNC_MAX_REVIEWS=100
+APIFY_GOOGLE_REVIEWS_ACTOR=compass~google-maps-reviews-scraper
+```
+
+Deploy after setting secrets:
+
+```bash
+supabase functions deploy sync-google-reviews
+```
+
 ## Admin Route
 
 Netlify uses `_redirects`, and Vercel uses `vercel.json`, so `/admin` will serve `admin.html` on either platform. On other static hosts, add an equivalent rewrite from `/admin` and `/admin/*` to `/admin.html`.

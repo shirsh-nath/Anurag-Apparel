@@ -29,6 +29,10 @@
     {
       "path": "/api/purge-analytics",
       "schedule": "30 20 * * *"
+    },
+    {
+      "path": "/api/sync-google-reviews",
+      "schedule": "45 21 * * *"
     }
   ]
 }

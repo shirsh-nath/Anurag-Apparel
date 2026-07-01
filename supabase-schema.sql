@@ -95,19 +95,32 @@ create table if not exists public.site_settings (
   phone_number  text        not null default '',
   instagram_url text        not null default '',
   facebook_url  text        not null default '',
+  reviews_section_enabled boolean not null default true,
+  review_sort_mode text not null default 'latest',
+  review_display_limit integer not null default 6,
   updated_at    timestamptz not null default now(),
   constraint site_settings_phone_number_length
     check (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15),
   constraint site_settings_instagram_url_valid
     check (instagram_url = '' or instagram_url ~* '^https?://'),
   constraint site_settings_facebook_url_valid
-    check (facebook_url = '' or facebook_url ~* '^https?://')
+    check (facebook_url = '' or facebook_url ~* '^https?://'),
+  constraint site_settings_review_sort_mode_valid
+    check (review_sort_mode in ('latest', 'highest_rated', 'featured', 'longest')),
+  constraint site_settings_review_display_limit_valid
+    check (review_display_limit between 1 and 12)
 );
 
 alter table public.site_settings
   add column if not exists instagram_url text not null default '';
 alter table public.site_settings
   add column if not exists facebook_url text not null default '';
+alter table public.site_settings
+  add column if not exists reviews_section_enabled boolean not null default true;
+alter table public.site_settings
+  add column if not exists review_sort_mode text not null default 'latest';
+alter table public.site_settings
+  add column if not exists review_display_limit integer not null default 6;
 
 do $$
 begin
@@ -125,6 +138,22 @@ begin
     alter table public.site_settings
       add constraint site_settings_facebook_url_valid
       check (facebook_url = '' or facebook_url ~* '^https?://');
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_settings_review_sort_mode_valid'
+  ) then
+    alter table public.site_settings
+      add constraint site_settings_review_sort_mode_valid
+      check (review_sort_mode in ('latest', 'highest_rated', 'featured', 'longest'));
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_settings_review_display_limit_valid'
+  ) then
+    alter table public.site_settings
+      add constraint site_settings_review_display_limit_valid
+      check (review_display_limit between 1 and 12);
   end if;
 end $$;
 
@@ -223,6 +252,51 @@ create index if not exists website_analytics_events_visitor_id_idx
 create index if not exists website_analytics_events_session_id_idx
   on public.website_analytics_events (session_id);
 
+-- Stores Google Maps reviews scraped by the serverless Apify sync route.
+create table if not exists public.google_reviews (
+  id                         uuid         primary key default gen_random_uuid(),
+  google_review_id           text         not null unique,
+  author_name                text         not null default '',
+  author_photo_url           text         not null default '',
+  rating                     numeric(2,1) not null,
+  review_text                text         not null default '',
+  review_url                 text         not null default '',
+  language                   text         not null default '',
+  relative_time_description  text         not null default '',
+  reviewed_at                timestamptz,
+  scraped_at                 timestamptz  not null default now(),
+  is_active                  boolean      not null default true,
+  is_featured                boolean      not null default false,
+  raw                        jsonb        not null default '{}'::jsonb,
+  constraint google_reviews_review_id_not_blank check (length(trim(google_review_id)) > 0),
+  constraint google_reviews_author_or_text_present check (length(trim(author_name)) > 0 or length(trim(review_text)) > 0),
+  constraint google_reviews_rating_valid check (rating >= 0 and rating <= 5)
+);
+
+alter table public.google_reviews
+  add column if not exists author_photo_url text not null default '';
+alter table public.google_reviews
+  add column if not exists language text not null default '';
+alter table public.google_reviews
+  add column if not exists relative_time_description text not null default '';
+alter table public.google_reviews
+  add column if not exists scraped_at timestamptz not null default now();
+alter table public.google_reviews
+  add column if not exists is_active boolean not null default true;
+alter table public.google_reviews
+  add column if not exists is_featured boolean not null default false;
+alter table public.google_reviews
+  add column if not exists raw jsonb not null default '{}'::jsonb;
+
+create index if not exists google_reviews_reviewed_at_idx
+  on public.google_reviews (reviewed_at desc nulls last);
+create index if not exists google_reviews_rating_idx
+  on public.google_reviews (rating desc);
+create index if not exists google_reviews_is_active_idx
+  on public.google_reviews (is_active);
+create index if not exists google_reviews_is_featured_idx
+  on public.google_reviews (is_featured);
+
 -- ── 8. Admin credentials (private schema) ───────────────────
 create table if not exists private.admin_credentials (
   id            text        primary key default 'dashboard',
@@ -298,6 +372,7 @@ alter table public.site_settings        enable row level security;
 alter table public.email_contacts       enable row level security;
 alter table public.email_campaign_images enable row level security;
 alter table public.website_analytics_events enable row level security;
+alter table public.google_reviews       enable row level security;
 
 -- ── 11. Table grants ─────────────────────────────────────────
 grant select, insert, update, delete on table public.products              to anon;
@@ -308,6 +383,7 @@ grant select, insert, update         on table public.site_settings         to an
 grant select, insert, update, delete on table public.email_contacts        to anon;
 grant select, insert, update, delete on table public.email_campaign_images to anon;
 grant select, insert, delete       on table public.website_analytics_events to anon;
+grant select, insert, update, delete on table public.google_reviews         to anon;
 
 -- ── 12. RLS Policies ─────────────────────────────────────────
 
@@ -383,6 +459,8 @@ create policy "Anon can create site settings for static admin"
     and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
     and (instagram_url = '' or instagram_url ~* '^https?://')
     and (facebook_url = '' or facebook_url ~* '^https?://')
+    and review_sort_mode in ('latest', 'highest_rated', 'featured', 'longest')
+    and review_display_limit between 1 and 12
   );
 create policy "Anon can update site settings for static admin"
   on public.site_settings for update to anon
@@ -392,6 +470,8 @@ create policy "Anon can update site settings for static admin"
     and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
     and (instagram_url = '' or instagram_url ~* '^https?://')
     and (facebook_url = '' or facebook_url ~* '^https?://')
+    and review_sort_mode in ('latest', 'highest_rated', 'featured', 'longest')
+    and review_display_limit between 1 and 12
   );
 
 -- email_contacts
@@ -459,6 +539,30 @@ create policy "Admin can delete own analytics events"
   on public.website_analytics_events for delete to anon
   using (length(trim(visitor_id)) > 0);
 
+-- google_reviews
+drop policy if exists "Public can read active google reviews" on public.google_reviews;
+drop policy if exists "Public can read google reviews" on public.google_reviews;
+drop policy if exists "Workflow can create google reviews" on public.google_reviews;
+drop policy if exists "Static admin can update google reviews" on public.google_reviews;
+drop policy if exists "Static admin can delete google reviews" on public.google_reviews;
+
+create policy "Public can read google reviews"
+  on public.google_reviews for select to anon using (true);
+create policy "Workflow can create google reviews"
+  on public.google_reviews for insert to anon
+  with check (
+    length(trim(google_review_id)) > 0
+    and (length(trim(author_name)) > 0 or length(trim(review_text)) > 0)
+    and rating >= 0
+    and rating <= 5
+  );
+create policy "Static admin can update google reviews"
+  on public.google_reviews for update to anon
+  using (true)
+  with check (rating >= 0 and rating <= 5);
+create policy "Static admin can delete google reviews"
+  on public.google_reviews for delete to anon using (true);
+
 -- ── 13. Storage bucket ───────────────────────────────────────
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
@@ -487,8 +591,8 @@ values (
   'Get Directions', 'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6', true
 ) on conflict (id) do nothing;
 
-insert into public.site_settings (id, phone_number, instagram_url, facebook_url)
-values ('storefront', '', '', '') on conflict (id) do nothing;
+insert into public.site_settings (id, phone_number, instagram_url, facebook_url, reviews_section_enabled, review_sort_mode, review_display_limit)
+values ('storefront', '', '', '', true, 'latest', 6) on conflict (id) do nothing;
 
 insert into public.product_subcategories (name, slug, description, sort_order, is_active)
 values
