@@ -506,7 +506,8 @@ Exposes to `window`:
 
 - **Schedule:** Daily at `45 21 * * *` (03:15 IST) via Vercel Cron
 - Accepts **GET** (cron) and **POST** (manual trigger)
-- Protected by `CRON_SECRET` env var (Bearer token auth)
+- Cron **GET** requests are protected by `CRON_SECRET` Bearer token auth
+- Manual admin **POST** requests are proxied server-side without requiring a browser-visible secret
 - Proxies the request to `{SUPABASE_URL}/functions/v1/sync-google-reviews`
 - Uses only `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and optional `CRON_SECRET`; Apify credentials stay in Supabase secrets
 
@@ -580,7 +581,7 @@ Google Reviews are synced by a Supabase Edge Function (`supabase/functions/sync-
 ### Flow Architecture
 
 1. **Trigger:** The review sync is run daily via a Vercel Cron Job calling `/api/sync-google-reviews` or triggered manually from the admin UI.
-2. **Vercel Proxy:** `api/sync-google-reviews.js` validates the optional `CRON_SECRET`, then calls `{SUPABASE_URL}/functions/v1/sync-google-reviews` with the public Supabase anon key.
+2. **Vercel Proxy:** `api/sync-google-reviews.js` validates the optional `CRON_SECRET` for cron `GET` requests, accepts manual admin `POST` requests, then calls `{SUPABASE_URL}/functions/v1/sync-google-reviews` with the public Supabase anon key and server-side `x-cron-secret`.
 3. **Supabase Secrets:** The Edge Function reads `APIFY_API_KEY` and optional `CRON_SECRET` from Supabase Edge Function secrets. The Google Maps URL, max review count, and Apify actor are hardcoded in the function.
 4. **Apify API Execution:** The Edge Function makes a POST request to Apify's run sync dataset endpoint:
    `https://api.apify.com/v2/acts/compass~google-maps-reviews-scraper/run-sync-get-dataset-items`
