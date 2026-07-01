@@ -569,12 +569,16 @@ values ('product-images', 'product-images', true)
 on conflict (id) do update set public = true;
 
 drop policy if exists "Anon can upload product images" on storage.objects;
+drop policy if exists "Anon can read product images" on storage.objects;
 drop policy if exists "Anon can update product images" on storage.objects;
 drop policy if exists "Anon can delete product images" on storage.objects;
 
 create policy "Anon can upload product images"
   on storage.objects for insert to anon
   with check (bucket_id = 'product-images');
+create policy "Anon can read product images"
+  on storage.objects for select to anon
+  using (bucket_id = 'product-images');
 create policy "Anon can update product images"
   on storage.objects for update to anon
   using (bucket_id = 'product-images') with check (bucket_id = 'product-images');

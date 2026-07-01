@@ -912,7 +912,8 @@
       brandLogoPreviewUrl: "",
       objectUrls: [],
       offerImageUrls: [],
-      pendingOfferFiles: []
+      pendingOfferFiles: [],
+      removedOfferImageUrls: []
     };
 
     const dom = {};
@@ -1417,9 +1418,7 @@
           .delete()
           .eq("id", image.id);
         if (error) throw error;
-        if (image.storage_path) {
-          await state.client.storage.from(STORAGE_BUCKET).remove([image.storage_path]);
-        }
+        await removeStorageObjects([image.storage_path || image.image_url]);
         rowEl.remove();
         state.campaignImages = state.campaignImages.filter((img) => img.id !== image.id);
         const count = state.campaignImages.length;
@@ -1751,6 +1750,7 @@
       // Populate existing offer images
       state.offerImageUrls = Array.isArray(board.offer_images) ? [...board.offer_images.filter(Boolean)] : [];
       state.pendingOfferFiles = [];
+      state.removedOfferImageUrls = [];
       dom.boardOfferImages.value = "";
       renderOfferImagePreview();
     }
@@ -1766,9 +1766,11 @@
       setBoardSaving(true);
       setStatus("Saving homepage announcement board...", "info");
 
+      let newImageUrls = [];
+      let boardSaved = false;
+
       try {
         // Upload any pending offer poster images
-        const newImageUrls = [];
         for (const file of state.pendingOfferFiles) {
           const path = `offers/${createFileToken()}-${sanitizeFileName(file.name)}`;
           setStatus(`Uploading offer image ${file.name}...`, "info");
@@ -1781,7 +1783,7 @@
 
         const payload = readBoardPayload(allOfferImages);
         if (!payload) {
-          setBoardSaving(false);
+          await removeStorageObjects(newImageUrls, { throwOnError: false });
           return;
         }
 
@@ -1792,15 +1794,25 @@
         if (error) {
           throw error;
         }
+        boardSaved = true;
+
+        // Delete removed images from Supabase Storage now that DB save succeeded
+        if (state.removedOfferImageUrls.length > 0) {
+          await removeStorageObjects(state.removedOfferImageUrls);
+        }
 
         state.board = payload;
         state.offerImageUrls = allOfferImages;
         state.pendingOfferFiles = [];
+        state.removedOfferImageUrls = [];
         dom.boardOfferImages.value = "";
         renderOfferImagePreview();
         setStatus("Homepage announcement board updated.", "success");
         closeActivePanelAfterSave();
       } catch (error) {
+        if (!boardSaved && newImageUrls.length) {
+          await removeStorageObjects(newImageUrls, { throwOnError: false });
+        }
         console.error(error);
         setStatus(error.message || "Unable to save announcement board.", "error");
       } finally {
@@ -1854,6 +1866,8 @@
     }
 
     function clearAllOfferImages() {
+      // Track all existing (saved) images as removed so they get deleted from storage on save
+      state.removedOfferImageUrls.push(...state.offerImageUrls);
       state.offerImageUrls = [];
       state.pendingOfferFiles = [];
       dom.boardOfferImages.value = "";
@@ -1864,7 +1878,11 @@
       if (isPending) {
         state.pendingOfferFiles.splice(index, 1);
       } else {
-        state.offerImageUrls.splice(index, 1);
+        // Track the removed URL so it gets deleted from storage on save
+        const [removed] = state.offerImageUrls.splice(index, 1);
+        if (removed) {
+          state.removedOfferImageUrls.push(removed);
+        }
       }
       renderOfferImagePreview();
     }
@@ -2272,6 +2290,7 @@
       const closeAfterSave = shouldCloseActivePanelAfterSave();
 
       let uploadedLogoUrl = "";
+      let brandSaved = false;
 
       try {
         if (state.pendingBrandLogoFile) {
@@ -2295,6 +2314,7 @@
           if (error) {
             throw error;
           }
+          brandSaved = true;
 
           if (uploadedLogoUrl && state.originalBrandLogoUrl && state.originalBrandLogoUrl !== uploadedLogoUrl) {
             await removeStorageObjects([state.originalBrandLogoUrl]);
@@ -2308,6 +2328,7 @@
           if (error) {
             throw error;
           }
+          brandSaved = true;
 
           setStatus("Brand created.", "success");
         }
@@ -2316,8 +2337,8 @@
         await loadBrands();
         closeActivePanelAfterSave(closeAfterSave);
       } catch (error) {
-        if (uploadedLogoUrl) {
-          await removeStorageObjects([uploadedLogoUrl]);
+        if (!brandSaved && uploadedLogoUrl) {
+          await removeStorageObjects([uploadedLogoUrl], { throwOnError: false });
         }
         console.error(error);
         setStatus(error.message || "Unable to save brand.", "error");
@@ -2424,6 +2445,7 @@
       const closeAfterSave = shouldCloseActivePanelAfterSave();
 
       let uploadedUrls = [];
+      let productSaved = false;
 
       try {
         uploadedUrls = await uploadPendingImages((url) => uploadedUrls.push(url));
@@ -2438,6 +2460,7 @@
           if (error) {
             throw error;
           }
+          productSaved = true;
 
           const removedUrls = state.originalGallery.filter((url) => !payload.gallery_images.includes(url));
           await removeStorageObjects(removedUrls);
@@ -2450,6 +2473,7 @@
           if (error) {
             throw error;
           }
+          productSaved = true;
 
           setStatus("Product created.", "success");
         }
@@ -2458,8 +2482,8 @@
         await loadProducts();
         closeActivePanelAfterSave(closeAfterSave);
       } catch (error) {
-        if (uploadedUrls.length) {
-          await removeStorageObjects(uploadedUrls);
+        if (!productSaved && uploadedUrls.length) {
+          await removeStorageObjects(uploadedUrls, { throwOnError: false });
         }
         console.error(error);
         setStatus(error.message || "Unable to save product.", "error");
@@ -3138,30 +3162,74 @@
       dom.brandLogoPreview.appendChild(preview);
     }
 
-    async function removeStorageObjects(urls) {
-      const paths = urls.map(getStoragePathFromPublicUrl).filter(Boolean);
+    async function removeStorageObjects(urls, { throwOnError = true } = {}) {
+      const paths = Array.from(new Set(urls.map(getStoragePathFromStorageValue).filter(Boolean)));
       if (!paths.length || !state.client) {
         return;
       }
 
       const { error } = await state.client.storage.from(STORAGE_BUCKET).remove(paths);
       if (error) {
-        console.warn("Storage cleanup failed:", error.message);
+        const message = `Storage cleanup failed for ${paths.join(", ")}: ${error.message}`;
+        if (throwOnError) {
+          throw new Error(message);
+        }
+        console.warn(message);
       }
     }
 
-    function getStoragePathFromPublicUrl(url) {
-      if (!url || url.includes("images.unsplash.com")) {
+    function getStoragePathFromStorageValue(value) {
+      if (!value || value.includes("images.unsplash.com")) {
         return null;
       }
 
+      const trimmed = String(value).trim();
+      if (isKnownStoragePath(trimmed)) {
+        return trimmed.replace(/^\/+/, "");
+      }
+
+      const parsedPath = getSupabaseStoragePathname(trimmed);
+      if (parsedPath) {
+        const markerMatch = parsedPath.match(new RegExp(`/storage/v1/(?:object|render/image)/public/${escapeRegExp(STORAGE_BUCKET)}/(.+)$`));
+        if (markerMatch?.[1]) {
+          const storagePath = safeDecodeURIComponent(markerMatch[1]);
+          return isKnownStoragePath(storagePath) ? storagePath : null;
+        }
+      }
+
       const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
-      const markerIndex = url.indexOf(marker);
+      const markerIndex = trimmed.indexOf(marker);
       if (markerIndex === -1) {
         return null;
       }
 
-      return decodeURIComponent(url.slice(markerIndex + marker.length));
+      const rawPath = trimmed.slice(markerIndex + marker.length).split(/[?#]/)[0];
+      const storagePath = safeDecodeURIComponent(rawPath);
+      return isKnownStoragePath(storagePath) ? storagePath : null;
+    }
+
+    function getSupabaseStoragePathname(value) {
+      try {
+        return new URL(value).pathname;
+      } catch (_) {
+        return "";
+      }
+    }
+
+    function isKnownStoragePath(value) {
+      return /^(products|brands|offers|campaigns)\//.test(String(value || "").replace(/^\/+/, ""));
+    }
+
+    function safeDecodeURIComponent(value) {
+      try {
+        return decodeURIComponent(value);
+      } catch (_) {
+        return value;
+      }
+    }
+
+    function escapeRegExp(value) {
+      return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
     function resetForm() {
