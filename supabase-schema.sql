@@ -91,12 +91,42 @@ create trigger site_announcements_updated_at
 
 -- ── 5. site_settings ─────────────────────────────────────────
 create table if not exists public.site_settings (
-  id           text        primary key default 'storefront',
-  phone_number text        not null default '',
-  updated_at   timestamptz not null default now(),
+  id            text        primary key default 'storefront',
+  phone_number  text        not null default '',
+  instagram_url text        not null default '',
+  facebook_url  text        not null default '',
+  updated_at    timestamptz not null default now(),
   constraint site_settings_phone_number_length
-    check (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
+    check (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15),
+  constraint site_settings_instagram_url_valid
+    check (instagram_url = '' or instagram_url ~* '^https?://'),
+  constraint site_settings_facebook_url_valid
+    check (facebook_url = '' or facebook_url ~* '^https?://')
 );
+
+alter table public.site_settings
+  add column if not exists instagram_url text not null default '';
+alter table public.site_settings
+  add column if not exists facebook_url text not null default '';
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_settings_instagram_url_valid'
+  ) then
+    alter table public.site_settings
+      add constraint site_settings_instagram_url_valid
+      check (instagram_url = '' or instagram_url ~* '^https?://');
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'site_settings_facebook_url_valid'
+  ) then
+    alter table public.site_settings
+      add constraint site_settings_facebook_url_valid
+      check (facebook_url = '' or facebook_url ~* '^https?://');
+  end if;
+end $$;
 
 create or replace function public.set_site_settings_updated_at()
 returns trigger language plpgsql set search_path = '' as $$
@@ -351,6 +381,8 @@ create policy "Anon can create site settings for static admin"
   with check (
     id = 'storefront'
     and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
+    and (instagram_url = '' or instagram_url ~* '^https?://')
+    and (facebook_url = '' or facebook_url ~* '^https?://')
   );
 create policy "Anon can update site settings for static admin"
   on public.site_settings for update to anon
@@ -358,6 +390,8 @@ create policy "Anon can update site settings for static admin"
   with check (
     id = 'storefront'
     and (phone_number = '' or length(regexp_replace(phone_number, '\D', '', 'g')) between 7 and 15)
+    and (instagram_url = '' or instagram_url ~* '^https?://')
+    and (facebook_url = '' or facebook_url ~* '^https?://')
   );
 
 -- email_contacts
@@ -453,8 +487,8 @@ values (
   'Get Directions', 'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6', true
 ) on conflict (id) do nothing;
 
-insert into public.site_settings (id, phone_number)
-values ('storefront', '') on conflict (id) do nothing;
+insert into public.site_settings (id, phone_number, instagram_url, facebook_url)
+values ('storefront', '', '', '') on conflict (id) do nothing;
 
 insert into public.product_subcategories (name, slug, description, sort_order, is_active)
 values

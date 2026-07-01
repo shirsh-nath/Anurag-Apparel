@@ -161,6 +161,61 @@
       white-space: nowrap;
     }
 
+    .nav-socials,
+    .footer-socials {
+      align-items: center;
+      display: inline-flex;
+      gap: 0.35rem;
+    }
+
+    .social-link {
+      align-items: center;
+      border-radius: 0.65rem;
+      display: inline-flex;
+      justify-content: center;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .social-link svg {
+      height: 1.15rem;
+      width: 1.15rem;
+    }
+
+    .social-link.hidden,
+    .nav-socials.hidden,
+    #footerSocialGroup.hidden {
+      display: none;
+    }
+
+    .nav-social-link {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(231, 225, 216, 0.98);
+      color: rgba(23, 23, 23, 0.74);
+      height: 2.65rem;
+      width: 2.65rem;
+    }
+
+    .nav-social-link:hover {
+      border-color: rgba(183, 135, 45, 0.46);
+      color: #b7872d;
+      transform: translateY(-1px);
+    }
+
+    .footer-social-link {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.72);
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+
+    .footer-social-link:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(183, 135, 45, 0.48);
+      color: #f3d58e;
+      transform: translateY(-1px);
+    }
+
     .nav-shop {
       background: #171717;
       box-shadow: 0 12px 26px rgba(23, 23, 23, 0.16);
@@ -191,6 +246,34 @@
     @media (min-width: 768px) {
       .nav-link {
         display: inline-flex;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .brand-mark {
+        width: 6.35rem;
+      }
+
+      .nav-action {
+        min-height: 2.65rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+
+      .nav-action-label {
+        display: none;
+      }
+
+      .nav-shop {
+        min-height: 2.65rem;
+        min-width: 3.7rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+
+      .nav-social-link {
+        height: 2.5rem;
+        width: 2.5rem;
       }
     }
 
@@ -1536,6 +1619,11 @@
         border-color: rgba(231, 225, 216, 0.98) !important;
         color: #171717 !important;
       }
+      .nav-social-link {
+        background: rgba(255, 255, 255, 0.78) !important;
+        border-color: rgba(231, 225, 216, 0.98) !important;
+        color: rgba(23, 23, 23, 0.74) !important;
+      }
       .nav-shop {
         background: #171717 !important;
         color: #fff !important;
@@ -1736,6 +1824,11 @@
         border-color: #e7e1d8 !important;
         color: rgba(255, 255, 255, 0.62) !important;
       }
+      .footer-social-link {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.14) !important;
+        color: rgba(255, 255, 255, 0.72) !important;
+      }
 
       /* Modal */
       .modal-panel:not(.product-modal-panel) {
@@ -1804,6 +1897,20 @@
           </svg>
           <span class="nav-action-label">Call Us</span>
         </a>
+        <div id="navSocialLinks" class="nav-socials hidden" aria-label="Follow Anurag Apparel">
+          <a id="navInstagramLink" class="social-link nav-social-link hidden" target="_blank" rel="noreferrer" aria-label="Follow Anurag Apparel on Instagram" title="Instagram">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="4" width="16" height="16" rx="4.4" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="2"/>
+              <circle cx="17" cy="7" r="1.1" fill="currentColor"/>
+            </svg>
+          </a>
+          <a id="navFacebookLink" class="social-link nav-social-link hidden" target="_blank" rel="noreferrer" aria-label="Follow Anurag Apparel on Facebook" title="Facebook">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.2 8.1V6.7c0-.7.5-.9 1-.9h2.2V2.2L14.3 2c-3.1 0-4.8 1.8-4.8 5.1v1H6.6V12h2.9v10h4.1V12H17l.5-3.9h-3.3Z"/>
+            </svg>
+          </a>
+        </div>
         <a class="nav-link" href="#visit">Visit</a>
       </div>
       <a href="#products" class="nav-shop justify-self-end">Shop</a>
@@ -2056,8 +2163,25 @@
   </main>
 
   <footer class="border-t border-line bg-ink px-4 py-8 text-white sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-7xl text-sm text-white/62">
+    <div class="mx-auto flex max-w-7xl flex-col gap-5 text-sm text-white/62 sm:flex-row sm:items-center sm:justify-between">
       <p>&copy; <span id="year"></span> Anurag Apparel. All rights reserved.</p>
+      <div id="footerSocialGroup" class="hidden items-center gap-3">
+        <span class="font-semibold text-white/68">Follow us</span>
+        <div id="footerSocialLinks" class="footer-socials" aria-label="Follow Anurag Apparel">
+          <a id="footerInstagramLink" class="social-link footer-social-link hidden" target="_blank" rel="noreferrer" aria-label="Follow Anurag Apparel on Instagram" title="Instagram">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="4" width="16" height="16" rx="4.4" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="2"/>
+              <circle cx="17" cy="7" r="1.1" fill="currentColor"/>
+            </svg>
+          </a>
+          <a id="footerFacebookLink" class="social-link footer-social-link hidden" target="_blank" rel="noreferrer" aria-label="Follow Anurag Apparel on Facebook" title="Facebook">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.2 8.1V6.7c0-.7.5-.9 1-.9h2.2V2.2L14.3 2c-3.1 0-4.8 1.8-4.8 5.1v1H6.6V12h2.9v10h4.1V12H17l.5-3.9h-3.3Z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </footer>
 
@@ -2102,7 +2226,9 @@
     };
     const DEFAULT_SETTINGS = {
       id: "storefront",
-      phone_number: ""
+      phone_number: "",
+      instagram_url: "",
+      facebook_url: ""
     };
     const DEFAULT_SUBCATEGORIES = [
       { id: "shirts", name: "Shirts", slug: "shirts", sort_order: 10, is_active: true },
@@ -2197,6 +2323,12 @@
     function cacheDom() {
       dom.configNotice = document.querySelector("#configNotice");
       dom.callUsButton = document.querySelector("#callUsButton");
+      dom.navSocialLinks = document.querySelector("#navSocialLinks");
+      dom.footerSocialGroup = document.querySelector("#footerSocialGroup");
+      dom.navInstagramLink = document.querySelector("#navInstagramLink");
+      dom.navFacebookLink = document.querySelector("#navFacebookLink");
+      dom.footerInstagramLink = document.querySelector("#footerInstagramLink");
+      dom.footerFacebookLink = document.querySelector("#footerFacebookLink");
       dom.loadingState = document.querySelector("#loadingState");
       dom.categorySlider = document.querySelector("#categorySlider");
       dom.categoryTrack = document.querySelector("#categoryTrack");
@@ -2342,12 +2474,13 @@
       try {
         if (!state.client) {
           renderCallButton(DEFAULT_SETTINGS);
+          renderSocialLinks(DEFAULT_SETTINGS);
           return;
         }
 
         const { data, error } = await state.client
           .from("site_settings")
-          .select("id,phone_number,updated_at")
+          .select("id,phone_number,instagram_url,facebook_url,updated_at")
           .eq("id", "storefront")
           .maybeSingle();
 
@@ -2357,9 +2490,11 @@
 
         state.settings = data || DEFAULT_SETTINGS;
         renderCallButton(state.settings);
+        renderSocialLinks(state.settings);
       } catch (error) {
         console.error(error);
         renderCallButton(DEFAULT_SETTINGS);
+        renderSocialLinks(DEFAULT_SETTINGS);
       }
     }
 
@@ -2385,6 +2520,46 @@
       dom.callUsButton.setAttribute("aria-disabled", "true");
       dom.callUsButton.setAttribute("aria-label", "Call number not set");
       dom.callUsButton.classList.add("pointer-events-none", "opacity-55");
+    }
+
+    function renderSocialLinks(settings) {
+      const instagramUrl = normalizeSocialUrl(settings?.instagram_url);
+      const facebookUrl = normalizeSocialUrl(settings?.facebook_url);
+      const hasSocialLinks = Boolean(instagramUrl || facebookUrl);
+
+      dom.navSocialLinks?.classList.toggle("hidden", !hasSocialLinks);
+      dom.footerSocialGroup?.classList.toggle("hidden", !hasSocialLinks);
+      dom.footerSocialGroup?.classList.toggle("flex", hasSocialLinks);
+
+      updateSocialLink(dom.navInstagramLink, instagramUrl, "Instagram");
+      updateSocialLink(dom.footerInstagramLink, instagramUrl, "Instagram");
+      updateSocialLink(dom.navFacebookLink, facebookUrl, "Facebook");
+      updateSocialLink(dom.footerFacebookLink, facebookUrl, "Facebook");
+    }
+
+    function updateSocialLink(link, url, platform) {
+      if (!link) {
+        return;
+      }
+
+      const safeUrl = normalizeSocialUrl(url);
+      if (!safeUrl) {
+        link.removeAttribute("href");
+        link.classList.add("hidden");
+        return;
+      }
+
+      link.href = safeUrl;
+      link.classList.remove("hidden");
+      link.setAttribute("aria-label", `Follow Anurag Apparel on ${platform}`);
+    }
+
+    function normalizeSocialUrl(value) {
+      const trimmed = String(value || "").trim();
+      if (!trimmed || !/^https?:\/\//i.test(trimmed)) {
+        return "";
+      }
+      return trimmed;
     }
 
     function handleCallButtonClick(event) {
@@ -3102,6 +3277,11 @@
 
       if (href === MAP_URL || /maps\.app\.goo\.gl|google\.com\/maps/i.test(href)) {
         trackAnalyticsEvent("directions_click", metadata);
+        return;
+      }
+
+      if (/instagram\.com|facebook\.com|fb\.com/i.test(href)) {
+        trackAnalyticsEvent("social_click", metadata);
       }
     }
   </script>

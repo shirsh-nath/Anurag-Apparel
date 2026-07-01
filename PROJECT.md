@@ -1,6 +1,6 @@
 # 📦 Anurag Apparel — Project Documentation
 
-> **Last updated:** 2026-06-28  
+> **Last updated:** 2026-07-01
 > **Status:** Production  
 > **Live domain:** `anuragapparel.in`  
 > **Location:** Hazaribagh, Jharkhand, India
@@ -205,6 +205,8 @@ Exposes to `window`:
 | -------------- | --------- | ---------------------------------------- |
 | `id`           | text (PK) | Default: `'storefront'`                  |
 | `phone_number` | text      | Validated: 7-15 digits                   |
+| `instagram_url`| text      | Optional `http(s)` URL for follow button |
+| `facebook_url` | text      | Optional `http(s)` URL for follow button |
 | `created_at`   | timestamptz | Auto                                   |
 | `updated_at`   | timestamptz | Auto via trigger                       |
 
@@ -325,6 +327,7 @@ Both delete `website_analytics_events` older than **90 days**.
 
 **Sections:**
 - **Header** — Brand logo, nav links (Home, Shop, About), call button (from `site_settings.phone_number`), "Shop" CTA
+- **Social follow buttons** — Instagram and Facebook logo links in the header and footer, loaded from `site_settings`
 - **Hero** — Background image with overlay, tagline, CTA buttons
 - **Announcement/Offers Board** — Dynamic from `site_announcements`; offer images carousel, CTA button
 - **Brands Strip** — Horizontal scrolling brand logos from `brands` table
@@ -359,6 +362,7 @@ Both delete `website_analytics_events` older than **90 days**.
 | **Brands**          | Upload/manage brand logos (transparent PNG)                                 |
 | **Announcement Board** | Edit homepage announcement (eyebrow, title, message, offer text, CTA, offer images) |
 | **Contact Settings**| Edit store phone number                                                     |
+| **Social Links**    | Edit Instagram and Facebook redirect URLs for header/footer follow buttons  |
 | **Campaign Images** | Manage reusable email campaign images (upload, rename, remove)              |
 | **Security**        | Change admin password                                                       |
 | **Traffic Analytics**| Link to `analytics.html`                                                   |
@@ -578,6 +582,7 @@ Same rewrites as Vercel with `200` status (rewrite, not redirect).
 
 | Date       | Change Description                                 |
 | ---------- | -------------------------------------------------- |
+| 2026-07-01 | ✨ Added Instagram and Facebook follow buttons to the storefront header/footer, plus admin-managed social URLs stored in `site_settings`. |
 | 2026-06-28 | 🐛 Fixed email send endpoint in `email_resend.html` on deployed sites by calling dynamic config (`state.supabaseConfig`) instead of global script window variables (which are undefined in production). |
 | 2026-06-28 | ✨ Tinted the outer `visit-glass-card` with a warm yellow/cream overlay in all views (light, dark, and iOS `@supports` compatibility blocks) to match the surrounding gold/paper theme. |
 | 2026-06-28 | 🗑️ Removed "Video" and "X views" badges from product cards in `index.html`. Modal thumbnails still show Video badges. |
