@@ -95,6 +95,7 @@ create table if not exists public.site_settings (
   phone_number  text        not null default '',
   instagram_url text        not null default '',
   facebook_url  text        not null default '',
+  email_address text        not null default '',
   reviews_section_enabled boolean not null default true,
   review_sort_mode text not null default 'latest',
   review_display_limit integer not null default 6,
@@ -121,6 +122,8 @@ alter table public.site_settings
   add column if not exists review_sort_mode text not null default 'latest';
 alter table public.site_settings
   add column if not exists review_display_limit integer not null default 6;
+alter table public.site_settings
+  add column if not exists email_address text not null default '';
 
 do $$
 begin
@@ -595,8 +598,8 @@ values (
   'Get Directions', 'https://maps.app.goo.gl/ZsyAXskboHbKB6RA6', true
 ) on conflict (id) do nothing;
 
-insert into public.site_settings (id, phone_number, instagram_url, facebook_url, reviews_section_enabled, review_sort_mode, review_display_limit)
-values ('storefront', '', '', '', true, 'latest', 6) on conflict (id) do nothing;
+insert into public.site_settings (id, phone_number, instagram_url, facebook_url, email_address, reviews_section_enabled, review_sort_mode, review_display_limit)
+values ('storefront', '', '', '', '', true, 'latest', 6) on conflict (id) do nothing;
 
 insert into public.product_subcategories (name, slug, description, sort_order, is_active)
 values

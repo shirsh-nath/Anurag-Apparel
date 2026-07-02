@@ -337,8 +337,8 @@
                 </svg>
               </span>
               <span>
-                <span class="block text-sm font-semibold text-ink">Call Button</span>
-                <span class="block text-xs leading-5 text-ink/54">Store mobile number</span>
+                <span class="block text-sm font-semibold text-ink">Call & Mail Buttons</span>
+                <span class="block text-xs leading-5 text-ink/54">Store mobile number and email</span>
               </span>
             </button>
 
@@ -507,8 +507,8 @@
         <form id="contactForm" data-admin-panel="contact" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
           <div>
             <p class="text-sm font-semibold uppercase text-leaf">Store Contact</p>
-            <h2 class="mt-1 text-2xl font-semibold">Call Button</h2>
-            <p class="mt-2 text-sm leading-6 text-ink/58">Update the mobile number used by the storefront call button.</p>
+            <h2 class="mt-1 text-2xl font-semibold">Call and Mail Buttons</h2>
+            <p class="mt-2 text-sm leading-6 text-ink/58">Update the mobile number and email address used by the storefront contact buttons.</p>
           </div>
 
           <div class="mt-6 space-y-4">
@@ -516,9 +516,13 @@
               <span class="text-sm font-medium text-ink/70">Mobile Number</span>
               <input id="contactPhone" class="field mt-2 px-4 py-3" type="tel" inputmode="tel" placeholder="+91 98765 43210" required>
             </label>
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Email Address</span>
+              <input id="contactEmail" class="field mt-2 px-4 py-3" type="email" inputmode="email" placeholder="store@example.com">
+            </label>
           </div>
 
-          <button id="saveContact" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Number</button>
+          <button id="saveContact" type="submit" class="mt-6 w-full rounded-md bg-leaf px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink disabled:cursor-not-allowed disabled:bg-ink/45">Save Settings</button>
         </form>
 
         <form id="socialForm" data-admin-panel="social" class="hidden rounded-lg border border-line bg-white/92 p-5 shadow-crisp backdrop-blur">
@@ -879,6 +883,7 @@
     const DEFAULT_SETTINGS = {
       id: "storefront",
       phone_number: "",
+      email_address: "",
       instagram_url: "",
       facebook_url: "",
       reviews_section_enabled: true,
@@ -967,6 +972,7 @@
       dom.saveBoard = document.querySelector("#saveBoard");
       dom.contactForm = document.querySelector("#contactForm");
       dom.contactPhone = document.querySelector("#contactPhone");
+      dom.contactEmail = document.querySelector("#contactEmail");
       dom.saveContact = document.querySelector("#saveContact");
       dom.socialForm = document.querySelector("#socialForm");
       dom.instagramUrl = document.querySelector("#instagramUrl");
@@ -1942,7 +1948,7 @@
       try {
         const { data, error } = await state.client
           .from("site_settings")
-          .select("id,phone_number,instagram_url,facebook_url,reviews_section_enabled,review_sort_mode,review_display_limit,updated_at")
+          .select("id,phone_number,email_address,instagram_url,facebook_url,reviews_section_enabled,review_sort_mode,review_display_limit,updated_at")
           .eq("id", "storefront")
           .maybeSingle();
 
@@ -1961,6 +1967,7 @@
 
     function populateContactForm(settings) {
       dom.contactPhone.value = settings.phone_number || DEFAULT_SETTINGS.phone_number;
+      dom.contactEmail.value = settings.email_address || DEFAULT_SETTINGS.email_address;
       dom.instagramUrl.value = settings.instagram_url || DEFAULT_SETTINGS.instagram_url;
       dom.facebookUrl.value = settings.facebook_url || DEFAULT_SETTINGS.facebook_url;
       dom.reviewsEnabled.checked = settings.reviews_section_enabled !== false;
@@ -1982,7 +1989,7 @@
       }
 
       setContactSaving(true);
-      setStatus("Saving call button number...", "info");
+      setStatus("Saving contact settings...", "info");
 
       try {
         const { error } = await state.client
@@ -1994,11 +2001,11 @@
         }
 
         state.settings = payload;
-        setStatus("Call button number updated.", "success");
+        setStatus("Contact settings updated.", "success");
         closeActivePanelAfterSave();
       } catch (error) {
         console.error(error);
-        setStatus(error.message || "Unable to save call button number.", "error");
+        setStatus(error.message || "Unable to save contact settings.", "error");
       } finally {
         setContactSaving(false);
       }
@@ -2080,15 +2087,21 @@
       const phoneNumber = dom.contactPhone.value.trim();
       const dialableNumber = normalizePhoneNumber(phoneNumber);
       const digitCount = dialableNumber.replace(/\D/g, "").length;
+      const emailAddress = dom.contactEmail.value.trim();
 
       if (digitCount < 7 || digitCount > 15) {
         setStatus("Please enter a valid mobile number with 7 to 15 digits.", "error");
+        return null;
+      }
+      if (emailAddress && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
+        setStatus("Please enter a valid email address.", "error");
         return null;
       }
 
       return {
         id: "storefront",
         phone_number: phoneNumber,
+        email_address: emailAddress,
         instagram_url: state.settings?.instagram_url || DEFAULT_SETTINGS.instagram_url,
         facebook_url: state.settings?.facebook_url || DEFAULT_SETTINGS.facebook_url,
         reviews_section_enabled: state.settings?.reviews_section_enabled ?? DEFAULT_SETTINGS.reviews_section_enabled,
@@ -2109,6 +2122,7 @@
       return {
         id: "storefront",
         phone_number: state.settings?.phone_number || DEFAULT_SETTINGS.phone_number,
+        email_address: state.settings?.email_address || DEFAULT_SETTINGS.email_address,
         instagram_url: instagramUrl,
         facebook_url: facebookUrl,
         reviews_section_enabled: state.settings?.reviews_section_enabled ?? DEFAULT_SETTINGS.reviews_section_enabled,
@@ -2130,6 +2144,7 @@
       return {
         id: "storefront",
         phone_number: state.settings?.phone_number || DEFAULT_SETTINGS.phone_number,
+        email_address: state.settings?.email_address || DEFAULT_SETTINGS.email_address,
         instagram_url: state.settings?.instagram_url || DEFAULT_SETTINGS.instagram_url,
         facebook_url: state.settings?.facebook_url || DEFAULT_SETTINGS.facebook_url,
         reviews_section_enabled: dom.reviewsEnabled.checked,
