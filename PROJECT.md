@@ -716,6 +716,7 @@ Same rewrites as Vercel with `200` status (rewrite, not redirect).
 
 | Date       | Change Description                                 |
 | ---------- | -------------------------------------------------- |
+| 2026-07-02 | ⭐ Added a "Leave us a review" button redirecting to Google reviews; optimized with hardware-accelerating compositing layers for buttery-smooth transitions and centered button layout. Removed store review sync subtext. |
 | 2026-07-02 | 🪔 Redesigned the customer reviews section with a premium frosted glass card wrap and sideways arrow navigation controls. |
 | 2026-07-02 | ✨ Added a "Mail Us" button in the header nav with desktop-only popup display (preventing client redirect) and mobile mailto functionality. |
 | 2026-07-02 | 🛡️ Resolved responsive overlapping issues on mobile by preventing brand logo shrink and collapsing nav buttons into icon-only squares below 1024px. |

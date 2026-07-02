@@ -1045,6 +1045,15 @@
       }
     }
 
+    .review-cta-btn {
+      backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
+      will-change: transform, background-color, box-shadow;
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+                  background-color 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+                  box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
     .reviews-glass-card {
       background: rgba(254, 250, 235, 0.22);
       backdrop-filter: blur(52px) saturate(220%) brightness(104%);
@@ -2356,6 +2365,14 @@
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brass">Customer reviews</p>
             <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">Loved by shoppers in Hazaribagh</h2>
             <p id="reviewSummary" class="max-w-2xl text-sm leading-6 text-ink/62"></p>
+            <div class="mt-1">
+              <a href="https://g.page/r/CWmc007bE1EhEBM/review" target="_blank" rel="noreferrer" class="review-cta-btn inline-flex items-center justify-center gap-2 rounded-md bg-brass px-5 py-2.5 text-sm font-semibold leading-none text-white shadow-md hover:bg-ink hover:scale-[1.02] active:scale-[0.98]">
+                <svg class="h-4 w-4 fill-current text-white" viewBox="0 0 24 24">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+                Leave us a review
+              </a>
+            </div>
           </div>
 
           <div class="relative z-10 mt-8">
