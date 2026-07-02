@@ -1,6 +1,6 @@
 # 📦 Anurag Apparel — Project Documentation
 
-> **Last updated:** 2026-07-01
+> **Last updated:** 2026-07-02
 > **Status:** Production  
 > **Live domain:** `anuragapparel.in`  
 > **Location:** Hazaribagh, Jharkhand, India
@@ -230,6 +230,7 @@ Exposes to `window`:
 | -------------- | --------- | ---------------------------------------- |
 | `id`           | text (PK) | Default: `'storefront'`                  |
 | `phone_number` | text      | Validated: 7-15 digits                   |
+| `email_address`| text      | Optional email address for contact button |
 | `instagram_url`| text      | Optional `http(s)` URL for follow button |
 | `facebook_url` | text      | Optional `http(s)` URL for follow button |
 | `reviews_section_enabled` | boolean | Toggle homepage reviews section |
@@ -379,20 +380,20 @@ Exposes to `window`:
 > ~3206 lines, ~110KB | **Route:** `/` (root)
 
 **Sections:**
-- **Header** — Brand logo, nav links (Home, Shop, About), call button (from `site_settings.phone_number`), "Shop" CTA
-- **Social follow buttons** — Instagram and Facebook logo links in the header and footer, loaded from `site_settings`
+- **Header** — Brand logo, nav links (Home, Shop, About), contact buttons (Call Us from phone_number, Mail Us from email_address), "Shop" CTA
+- **Social follow & contact buttons** — Instagram, Facebook, and Mail Us links in the header/footer, loaded from `site_settings`
 - **Hero** — Background image with overlay, tagline, CTA buttons
 - **Announcement/Offers Board** — Dynamic from `site_announcements`; offer images carousel, CTA button
 - **Brands Strip** — Horizontal scrolling brand logos from `brands` table
 - **Subcategory Slider** — Horizontal category chips for filtering products
 - **Product Grid** — Responsive grid of product cards with gallery images/videos, price or "Price on Request"
-- **Google Reviews Carousel** - Admin-controlled cards below products, styled to match the cream/brass/leaf storefront theme
+- **Google Reviews Carousel** — Admin-controlled cards wrapped in a frosted glass card, with sideways navigation controls
 - **Product Modal** — Full-screen modal with media gallery, description, subcategory badge, price
 
 **Key JS Functions (50+):**
 - **Init:** `init()`, `createSupabaseClient()`, `loadSupabaseConfig()` — 3-tier config fallback
 - **Data:** `loadProducts()`, `loadSubcategories()`, `loadBrands()`, `loadSiteSettings()`, `loadAnnouncementBoard()`, `loadReviews()`
-- **Render:** `renderProducts()`, `renderBrands()`, `renderCategorySlider()`, `renderAnnouncementBoard()`, `renderReviews()`, `renderCallButton()`
+- **Render:** `renderProducts()`, `renderBrands()`, `renderCategorySlider()`, `renderAnnouncementBoard()`, `renderReviews()`, `renderCallButton()`, `renderMailButton()`
 - **Reviews:** `sortReviews()`, `createReviewCard()`, `renderReviewStars()`, `scrollReviews()`
 - **Modal:** `openProductModal()`, `closeProductModal()`, `renderModal()`
 - **Media:** `createMediaElement()`, `isVideoUrl()`, `getGalleryImages()`
@@ -715,6 +716,10 @@ Same rewrites as Vercel with `200` status (rewrite, not redirect).
 
 | Date       | Change Description                                 |
 | ---------- | -------------------------------------------------- |
+| 2026-07-02 | 🪔 Redesigned the customer reviews section with a premium frosted glass card wrap and sideways arrow navigation controls. |
+| 2026-07-02 | ✨ Added a "Mail Us" button in the header nav with desktop-only popup display (preventing client redirect) and mobile mailto functionality. |
+| 2026-07-02 | 🛡️ Resolved responsive overlapping issues on mobile by preventing brand logo shrink and collapsing nav buttons into icon-only squares below 1024px. |
+| 2026-07-02 | 🛠️ Upgraded the admin "Call Button" menu to "Call and Mail Buttons", allowing email editing, validation, and database upserts. |
 | 2026-07-01 | Moved Google Reviews scraping into a Supabase Edge Function so Apify credentials can live in Supabase production secrets; Vercel route now proxies cron/manual triggers. |
 | 2026-07-01 | Updated Apify review sync to cap latest reviews at 100, upsert the fresh batch, and delete stale Supabase review rows after a successful sync. |
 | 2026-07-01 | Updated `PROJECT.md` to document the direct Apify Google Reviews sync API handler (`api/sync-google-reviews.js`) and environment variables. |
