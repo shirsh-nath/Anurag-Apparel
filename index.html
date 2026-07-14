@@ -934,10 +934,20 @@
 
     .reviews-section {
       background:
-        linear-gradient(180deg, rgba(251, 250, 247, 0.96), rgba(243, 238, 229, 0.78)),
-        radial-gradient(circle at 12% 18%, rgba(183, 135, 45, 0.18), transparent 34%),
-        radial-gradient(circle at 88% 72%, rgba(45, 106, 79, 0.14), transparent 36%);
+        linear-gradient(180deg, #fbfaf5 0%, #f3efe5 100%);
       border-bottom: 1px solid rgba(231, 225, 216, 0.9);
+      transform: translateZ(0);
+    }
+
+    .reviews-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(183, 135, 45, 0.10), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(45, 106, 79, 0.08), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .reviews-track {
@@ -1055,21 +1065,19 @@
     }
 
     .reviews-glass-card {
-      background: rgba(254, 250, 235, 0.22);
-      backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      -webkit-backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      border: 1px solid rgba(255, 255, 255, 0.65);
+      background: rgba(255, 252, 245, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
       border-radius: 1.25rem;
       box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -0.5px 0 rgba(255, 255, 255, 0.22),
-        inset 1px 0 0 rgba(255, 255, 255, 0.18),
-        inset -1px 0 0 rgba(255, 255, 255, 0.18),
-        0 36px 80px rgba(23, 23, 23, 0.16),
-        0 10px 28px rgba(23, 23, 23, 0.08),
-        0 2px 8px rgba(23, 23, 23, 0.04);
+        inset 0 -0.5px 0 rgba(255, 255, 255, 0.18),
+        0 20px 50px rgba(23, 23, 23, 0.10),
+        0 6px 18px rgba(23, 23, 23, 0.06);
       overflow: hidden;
       position: relative;
+      transform: translateZ(0);
     }
 
     .reviews-glass-card::before {
@@ -1079,30 +1087,16 @@
       border-radius: inherit;
       background: linear-gradient(
         128deg,
-        rgba(255, 255, 255, 0.38) 0%,
-        rgba(255, 255, 255, 0.12) 26%,
-        rgba(255, 255, 255, 0.04) 48%,
-        transparent 48.5%
+        rgba(255, 255, 255, 0.32) 0%,
+        rgba(255, 255, 255, 0.08) 30%,
+        transparent 50%
       );
       pointer-events: none;
       z-index: 0;
     }
 
     .reviews-glass-card::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      border-radius: 0 0 1.25rem 1.25rem;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(255, 255, 255, 0.06) 100%
-      );
-      pointer-events: none;
-      z-index: 0;
+      display: none;
     }
 
     @media (min-width: 768px) {
@@ -1123,36 +1117,41 @@
     }
     #offerSection {
       background:
-        linear-gradient(175deg, rgba(253, 251, 246, 0.55) 0%, rgba(243, 238, 229, 0.38) 100%),
-        radial-gradient(circle at 80% 15%, rgba(183, 135, 45, 0.62) 0%, transparent 42%),
-        radial-gradient(circle at 14% 82%, rgba(45, 106, 79, 0.52) 0%, transparent 40%),
-        radial-gradient(circle at 58% 55%, rgba(168, 95, 61, 0.38) 0%, transparent 46%),
-        radial-gradient(circle at 92% 72%, rgba(212, 166, 64, 0.28) 0%, transparent 36%),
-        linear-gradient(135deg, #fdf5dc 0%, #dff0e8 100%);
+        linear-gradient(175deg, #fbfaf5 0%, #f5f0e4 50%, #f0ede4 100%);
       border-bottom: 1px solid rgba(231, 225, 216, 0.9);
       border-top: 1px solid rgba(255, 255, 255, 0.76);
       position: relative;
       overflow: hidden;
+      transform: translateZ(0);
+    }
+
+    #offerSection::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 75% 20%, rgba(183, 135, 45, 0.15), transparent 45%),
+        radial-gradient(circle at 20% 75%, rgba(45, 106, 79, 0.10), transparent 45%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .offer-board-card {
-      background:
-        linear-gradient(120deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.24)),
-        linear-gradient(180deg, rgba(251, 250, 247, 0.16), rgba(243, 238, 229, 0.08));
-      backdrop-filter: blur(34px) saturate(180%) contrast(104%);
-      -webkit-backdrop-filter: blur(34px) saturate(180%) contrast(104%);
-      border: 1px solid rgba(255, 255, 255, 0.78);
+      background: rgba(255, 252, 245, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
       border-radius: 1.25rem;
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.24),
-        inset 0 0 42px rgba(255, 255, 255, 0.12),
-        0 24px 54px rgba(80, 64, 42, 0.14);
+        inset 0 -0.5px 0 rgba(255, 255, 255, 0.18),
+        0 20px 50px rgba(80, 64, 42, 0.10),
+        0 6px 18px rgba(80, 64, 42, 0.06);
       overflow: hidden;
       position: relative;
+      transform: translateZ(0);
     }
 
-    /* Specular diagonal light sweep — top-left shine */
     .offer-board-card::before {
       content: "";
       position: absolute;
@@ -1160,82 +1159,37 @@
       border-radius: inherit;
       background: linear-gradient(
         128deg,
-        rgba(255, 255, 255, 0.38) 0%,
-        rgba(255, 255, 255, 0.12) 26%,
-        rgba(255, 255, 255, 0.04) 48%,
-        transparent 48.5%
+        rgba(255, 255, 255, 0.32) 0%,
+        rgba(255, 255, 255, 0.08) 30%,
+        transparent 50%
       );
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Soft bottom-edge refraction glow */
     .offer-board-card::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      border-radius: 0 0 1.25rem 1.25rem;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(255, 255, 255, 0.06) 100%
-      );
-      pointer-events: none;
-      z-index: 0;
+      display: none;
     }
 
-    /* ── Section 1: Offer Board Text — ghost warm-gold tint ── */
     .offer-board-text-col {
       background: transparent;
       position: relative;
     }
 
-    .offer-board-text-col::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
-        radial-gradient(ellipse at 100% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
+    .offer-board-text-col::after,
+    #offerImageSlider::after,
+    #announcementBoard::after {
+      display: none;
     }
 
-    /* ── Section 2: Image Slider — ghost sage-mint tint ── */
     #offerImageSlider {
       background: transparent;
       position: relative;
     }
 
-    #offerImageSlider::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 100% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 55%),
-        radial-gradient(ellipse at 0% 100%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── Section 3: Store Update — ghost cream tint ── */
     #announcementBoard {
       background: transparent;
       position: relative;
-    }
-
-    #announcementBoard::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     .offer-board-grid-container {
@@ -1620,40 +1574,44 @@
       color: #655d52;
     }
 
-    /* ── Visit Section — vivid blob background ── */
+    /* ── Visit Section ── */
     #visit {
       background:
-        linear-gradient(175deg, rgba(253, 251, 246, 0.55) 0%, rgba(243, 238, 229, 0.38) 100%),
-        radial-gradient(circle at 15% 20%, rgba(168, 95, 61, 0.55) 0%, transparent 40%),
-        radial-gradient(circle at 85% 75%, rgba(183, 135, 45, 0.58) 0%, transparent 42%),
-        radial-gradient(circle at 50% 50%, rgba(45, 106, 79, 0.38) 0%, transparent 50%),
-        radial-gradient(circle at 10% 80%, rgba(212, 166, 64, 0.28) 0%, transparent 36%),
-        linear-gradient(135deg, #fdf5dc 0%, #dff0e8 100%);
+        linear-gradient(175deg, #fbfaf5 0%, #f5f0e4 50%, #f0ede4 100%);
       border-top: 1px solid rgba(255, 255, 255, 0.76);
       position: relative;
       overflow: hidden;
+      transform: translateZ(0);
+    }
+
+    #visit::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(168, 95, 61, 0.12), transparent 42%),
+        radial-gradient(circle at 80% 70%, rgba(183, 135, 45, 0.12), transparent 42%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* ── Visit Glass Card ── */
     .visit-glass-card {
-      background: rgba(254, 250, 235, 0.22);
-      backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      -webkit-backdrop-filter: blur(52px) saturate(220%) brightness(104%);
-      border: 1px solid rgba(255, 255, 255, 0.65);
+      background: rgba(255, 252, 245, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
       border-radius: 1.25rem;
       box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -0.5px 0 rgba(255, 255, 255, 0.22),
-        inset 1px 0 0 rgba(255, 255, 255, 0.18),
-        inset -1px 0 0 rgba(255, 255, 255, 0.18),
-        0 36px 80px rgba(23, 23, 23, 0.16),
-        0 10px 28px rgba(23, 23, 23, 0.08),
-        0 2px 8px rgba(23, 23, 23, 0.04);
+        inset 0 -0.5px 0 rgba(255, 255, 255, 0.18),
+        0 20px 50px rgba(23, 23, 23, 0.10),
+        0 6px 18px rgba(23, 23, 23, 0.06);
       overflow: hidden;
       position: relative;
+      transform: translateZ(0);
     }
 
-    /* Specular diagonal light sweep */
     .visit-glass-card::before {
       content: "";
       position: absolute;
@@ -1661,37 +1619,20 @@
       border-radius: inherit;
       background: linear-gradient(
         128deg,
-        rgba(255, 255, 255, 0.38) 0%,
-        rgba(255, 255, 255, 0.12) 26%,
-        rgba(255, 255, 255, 0.04) 48%,
-        transparent 48.5%
+        rgba(255, 255, 255, 0.32) 0%,
+        rgba(255, 255, 255, 0.08) 30%,
+        transparent 50%
       );
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Soft bottom-edge refraction glow */
     .visit-glass-card::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      border-radius: 0 0 1.25rem 1.25rem;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(255, 255, 255, 0.06) 100%
-      );
-      pointer-events: none;
-      z-index: 0;
+      display: none;
     }
 
     .visit-address-card {
-      background: rgba(255, 252, 245, 0.52);
-      backdrop-filter: blur(18px) saturate(1.2);
-      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      background: rgba(255, 252, 245, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.5);
       border-left: 3px solid rgba(183, 135, 45, 0.5);
       border-radius: 1rem;
@@ -1733,8 +1674,6 @@
     .visit-address-pin {
       align-items: center;
       background: rgba(183, 135, 45, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(183, 135, 45, 0.15);
       border-radius: 999px;
       box-shadow:
@@ -1915,18 +1854,12 @@
 
       #offerSection {
         background:
-          linear-gradient(180deg, rgba(251, 250, 247, 0.88), rgba(243, 238, 229, 0.72)),
-          radial-gradient(circle at 80% 20%, rgba(183, 135, 45, 0.35), transparent 45%),
-          radial-gradient(circle at 20% 80%, rgba(45, 106, 79, 0.28), transparent 45%),
-          radial-gradient(circle at 50% 50%, rgba(168, 95, 61, 0.24), transparent 50%),
-          linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(183, 135, 45, 0.08)) !important;
+          linear-gradient(175deg, #fbfaf5 0%, #f5f0e4 50%, #f0ede4 100%) !important;
       }
 
       .offer-board-card {
-        background:
-          linear-gradient(120deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.24)),
-          linear-gradient(180deg, rgba(251, 250, 247, 0.16), rgba(243, 238, 229, 0.08)) !important;
-        border-color: rgba(255, 255, 255, 0.78) !important;
+        background: rgba(255, 252, 245, 0.55) !important;
+        border-color: rgba(255, 255, 255, 0.72) !important;
         color: #171717 !important;
       }
       #announcementOffer { color: #3b3329 !important; }
@@ -1934,19 +1867,15 @@
       /* Visit section */
       #visit {
         background:
-          linear-gradient(180deg, rgba(251, 250, 247, 0.88), rgba(243, 238, 229, 0.72)),
-          radial-gradient(circle at 15% 20%, rgba(168, 95, 61, 0.30), transparent 40%),
-          radial-gradient(circle at 85% 75%, rgba(183, 135, 45, 0.30), transparent 42%),
-          radial-gradient(circle at 50% 50%, rgba(45, 106, 79, 0.22), transparent 50%),
-          linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(183, 135, 45, 0.08)) !important;
+          linear-gradient(175deg, #fbfaf5 0%, #f5f0e4 50%, #f0ede4 100%) !important;
       }
       .visit-glass-card {
-        background: rgba(254, 250, 235, 0.42) !important;
-        border-color: rgba(255, 255, 255, 0.45) !important;
+        background: rgba(255, 252, 245, 0.55) !important;
+        border-color: rgba(255, 255, 255, 0.72) !important;
         color: #171717 !important;
       }
       .visit-address-card {
-        background: rgba(255, 252, 245, 0.55) !important;
+        background: rgba(255, 252, 245, 0.95) !important;
         border-color: rgba(255, 255, 255, 0.5) !important;
         border-left-color: rgba(183, 135, 45, 0.5) !important;
         color: #171717 !important;
@@ -1960,14 +1889,11 @@
       /* Reviews section */
       .reviews-section {
         background:
-          linear-gradient(180deg, rgba(251, 250, 247, 0.88), rgba(243, 238, 229, 0.72)),
-          radial-gradient(circle at 12% 18%, rgba(183, 135, 45, 0.22), transparent 34%),
-          radial-gradient(circle at 88% 72%, rgba(45, 106, 79, 0.16), transparent 32%),
-          linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(183, 135, 45, 0.08)) !important;
+          linear-gradient(180deg, #fbfaf5 0%, #f3efe5 100%) !important;
       }
       .reviews-glass-card {
-        background: rgba(254, 250, 235, 0.42) !important;
-        border-color: rgba(255, 255, 255, 0.45) !important;
+        background: rgba(255, 252, 245, 0.55) !important;
+        border-color: rgba(255, 255, 255, 0.72) !important;
         color: #171717 !important;
       }
 
@@ -2047,59 +1973,7 @@
       }
     }
 
-    /* ─── iOS Safari: remove backdrop-filter double-layer effect ───
-       On iOS, the semi-transparent glass cards render with a visible
-       "bottom layer" beneath them due to how WebKit composites
-       backdrop-filter. We replace them with a solid opaque background
-       so only a single, clean card layer is visible — matching desktop.
-    ──────────────────────────────────────────────────────────────── */
-    @supports (-webkit-touch-callout: none) {
-      .offer-board-card {
-        background:
-          linear-gradient(120deg, rgba(255, 255, 255, 0.96), rgba(251, 250, 247, 0.96) 42%, rgba(255, 255, 255, 0.96)),
-          linear-gradient(180deg, rgba(251, 250, 247, 0.98), rgba(243, 238, 229, 0.96)) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border-color: rgba(231, 225, 216, 0.95) !important;
-      }
-
-      .offer-board-card::before,
-      .offer-board-card::after {
-        display: none !important;
-      }
-
-      .visit-glass-card {
-        background:
-          linear-gradient(135deg, rgba(255, 251, 235, 0.98), rgba(251, 244, 222, 0.97)) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border-color: rgba(231, 225, 216, 0.95) !important;
-        box-shadow:
-          0 10px 28px rgba(23, 23, 23, 0.08),
-          0 2px 8px rgba(23, 23, 23, 0.04) !important;
-      }
-
-      .visit-glass-card::before,
-      .visit-glass-card::after {
-        display: none !important;
-      }
-
-      .reviews-glass-card {
-        background:
-          linear-gradient(135deg, rgba(255, 251, 235, 0.98), rgba(251, 244, 222, 0.97)) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border-color: rgba(231, 225, 216, 0.95) !important;
-        box-shadow:
-          0 10px 28px rgba(23, 23, 23, 0.08),
-          0 2px 8px rgba(23, 23, 23, 0.04) !important;
-      }
-
-      .reviews-glass-card::before,
-      .reviews-glass-card::after {
-        display: none !important;
-      }
-    }
+    /* iOS Safari fixes no longer needed — base styles are already opaque */
   </style>
 </head>
 <body class="bg-paper text-ink antialiased">
