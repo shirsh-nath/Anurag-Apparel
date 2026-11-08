@@ -14,14 +14,16 @@ it is not sent to the frontend or required by the storefront at runtime.
 
 Verification confirmed Google is enabled at the public Auth endpoint and all three
 return URLs receive a 302 redirect to Google with the correct client ID and Supabase
-callback. **Google currently rejects that callback with `redirect_uri_mismatch`.**
-The remaining setup is step 2 below in Google Cloud. A Supabase access token cannot
-edit a Google Cloud OAuth client, and no browser connection was available to do so.
+callback. **The Google callback registration is now accepted:** the authorization
+request reaches Google's `/v3/signin/identifier` page with no `redirect_uri_mismatch`
+or OAuth error page. Console configuration checks pass. Real-account Google consent,
+the return to the storefront, and saving a customer profile still need an end-to-end
+test in a browser.
 
 1. Open the existing web OAuth client in Google Cloud Console. Keep the JavaScript
    origins already configured: `http://localhost:5500`,
    `https://anuragapparel.in`, and `https://www.anuragapparel.in`.
-2. Under **Authorized redirect URIs**, add exactly:
+2. **Completed:** Under **Authorized redirect URIs**, add exactly:
 
    ```text
    https://imclnhkuusypelcmwogt.supabase.co/auth/v1/callback
@@ -63,7 +65,7 @@ Run `npm run check` and `npm test`. Run `tests/customer-profiles.sql` in the SQL
 editor for transactional database access tests; all synthetic fixtures roll back.
 `node scripts/inspect-auth.mjs` checks whether Google is enabled without printing secrets.
 
-After registering the Google callback, manually verify Google consent, account completion,
+With the Google callback accepted, manually verify Google consent, account completion,
 profile persistence after reload, editing, sign-out, a second Google account, canceling
 consent, and keyboard/mobile dialog behavior. Stay on the same browser and origin
 through the PKCE flow. Automated tests cover account behavior with a mocked SDK;
