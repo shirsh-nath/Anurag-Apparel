@@ -7,6 +7,7 @@
   <meta name="description" content="Anurag Apparel is a premium clothing store in Hazaribagh, Jharkhand. Explore new arrivals and visit the store.">
   <title>Anurag Apparel</title>
   <link rel="stylesheet" href="/customer-account.css">
+  <link rel="stylesheet" href="/legal.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -2328,6 +2329,10 @@
         </div>
       </div>
     </div>
+    <nav class="policy-footer-nav" aria-label="Website policies">
+      <a class="policy-footer-link" href="/privacy">Privacy Policy</a>
+      <a class="policy-footer-link" href="/terms">Terms of Service</a>
+    </nav>
   </footer>
 
   <div id="productModal" class="pointer-events-none fixed inset-0 z-50" aria-hidden="true">
@@ -2368,6 +2373,7 @@
       </button>
       <p class="account-switch"><span id="accountSwitchCopy">New to Anurag Apparel?</span> <button id="accountSwitch" class="account-link" type="button" data-mode="signup">Create an account</button></p>
       <p class="account-hint">We use your Google name and email to identify your account. No password is required.</p>
+      <p class="account-hint">Read our <a class="account-link" href="/privacy">Privacy Policy</a> and <a class="account-link" href="/terms">Terms of Service</a>.</p>
     </div>
     <form id="accountProfile" hidden>
       <label class="account-field" for="accountEmail">Google email<input id="accountEmail" type="email" autocomplete="email" readonly></label>

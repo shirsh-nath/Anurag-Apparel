@@ -15,6 +15,12 @@ Traffic monitoring is available at `analytics.html` and from the Admin Menu. Sto
 
 The admin password is verified through Supabase RPC functions created by `supabase-schema.sql`; use the Security panel in `admin.html` to change it.
 
+Public customer-information pages are available at `/privacy` (`privacy.html`) and
+`/terms` (`terms.html`). The storefront footer links to each page, and both are also
+linked beside Google sign-in. They use the shared `legal.css` and work without
+JavaScript or an account. The URLs are supported by Vercel, Netlify and the local
+development server. Policy contact details match the public store settings.
+
 ## Setup
 
 1. Run `supabase-schema.sql` in the Supabase SQL editor.

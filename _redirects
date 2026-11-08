@@ -4,3 +4,7 @@
 /analytics/* /analytics.html 200
 /email /email_resend.html 200
 /email/* /email_resend.html 200
+/privacy /privacy.html 200
+/privacy/ /privacy.html 200
+/terms /terms.html 200
+/terms/ /terms.html 200

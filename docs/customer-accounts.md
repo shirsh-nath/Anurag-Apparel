@@ -49,6 +49,19 @@ test in a browser.
 5. Keep the Google app in Testing for this phase. If Google requires test-user
    access for your consent-screen configuration, add the accounts you will test.
    Only request `openid email profile`; no offline Google access is needed.
+6. The website includes public Privacy Policy and Terms of Service pages. After the
+   feature branch is deployed to the production domain, set these in Google Auth
+   Platform → Branding → App domain:
+
+   ```text
+   Application privacy policy link: https://www.anuragapparel.in/privacy
+   Application terms of service link: https://www.anuragapparel.in/terms
+   ```
+
+   Check both public URLs before adding them. A GitHub branch push alone does not
+   confirm that the pages are available on the production domain. Both links also
+   appear in the storefront footer and Google sign-in dialog. See
+   [Google's branding instructions](https://support.google.com/cloud/answer/15549049?hl=en).
 
 Supabase documentation: [Google login](https://supabase.com/docs/guides/auth/social-login/auth-google),
 [redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls),
