@@ -6,10 +6,17 @@ additive change on the existing shared Supabase project; it does not contain ord
 
 ## Required console configuration
 
-Google is currently disabled in the project's Supabase Auth settings. The `.env`
-credentials alone do not enable the hosted Supabase provider. The connector supports
-database changes but not provider settings, and no browser session was available
-to configure the consoles during implementation.
+Google is enabled in Supabase as of 2026-11-08. The Google client credentials,
+production Site URL, and the three return URLs below were configured through the
+Supabase Management API using the locally supplied personal access token. Nonce
+checks remain enabled, and signup is allowed. The token is only needed for setup;
+it is not sent to the frontend or required by the storefront at runtime.
+
+Verification confirmed Google is enabled at the public Auth endpoint and all three
+return URLs receive a 302 redirect to Google with the correct client ID and Supabase
+callback. **Google currently rejects that callback with `redirect_uri_mismatch`.**
+The remaining setup is step 2 below in Google Cloud. A Supabase access token cannot
+edit a Google Cloud OAuth client, and no browser connection was available to do so.
 
 1. Open the existing web OAuth client in Google Cloud Console. Keep the JavaScript
    origins already configured: `http://localhost:5500`,
@@ -21,11 +28,11 @@ to configure the consoles during implementation.
    ```
 
    This is the Supabase callback, not the storefront address.
-3. In [Supabase Auth → Sign In / Providers](https://supabase.com/dashboard/project/imclnhkuusypelcmwogt/auth/providers),
+3. **Completed:** In [Supabase Auth → Sign In / Providers](https://supabase.com/dashboard/project/imclnhkuusypelcmwogt/auth/providers),
    enable Google. Copy `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`
    from your local `.env` to the provider's Client IDs and Client Secret fields.
    Keep nonce checks enabled. Do not add the secret to frontend code or `/api/config`.
-4. In [Supabase Auth → URL Configuration](https://supabase.com/dashboard/project/imclnhkuusypelcmwogt/auth/url-configuration),
+4. **Completed:** In [Supabase Auth → URL Configuration](https://supabase.com/dashboard/project/imclnhkuusypelcmwogt/auth/url-configuration),
    preserve any existing application redirects. Set Site URL to
    `https://www.anuragapparel.in` and add these exact Redirect URLs:
 
@@ -56,7 +63,7 @@ Run `npm run check` and `npm test`. Run `tests/customer-profiles.sql` in the SQL
 editor for transactional database access tests; all synthetic fixtures roll back.
 `node scripts/inspect-auth.mjs` checks whether Google is enabled without printing secrets.
 
-After enabling the provider, manually verify Google consent, account completion,
+After registering the Google callback, manually verify Google consent, account completion,
 profile persistence after reload, editing, sign-out, a second Google account, canceling
 consent, and keyboard/mobile dialog behavior. Stay on the same browser and origin
 through the PKCE flow. Automated tests cover account behavior with a mocked SDK;
