@@ -43,6 +43,7 @@
 **Anurag Apparel** is a full-featured static storefront and admin portal for a premium clothing store. It functions as a product catalog (not a transactional e-commerce store) with:
 
 - **Public storefront** — showcasing products, brands, announcements, and offers
+- **Customer accounts (feature branch, 2026-11-08)** — Google OAuth through Supabase Auth with private customer profiles; see [setup and current activation status](docs/customer-accounts.md). Checkout is deferred. Frontend configuration now uses `public-config.js` and never fetches `.env`.
 - **Admin dashboard** — managing products, categories, brands, announcements, settings, and campaign images
 - **Analytics dashboard** — anonymous traffic & engagement tracking
 - **Email campaign tool** — sending branded marketing emails to customer groups via Resend

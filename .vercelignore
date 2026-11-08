@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+credential.txt
+SUPABASE_SECRETS_SETUP.txt
+supabase-browser-config.js
+.account-work/
+tests/

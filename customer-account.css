@@ -1,0 +1,30 @@
+.account-nav { display: flex; align-items: center; justify-content: flex-end; gap: .4rem; }
+.account-button { min-height: 2.65rem; padding: .6rem .8rem; border: 1px solid #d6c9b5; border-radius: .65rem; color: #171717; background: transparent; font-size: .82rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.account-button:hover { background: #f3eee5; }
+.account-button-primary { background: #171717; border-color: #171717; color: #fff; }
+.account-button-primary:hover { background: #333; }
+.account-button:disabled { opacity: .55; cursor: wait; }
+.account-button:focus-visible, .account-dialog input:focus-visible, .account-close:focus-visible, .account-link:focus-visible { outline: 3px solid #b7872d; outline-offset: 3px; }
+.account-dialog { box-sizing: border-box; position: fixed; inset: 0; margin: auto; width: min(31rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 2rem; overflow-y: auto; border: 1px solid #e7e1d8; border-radius: 1.2rem; background: #fbfaf7; color: #171717; box-shadow: 0 24px 100px #0004; color-scheme: light; }
+.account-dialog::backdrop { background: #171717b8; backdrop-filter: blur(5px); }
+.account-dialog [hidden], .account-nav [hidden] { display: none !important; }
+.account-close { position: absolute; right: .8rem; top: .8rem; width: 2.5rem; height: 2.5rem; border: 0; border-radius: 50%; background: #f3eee5; color: #171717; font-size: 1.5rem; cursor: pointer; }
+.account-eyebrow { margin: .5rem 0 .6rem; color: #85601e; font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.account-dialog h2 { margin: 0 1rem .65rem 0; font-size: 1.8rem; font-weight: 700; line-height: 1.2; }
+.account-copy { margin: 0 0 1.4rem; color: #625d55; font-size: .92rem; line-height: 1.6; }
+.account-google { display: flex; align-items: center; justify-content: center; gap: .8rem; width: 100%; min-height: 3.2rem; border: 1px solid #747775; border-radius: .5rem; background: #fff; color: #1f1f1f; font-family: Arial, sans-serif; font-size: .95rem; font-weight: 500; cursor: pointer; }
+.account-google:hover { background: #f5f6f7; }
+.account-google:disabled { opacity: .6; cursor: wait; }
+.account-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+.account-switch { margin: 1.1rem 0 0; text-align: center; color: #625d55; font-size: .85rem; }
+.account-link { color: #79551b; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.account-field { display: block; margin: 1rem 0; color: #3f3a33; font-size: .85rem; font-weight: 600; }
+.account-field input { display: block; box-sizing: border-box; width: 100%; min-height: 2.85rem; margin-top: .4rem; padding: .65rem .8rem; border: 1px solid #c9c0b2; border-radius: .55rem; background: #fff; color: #171717; font: inherit; }
+.account-field input:read-only { background: #f3eee5; color: #625d55; }
+.account-hint { display: block; margin-top: .35rem; color: #625d55; font-size: .76rem; font-weight: 400; line-height: 1.5; }
+.account-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.3rem; }
+.account-status { margin: 1rem 0 0; padding: .8rem; border-radius: .55rem; background: #ede8de; color: #494034; font-size: .85rem; line-height: 1.5; }
+.account-status[data-error="true"] { background: #fae9e5; color: #8c2920; }
+@media (max-width: 1100px) { .account-nav > #customerSignUp { display: none; } }
+@media (max-width: 430px) { .account-button { padding: .55rem; font-size: .75rem; } .account-dialog { padding: 1.5rem; } }
+@media (max-width: 360px) { .site-header .nav-socials { display: none !important; } }

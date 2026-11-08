@@ -10,3 +10,7 @@ supabase-browser-config.js
 # Local API credentials
 credential.txt
 SUPABASE_SECRETS_SETUP.txt
+
+# Development and verification output
+node_modules/
+.account-work/

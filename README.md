@@ -36,7 +36,7 @@ RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=hello@your-domain.com
 ```
 
-The browser pages load `supabase-browser-config.js` first and then fall back to `/.env`. On hosts that block dotfiles, the browser config file is the reliable option.
+The browser pages load public values from `supabase-browser-config.js` or `/api/config`. They never fetch `.env`. Run `npm run dev` for a local server that reads `.env` on the server and returns only the public Supabase URL/key. Do not use a generic static server at the repository root: it may serve local secrets.
 
 Supabase Free projects cannot upload files larger than 50 MB. If you upgrade and raise the Storage file-size limit, update `window.ANURAG_MAX_VIDEO_MB` to match.
 
@@ -126,3 +126,25 @@ Netlify uses `_redirects`, and Vercel uses `vercel.json`, so `/admin` will serve
 ## Security Note
 
 The admin password is no longer hardcoded in the browser, but this is still a static admin portal using the anon key for product writes. A production admin portal should use Supabase Auth, stricter RLS policies, and server-side write authorization.
+
+
+## Customer accounts (online ordering, phase 1)
+
+Branch: `feature/online-order-accounts`. Google sign-in creates/identifies users in
+Supabase Auth. A customer completes their full name and phone number in
+`public.customer_profiles`, linked to `auth.users.id`. Email stays authoritative in
+Supabase Auth and is read-only in the account screen. Customers may read and update
+only their own profile; anonymous visitors have no access to these records.
+
+Sign in and Create account use the same Google identity flow. Returning customers
+can edit their profile and sign out of this browser. Names and phone numbers are
+contact details, not independently verified. No customer is subscribed to marketing.
+Cart, checkout, payment, delivery addresses, and order history are the next phase.
+See [the OAuth setup guide](docs/customer-accounts.md) for the required console settings
+and [the database verification script](tests/customer-profiles.sql) for access checks.
+
+```sh
+npm run dev
+npm run check
+npm test
+```

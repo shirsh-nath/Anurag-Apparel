@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Anurag Apparel is a premium clothing store in Hazaribagh, Jharkhand. Explore new arrivals and visit the store.">
   <title>Anurag Apparel</title>
+  <link rel="stylesheet" href="/customer-account.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -29,7 +30,7 @@
       }
     };
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
   <script src="supabase-browser-config.js"></script>
   <style>
     html {
@@ -2019,7 +2020,11 @@
         </a>
         <a class="nav-link" href="#visit">Visit</a>
       </div>
-      <a href="#products" class="nav-shop justify-self-end">Shop</a>
+      <div class="account-nav justify-self-end" aria-label="Customer account">
+        <button id="customerSignIn" class="account-button" type="button" disabled>Sign in</button>
+        <button id="customerSignUp" class="account-button account-button-primary" type="button" disabled>Create account</button>
+        <button id="customerAccount" class="account-button account-button-primary" type="button" hidden>My account</button>
+      </div>
     </nav>
   </header>
 
@@ -2351,7 +2356,32 @@
     </div>
   </div>
 
+  <dialog id="accountDialog" class="account-dialog" aria-labelledby="accountTitle" aria-describedby="accountIntro">
+    <button id="accountClose" class="account-close" type="button" aria-label="Close account window">&times;</button>
+    <p class="account-eyebrow">Anurag Apparel / Your account</p>
+    <h2 id="accountTitle">Welcome back</h2>
+    <p id="accountIntro" class="account-copy">Sign in to your Anurag Apparel account with Google.</p>
+    <div id="accountAuth">
+      <button id="accountGoogle" class="account-google" type="button" disabled>
+        <svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6C44.4 38.02 46.98 31.86 46.98 24.55Z"/><path fill="#FBBC05" d="M10.53 28.59A14.41 14.41 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.87 23.87 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.81l-7.73-6c-2.15 1.45-4.92 2.31-8.18 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>
+        Continue with Google
+      </button>
+      <p class="account-switch"><span id="accountSwitchCopy">New to Anurag Apparel?</span> <button id="accountSwitch" class="account-link" type="button" data-mode="signup">Create an account</button></p>
+      <p class="account-hint">We use your Google name and email to identify your account. No password is required.</p>
+    </div>
+    <form id="accountProfile" hidden>
+      <label class="account-field" for="accountEmail">Google email<input id="accountEmail" type="email" autocomplete="email" readonly></label>
+      <label class="account-field" for="accountName">Full name <span aria-hidden="true">*</span><input id="accountName" name="full_name" autocomplete="name" minlength="2" maxlength="100" required></label>
+      <label class="account-field" for="accountPhone">Phone number <span aria-hidden="true">*</span><input id="accountPhone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="+91 98765 43210" aria-describedby="accountPhoneHint" required><span id="accountPhoneHint" class="account-hint">Include your country code. We’ll use this number for order-related contact when ordering becomes available.</span></label>
+      <p class="account-hint">Delivery details will be requested when online ordering is available.</p>
+      <div class="account-actions"><button id="accountSave" class="account-button account-button-primary" type="submit">Save details</button><button id="accountSignOut" class="account-button" type="button">Sign out</button></div>
+    </form>
+    <p id="accountStatus" class="account-status" role="status" aria-live="polite" hidden></p>
+  </dialog>
+
   <script type="module">
+    import { loadSupabaseConfig } from "/public-config.js";
+    import { initializeCustomerAccount } from '/customer-account.js';
     const MAP_URL = "https://maps.app.goo.gl/nyVYJmLnxqmvGUr89";
     const PLACEHOLDER_URL = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
     const DEFAULT_ANNOUNCEMENT = {
@@ -2454,6 +2484,11 @@
       dom.year.textContent = new Date().getFullYear();
       state.client = await createSupabaseClient();
       try {
+        await initializeCustomerAccount(state.publicConfig);
+      } catch (error) {
+        console.warn('Account initialization failed:', error.message);
+      }
+      try {
         await initAnalyticsTracking();
       } catch (analyticsError) {
         console.warn("Analytics initialization failed:", analyticsError);
@@ -2542,6 +2577,7 @@
 
     async function createSupabaseClient() {
       const config = await loadSupabaseConfig();
+      state.publicConfig = config;
       state.configured = isConfigured(config);
 
       if (!state.configured) {
@@ -2554,68 +2590,9 @@
         return null;
       }
 
-      return window.supabase.createClient(config.url, config.anonKey);
-    }
-
-    async function loadSupabaseConfig() {
-      const inlineConfig = {
-        url: window.ANURAG_SUPABASE_URL,
-        anonKey: window.ANURAG_SUPABASE_ANON_KEY
-      };
-
-      if (isConfigured(inlineConfig)) {
-        return inlineConfig;
-      }
-
-      // Primary: Vercel serverless function reads env vars
-      try {
-        const response = await fetch('/api/config');
-        if (response.ok) {
-          const config = await response.json();
-          return {
-            url: config.supabaseUrl || "your_supabase_project_url",
-            anonKey: config.supabaseAnonKey || "your_supabase_anon_key"
-          };
-        }
-      } catch (error) {
-        console.warn("API config endpoint not available, trying local .env:", error);
-      }
-
-      // Fallback: local .env file (development only)
-      try {
-        const envPath = window.location.protocol === "file:" ? ".env" : "/.env";
-        const response = await fetch(envPath, { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("No env file");
-        }
-        const env = parseEnv(await response.text());
-        return {
-          url: env.SUPABASE_URL || "your_supabase_project_url",
-          anonKey: env.SUPABASE_ANON_KEY || "your_supabase_anon_key"
-        };
-      } catch (error) {
-        return {
-          url: "your_supabase_project_url",
-          anonKey: "your_supabase_anon_key"
-        };
-      }
-    }
-
-    function parseEnv(text) {
-      return text.split(/\r?\n/).reduce((values, line) => {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith("#")) {
-          return values;
-        }
-        const separatorIndex = trimmed.indexOf("=");
-        if (separatorIndex === -1) {
-          return values;
-        }
-        const key = trimmed.slice(0, separatorIndex).trim();
-        const value = trimmed.slice(separatorIndex + 1).trim().replace(/^["']|["']$/g, "");
-        values[key] = value;
-        return values;
-      }, {});
+      return window.supabase.createClient(config.url, config.anonKey, {
+        auth: { storageKey: 'anurag-catalog', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
     }
 
     function isConfigured(config) {

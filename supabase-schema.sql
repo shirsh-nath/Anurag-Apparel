@@ -682,3 +682,48 @@ begin
   end if;
 end;
 $$;
+
+-- Customer accounts (phase 1)
+-- Customer accounts, phase 1. Additive; catalog and legacy admin policies are unchanged.
+create table if not exists public.customer_profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text not null check (char_length(btrim(full_name)) between 2 and 100),
+  phone text not null check (phone ~ '^\+[1-9][0-9]{7,14}$'),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+comment on table public.customer_profiles is 'Private customer contact details. Identity and verified email are held in Supabase Auth. Phone is customer supplied, not OTP verified.';
+alter table public.customer_profiles enable row level security;
+revoke all on public.customer_profiles from public, anon, authenticated;
+grant select on public.customer_profiles to authenticated;
+grant insert (id, full_name, phone), update (id, full_name, phone)
+  on public.customer_profiles to authenticated;
+grant all on public.customer_profiles to service_role;
+
+drop policy if exists "Customers read their own profile" on public.customer_profiles;
+drop policy if exists "Customers create their own profile" on public.customer_profiles;
+drop policy if exists "Customers update their own profile" on public.customer_profiles;
+create policy "Customers read their own profile"
+  on public.customer_profiles for select to authenticated
+  using ((select auth.uid()) = id);
+create policy "Customers create their own profile"
+  on public.customer_profiles for insert to authenticated
+  with check ((select auth.uid()) = id);
+create policy "Customers update their own profile"
+  on public.customer_profiles for update to authenticated
+  using ((select auth.uid()) = id)
+  with check ((select auth.uid()) = id);
+
+create or replace function public.set_customer_profile_updated_at()
+returns trigger language plpgsql security invoker set search_path = ''
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+revoke all on function public.set_customer_profile_updated_at() from public, anon, authenticated;
+drop trigger if exists customer_profile_updated_at on public.customer_profiles;
+create trigger customer_profile_updated_at
+  before update on public.customer_profiles
+  for each row execute function public.set_customer_profile_updated_at();
