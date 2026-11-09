@@ -211,7 +211,8 @@ production rollout.
    the SQL schedules named job `anurag-commerce-maintenance` at `*/5 * * * *`.
    The order job uses `net.http_post` with JSON `{"action":"maintenance"}` and the
    scoped maintenance header. Daily analytics cleanup runs at `30 20 * * *` UTC;
-   review refresh runs at `45 21 * * *` UTC using the same scoped server secret. Do not store the code encryption key in Vault. Check both
+   review refresh runs at `45 21 * * *` UTC using the same scoped server secret.
+   Do not store the code encryption key in Vault. Check both
    `cron.job_run_details` and `net._http_response`: a successful cron SQL statement
    only means a request was queued, while the HTTP result confirms the handler
    ran. Avoid selecting/logging request authorization headers.
