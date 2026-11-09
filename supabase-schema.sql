@@ -315,9 +315,9 @@ create policy "No direct admin credential access"
   on private.admin_credentials for all to public
   using (false) with check (false);
 
-insert into private.admin_credentials (id, username, password_hash)
-values ('dashboard', 'anurag', extensions.crypt('Anurag@2026', extensions.gen_salt('bf')))
-on conflict (id) do nothing;
+-- No shared/default administrator password is seeded. Existing credentials are
+-- preserved. For a new project, create the dashboard credential privately with
+-- a unique strong password; see docs/online-orders.md before enabling commerce.
 
 -- ── 8. Admin RPC functions ───────────────────────────────────
 create or replace function private.verify_admin_login(input_username text, input_password text)

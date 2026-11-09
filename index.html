@@ -7,6 +7,7 @@
   <meta name="description" content="Anurag Apparel is a premium clothing store in Hazaribagh, Jharkhand. Explore new arrivals and visit the store.">
   <title>Anurag Apparel</title>
   <link rel="stylesheet" href="/customer-account.css">
+  <link rel="stylesheet" href="/storefront-commerce.css">
   <link rel="stylesheet" href="/legal.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -2026,6 +2027,10 @@
         <button id="customerSignUp" class="account-button account-button-primary" type="button" disabled>Create account</button>
         <button id="customerAccount" class="account-button account-button-primary" type="button" hidden>My account</button>
       </div>
+      <div class="shop-shopping-nav" aria-label="Shopping">
+        <button id="customerCart" class="account-button" type="button" hidden>Cart</button>
+        <button id="customerOrders" class="account-button" type="button" disabled>My orders</button>
+      </div>
     </nav>
   </header>
 
@@ -2354,7 +2359,7 @@
             </div>
             <p id="modalPrice" class="product-modal-price"></p>
             <p id="modalDescription" class="product-modal-description"></p>
-            <a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="product-modal-cta">Visit Store</a>
+            <div id="modalCommerceActions"><a href="https://maps.app.goo.gl/nyVYJmLnxqmvGUr89" target="_blank" rel="noreferrer" class="product-modal-cta">Visit Store</a></div>
           </div>
         </div>
       </article>
@@ -2378,8 +2383,8 @@
     <form id="accountProfile" hidden>
       <label class="account-field" for="accountEmail">Google email<input id="accountEmail" type="email" autocomplete="email" readonly></label>
       <label class="account-field" for="accountName">Full name <span aria-hidden="true">*</span><input id="accountName" name="full_name" autocomplete="name" minlength="2" maxlength="100" required></label>
-      <label class="account-field" for="accountPhone">Phone number <span aria-hidden="true">*</span><input id="accountPhone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="+91 98765 43210" aria-describedby="accountPhoneHint" required><span id="accountPhoneHint" class="account-hint">Include your country code. We’ll use this number for order-related contact when ordering becomes available.</span></label>
-      <p class="account-hint">Delivery details will be requested when online ordering is available.</p>
+      <label class="account-field" for="accountPhone">Phone number <span aria-hidden="true">*</span><input id="accountPhone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="+91 98765 43210" aria-describedby="accountPhoneHint" required><span id="accountPhoneHint" class="account-hint">Include your country code. We’ll use this number for contact about your orders.</span></label>
+      <p class="account-hint">Your delivery address and exact map location are collected at checkout.</p>
       <div class="account-actions"><button id="accountSave" class="account-button account-button-primary" type="submit">Save details</button><button id="accountSignOut" class="account-button" type="button">Sign out</button></div>
     </form>
     <p id="accountStatus" class="account-status" role="status" aria-live="polite" hidden></p>
@@ -2388,6 +2393,7 @@
   <script type="module">
     import { loadSupabaseConfig } from "/public-config.js";
     import { initializeCustomerAccount } from '/customer-account.js';
+    import { initializeStorefrontCommerce } from '/storefront-commerce.js';
     const MAP_URL = "https://maps.app.goo.gl/nyVYJmLnxqmvGUr89";
     const PLACEHOLDER_URL = "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1200&q=82";
     const DEFAULT_ANNOUNCEMENT = {
@@ -2468,6 +2474,8 @@
 
     const state = {
       client: null,
+      account: null,
+      commerce: null,
       configured: false,
       products: [],
       brands: [],
@@ -2490,7 +2498,7 @@
       dom.year.textContent = new Date().getFullYear();
       state.client = await createSupabaseClient();
       try {
-        await initializeCustomerAccount(state.publicConfig);
+        state.account = await initializeCustomerAccount(state.publicConfig);
       } catch (error) {
         console.warn('Account initialization failed:', error.message);
       }
@@ -2504,6 +2512,16 @@
       await loadBrands();
       await loadSubcategories();
       await loadProducts();
+      try {
+        state.commerce = await initializeStorefrontCommerce(state.publicConfig, {
+          account: state.account,
+          getProducts: () => state.products,
+          closeProduct: closeProductModal
+        });
+        if (state.activeProduct) state.commerce.renderProductActions(dom.modalCommerceActions, state.activeProduct);
+      } catch {
+        document.getElementById('customerOrders').disabled = true;
+      }
       await loadReviews();
     }
 
@@ -2548,6 +2566,7 @@
       dom.modalTitle = document.querySelector("#modalTitle");
       dom.modalPrice = document.querySelector("#modalPrice");
       dom.modalDescription = document.querySelector("#modalDescription");
+      dom.modalCommerceActions = document.querySelector("#modalCommerceActions");
       dom.closeModal = document.querySelector("#closeModal");
       dom.year = document.querySelector("#year");
     }
@@ -2864,7 +2883,7 @@
 
         const { data, error } = await state.client
           .from("products")
-          .select("id,title,description,price,subcategory_id,gallery_images,created_at,is_active")
+          .select("id,title,description,price,subcategory_id,gallery_images,created_at,is_active,stock_quantity,size_options,color_options")
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
@@ -3371,6 +3390,7 @@
       dom.modalPrice.textContent = priceText;
       dom.modalPrice.classList.toggle("hidden", !priceText);
       dom.modalDescription.textContent = product.description || "Visit Anurag Apparel to explore this item in store.";
+      state.commerce?.renderProductActions(dom.modalCommerceActions, product);
       dom.modalThumbs.replaceChildren();
 
       mediaItems.forEach((mediaUrl, index) => {

@@ -1,22 +1,24 @@
 # Customer accounts: Google OAuth setup
 
-This feature is on `feature/online-order-accounts`. It does not add checkout or
-publish the branch to the production website. The customer profile schema is an
-additive change on the existing shared Supabase project; it does not contain orders.
+Customer accounts were introduced on `feature/online-order-accounts`. The current
+`feature/online-order-commerce` extends those accounts with COD checkout and order
+history; see [the commerce setup and rollout guide](online-orders.md). Pushing the
+commerce branch does not merge or publish its frontend to the production website.
+The customer-profile schema remains an additive part of the shared Supabase project.
 
 ## Required console configuration
 
-Google is enabled in Supabase as of 2026-11-08. The Google client credentials,
+The previous account setup recorded Google as enabled on 2026-11-08. The Google client credentials,
 production Site URL, and the three return URLs below were configured through the
 Supabase Management API using the locally supplied personal access token. Nonce
 checks remain enabled, and signup is allowed. The token is only needed for setup;
 it is not sent to the frontend or required by the storefront at runtime.
 
-Verification confirmed Google is enabled at the public Auth endpoint and all three
+That setup verification confirmed Google was enabled at the public Auth endpoint and all three
 return URLs receive a 302 redirect to Google with the correct client ID and Supabase
 callback. **The Google callback registration is now accepted:** the authorization
-request reaches Google's `/v3/signin/identifier` page with no `redirect_uri_mismatch`
-or OAuth error page. Console configuration checks pass. Real-account Google consent,
+request reached Google's `/v3/signin/identifier` page with no `redirect_uri_mismatch`
+or OAuth error page. Recheck these settings if credentials or domains change. Real-account Google consent,
 the return to the storefront, and saving a customer profile still need an end-to-end
 test in a browser.
 
@@ -100,21 +102,28 @@ they cannot substitute for a real Google login.
 - Customer profiles are separate from the existing marketing email-contact table.
   No customer is automatically enrolled in marketing emails.
 
-Future orders should reference `customer_profiles.id`. Delivery address and order
-details should be collected during checkout, with server-verified prices and owner
-policies on orders and line items.
+Commerce orders reference the stable Auth user UUID and require a completed
+customer profile. Checkout collects a separate delivery recipient, contact phone,
+full address and map point. Prices, inventory and delivery rules are verified by
+the server, and customers can read only their own visible orders/items/events.
+Customer profile updates do not rewrite past order snapshots.
 
-## Existing security follow-up before checkout
+## Commerce security activation
 
-The legacy admin uses password RPCs while catalog, media and marketing operations
-remain allowed to the anonymous database role. These existing policies are not an
-authorization boundary for a transactional store. Replace them with authenticated
-admin roles and server-authorized operations before introducing orders/payments.
-Customer profile policies do not grant any additional catalog/admin permissions.
-The Supabase advisor also flags the existing `public.purge_old_analytics_events()`
-function as callable by anonymous and authenticated users with definer privileges;
-see [the advisor remediation](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable).
-No new customer-profile advisor findings were reported.
+The historical admin uses password RPCs while catalogue, media and marketing
+operations have anonymous-write policies. The commerce branch replaces that
+boundary with server-validated opaque staff sessions, session-checked database
+policies, signed media writes and private marketing/analytics access. It also
+removes anonymous access to the analytics purge RPC. Customer sign-in never grants
+staff authority, and editable Google user metadata is not used for authorization.
+
+Apply `supabase/commerce-schema.sql` additively first. Ordering remains sealed/off.
+Apply `supabase/commerce-security.sql` only alongside deployment of the branch's
+new admin frontend and updated legacy Edge Functions, then change the administrator
+password through Security and sign in again. This deliberately makes old admin
+clients stop writing. See [the coordinated rollout](online-orders.md#installation-and-coordinated-rollout)
+before enabling ordering. Do not reapply the historical base permissions after
+commerce activation.
 
 The repository previously tracked `.env`. This branch stops tracking it and excludes
 secrets from Vercel uploads, while preserving your local file. Old Git history is

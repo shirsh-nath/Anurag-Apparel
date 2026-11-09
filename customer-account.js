@@ -20,6 +20,24 @@ export async function initializeCustomerAccount(config) {
   const byId = id => document.getElementById(id);
   const ui = Object.fromEntries(['customerSignIn', 'customerSignUp', 'customerAccount', 'accountDialog', 'accountClose', 'accountTitle', 'accountIntro', 'accountAuth', 'accountProfile', 'accountGoogle', 'accountSwitch', 'accountSwitchCopy', 'accountEmail', 'accountName', 'accountPhone', 'accountSave', 'accountSignOut', 'accountStatus'].map(id => [id, byId(id)]));
   let client, user = null, profile = null, revision = 0, saving = false, profileLoaded = false, signingOut = false;
+  const subscribers = new Set();
+  const notify = () => { for (const subscriber of subscribers) { try { subscriber({ user, profile, profileLoaded }); } catch {} } };
+  const controller = {
+    getClient: () => client,
+    getUser: () => user,
+    getProfile: () => profile,
+    isProfileComplete: () => Boolean(user && profileLoaded && profile?.full_name && profile?.phone),
+    open: mode => open(mode),
+    close: () => ui.accountDialog.close(),
+    onChange(subscriber) { subscribers.add(subscriber); return () => subscribers.delete(subscriber); },
+    async getAccessToken() {
+      const owner = user?.id, authRevision = revision;
+      if (!client || !owner || signingOut) return null;
+      const { data, error } = await client.auth.getSession();
+      if (error || signingOut || revision !== authRevision || user?.id !== owner || data.session?.user?.id !== owner) return null;
+      return data.session?.access_token || null;
+    }
+  };
   const returnRequested = new URL(window.location.href).searchParams.get('account') === '1';
   const callbackUrl = new URL(window.location.href);
   const callbackFailed = callbackUrl.searchParams.has('error') || new URLSearchParams(callbackUrl.hash.slice(1)).has('error');
@@ -73,6 +91,7 @@ export async function initializeCustomerAccount(config) {
     profile = null;
     profileLoaded = false;
     render();
+    notify();
     if (!user) return;
     try {
       const { data, error } = await client.from('customer_profiles').select(PROFILE_COLUMNS).eq('id', user.id).maybeSingle();
@@ -81,6 +100,7 @@ export async function initializeCustomerAccount(config) {
       profile = data;
       profileLoaded = true;
       render();
+      notify();
       status();
       if (!profile || returnRequested) open();
     } catch {
@@ -131,6 +151,7 @@ export async function initializeCustomerAccount(config) {
       if (error) throw error;
       profile = data;
       render();
+      notify();
       status('Your account details are saved.');
     } catch {
       if (currentRevision === revision) status('Your details could not be saved. Please check your connection and try again.', true);
@@ -159,7 +180,7 @@ export async function initializeCustomerAccount(config) {
     status('Account sign-in is temporarily unavailable. Please try again later.', true);
     clearCallback();
     if (returnRequested || callbackFailed) open();
-    return;
+    return controller;
   }
   // Catalog/admin clients keep using their existing anonymous permissions.
   client = window.supabase.createClient(config.url, config.anonKey, {
@@ -185,4 +206,5 @@ export async function initializeCustomerAccount(config) {
     open();
   }
   render();
+  return controller;
 }

@@ -6,3 +6,9 @@ SUPABASE_SECRETS_SETUP.txt
 supabase-browser-config.js
 .account-work/
 tests/
+supabase/
+*.sql
+docs/
+scripts/
+PROJECT.md
+README.md

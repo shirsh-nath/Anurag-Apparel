@@ -39,8 +39,28 @@ function fixture({ session = null, profile = null, profileError = null, saveErro
     history: { state: null, replaceState(state, title, url) { window.location = new URL(url, window.location); } },
     supabase: { createClient(url, key, options) { calls.clients.push({ url, key, options }); return client; } }
   };
-  return { ui: id => document.getElementById(id), calls };
+  return { ui: id => document.getElementById(id), calls, client };
 }
+
+test('checkout token belongs to the displayed account even before an Auth change notification arrives', async () => {
+  const { client } = fixture({ session: { user, access_token: 'customer-a-token' } });
+  const account = await initializeCustomerAccount(config);
+  assert.equal(await account.getAccessToken(), 'customer-a-token');
+  client.auth.getSession = async () => ({ data: { session: { user: { id: 'customer-b' }, access_token: 'customer-b-token' } }, error: null });
+  assert.equal(account.getUser().id, user.id);
+  assert.equal(await account.getAccessToken(), null);
+});
+
+test('a delayed token read cannot survive customer logout', async () => {
+  const { client, ui } = fixture({ session: { user, access_token: 'customer-a-token' } });
+  const account = await initializeCustomerAccount(config);
+  let finish;
+  client.auth.getSession = () => new Promise(resolve => { finish = resolve; });
+  const token = account.getAccessToken();
+  await ui('accountSignOut').fire();
+  finish({ data: { session: { user, access_token: 'customer-a-token' } }, error: null });
+  assert.equal(await token, null);
+});
 
 test('normalizes Indian and international contact details and rejects malformed input', () => {
   assert.deepEqual(normalizeProfile('  Asha   Nath  ', '98765 43210'), { full_name: 'Asha Nath', phone: '+919876543210' });

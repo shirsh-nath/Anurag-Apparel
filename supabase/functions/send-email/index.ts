@@ -1,6 +1,6 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-session",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -25,6 +25,24 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const adminToken = req.headers.get("x-admin-session") || "";
+    const projectUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!/^[a-f0-9]{64}$/i.test(adminToken) || !projectUrl || !serviceKey) return json({ error: "Admin sign-in is required." }, 401);
+    const verification = await fetch(`${projectUrl}/rest/v1/rpc/commerce_validate_admin_token`, {
+      method: "POST",
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ input_token: adminToken }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!verification.ok || await verification.json() !== true) return json({ error: "Your admin session has expired." }, 401);
+    const readiness = await fetch(`${projectUrl}/rest/v1/rpc/commerce_get_settings`, {
+      method: "POST",
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ input_public: false }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!readiness.ok || !(await readiness.json())?.admin_password_ready) return json({ error: "Change the administrator password before sending campaigns." }, 403);
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     const fromEmailSecret = Deno.env.get("RESEND_FROM_EMAIL");
 

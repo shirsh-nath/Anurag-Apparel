@@ -14,7 +14,7 @@ test('development server serves storefront/assets and blocks credentials and sou
       if (match) { clearTimeout(timeout); resolve(`http://127.0.0.1:${match[1]}`); }
     });
   });
-  for (const asset of ['/', '/customer-account.js', '/customer-account.css', '/public-config.js', '/admin', '/analytics', '/email', '/privacy', '/privacy/', '/privacy.html', '/terms', '/terms/', '/terms.html', '/legal.css']) {
+  for (const asset of ['/', '/customer-account.js', '/customer-account.css', '/public-config.js', '/admin-session.js', '/commerce-client.js', '/storefront-commerce.js', '/storefront-commerce.css', '/orders-admin.js', '/orders-admin.css', '/orders-admin-logic.js', '/orders', '/orders.html', '/orders/', '/admin', '/analytics', '/email', '/privacy', '/privacy/', '/privacy.html', '/terms', '/terms/', '/terms.html', '/legal.css']) {
     const response = await fetch(base + asset);
     assert.equal(response.status, 200, asset);
   }

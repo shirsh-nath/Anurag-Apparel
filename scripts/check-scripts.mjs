@@ -2,7 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
 let checked = 0;
-for (const file of ['index.html', 'admin.html', 'analytics.html', 'email_resend.html']) {
+for (const file of ['index.html', 'admin.html', 'orders.html', 'analytics.html', 'email_resend.html']) {
   const html = await readFile(file, 'utf8');
   for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     if (/\bsrc\s*=/.test(match[1]) || !match[2].trim()) continue;

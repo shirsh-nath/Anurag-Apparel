@@ -390,6 +390,16 @@
               </span>
             </button>
 
+            <a href="/orders.html" id="customersOrdersBtn" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf"><svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l2 12h11l3-9H6m3 13h.01M18 19h.01"/></svg></span>
+              <span><span class="block text-sm font-semibold text-ink">Customers &amp; Orders</span><span class="block text-xs leading-5 text-ink/54">Bookings, customer details and delivery desk</span></span>
+            </a>
+
+            <a href="/orders.html#settings" id="orderSettingsBtn" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-brass/10 text-brass"><svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 17h16M8 4v6m8 4v6"/></svg></span>
+              <span><span class="block text-sm font-semibold text-ink">Order Settings</span><span class="block text-xs leading-5 text-ink/54">Online orders, delivery slots, retention and emails</span></span>
+            </a>
+
             <a href="email_resend.html" id="emailCustomersBtn" class="admin-menu-option flex w-full items-center gap-3 rounded-lg border border-line bg-paper/70 px-4 py-3 text-left transition hover:border-leaf hover:bg-white focus:outline-none focus:ring-2 focus:ring-leaf/30">
               <span class="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-leaf/10 text-leaf">
                 <svg aria-hidden="true" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -599,12 +609,12 @@
 
             <label class="block">
               <span class="text-sm font-medium text-ink/70">New Password</span>
-              <input id="newAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="8" required>
+              <input id="newAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="12" required>
             </label>
 
             <label class="block">
               <span class="text-sm font-medium text-ink/70">Confirm Password</span>
-              <input id="confirmAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="8" required>
+              <input id="confirmAdminPassword" class="field mt-2 px-4 py-3" type="password" autocomplete="new-password" minlength="12" required>
             </label>
           </div>
 
@@ -629,6 +639,22 @@
             <label class="block">
               <span class="text-sm font-medium text-ink/70">Price</span>
               <input id="productPrice" class="field mt-2 px-4 py-3" type="number" min="0" step="1">
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Available stock for online orders</span>
+              <input id="productStock" class="field mt-2 px-4 py-3" type="number" min="0" max="1000000" step="1" value="0" required>
+              <span class="mt-1 block text-xs text-ink/54">Shared across the choices below. Bookings reserve stock automatically.</span>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Sizes (comma-separated)</span>
+              <input id="productSizes" class="field mt-2 px-4 py-3" type="text" placeholder="S, M, L, XL">
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-ink/70">Colours (comma-separated)</span>
+              <input id="productColors" class="field mt-2 px-4 py-3" type="text" placeholder="Black, White">
             </label>
 
             <label class="block">
@@ -858,8 +884,9 @@
 
   <script type="module">
     import { loadSupabaseConfig } from "/public-config.js";
+    import { ADMIN_SESSION_KEY, adminToken, createAdminClient, signInAdmin, validateAdminSession, signOutAdmin } from "/admin-session.js";
     const ADMIN_USERNAME = "anurag";
-    const AUTH_SESSION_KEY = "anurag-apparel-admin-unlocked";
+    const AUTH_SESSION_KEY = ADMIN_SESSION_KEY;
     const STORAGE_BUCKET = "product-images";
     const BYTES_IN_MB = 1024 * 1024;
     const DEFAULT_MAX_VIDEO_MB = 50;
@@ -893,6 +920,7 @@
     };
 
     const state = {
+      authGeneration: 0,
       client: null,
       supabaseConfig: null,
       configured: false,
@@ -934,7 +962,7 @@
       showAdminPanel(null);
       showAdminView("products");
 
-      if (sessionStorage.getItem(AUTH_SESSION_KEY) === "true") {
+      if (adminToken()) {
         unlockDashboard();
       }
     }
@@ -990,6 +1018,9 @@
       dom.cancelEdit = document.querySelector("#cancelEdit");
       dom.productTitle = document.querySelector("#productTitle");
       dom.productPrice = document.querySelector("#productPrice");
+      dom.productStock = document.querySelector("#productStock");
+      dom.productSizes = document.querySelector("#productSizes");
+      dom.productColors = document.querySelector("#productColors");
       dom.productSubcategory = document.querySelector("#productSubcategory");
       dom.productDescription = document.querySelector("#productDescription");
       dom.imageInput = document.querySelector("#imageInput");
@@ -1076,20 +1107,11 @@
         dom.authError.classList.add("hidden");
 
         try {
-          const client = await createSupabaseClient();
-          if (!client) {
-            throw new Error("Supabase credentials are missing.");
-          }
-
-          const isAuthorized = await verifyAdminLogin(client, username, password);
-          if (!isAuthorized) {
-            dom.authError.textContent = "Invalid username or password.";
-            dom.authError.classList.remove("hidden");
-            return;
-          }
-
+          const config = await loadSupabaseConfig();
+          state.supabaseConfig = config;
+          const { client } = await signInAdmin(config, username, password);
           state.client = client;
-          sessionStorage.setItem(AUTH_SESSION_KEY, "true");
+          dom.password.value = "";
           await unlockDashboard(client);
         } catch (error) {
           console.error(error);
@@ -1150,32 +1172,40 @@
       });
     }
 
+    function isCurrentAdmin(generation, client) {
+      return state.authGeneration === generation && state.client === client && Boolean(client) && Boolean(adminToken());
+    }
+
     async function unlockDashboard(existingClient = null) {
+      const generation = ++state.authGeneration;
+      setAdminControlsEnabled(false);
+      const client = existingClient || await createSupabaseClient();
+      if (generation !== state.authGeneration) return;
+      if (!client) {
+        state.client = null;
+        localStorage.removeItem("anurag-apparel-is-admin");
+        dom.dashboard.classList.add("hidden");
+        dom.authGate.classList.remove("hidden");
+        dom.authError.textContent = "Your admin session could not be restored. Sign in again.";
+        dom.authError.classList.remove("hidden");
+        return;
+      }
+      state.client = client;
       localStorage.setItem("anurag-apparel-is-admin", "true");
       dom.authGate.classList.add("hidden");
       dom.dashboard.classList.remove("hidden");
-      setAdminControlsEnabled(false);
-      state.client = existingClient || await createSupabaseClient();
-
-      if (!state.client) {
-        setStatus("Supabase credentials are missing. Add them to supabase-browser-config.js, the /api/config endpoint, or the window config globals.", "error");
-        return;
-      }
-
-      // Remove any storefront analytics created before the admin unlocked this portal.
       await purgeAdminAnalytics();
-
+      if (!isCurrentAdmin(generation, client)) return;
       setAdminControlsEnabled(true);
-      await loadAnnouncementBoard();
-      await loadSiteSettings();
-      await loadSubcategories();
-      await loadBrands();
-      await loadProducts();
-      await loadCampaignImages();
-      await loadGoogleReviews();
+      for (const loader of [loadAnnouncementBoard, loadSiteSettings, loadSubcategories, loadBrands, loadProducts, loadCampaignImages, loadGoogleReviews]) {
+        if (!isCurrentAdmin(generation, client)) return;
+        await loader();
+      }
     }
 
     function lockDashboard() {
+      state.authGeneration++;
+      void signOutAdmin(state.supabaseConfig);
       localStorage.removeItem("anurag-apparel-is-admin");
       sessionStorage.removeItem(AUTH_SESSION_KEY);
       resetForm();
@@ -1188,6 +1218,8 @@
       state.brands = [];
       state.subcategories = [];
       state.googleReviews = [];
+      state.campaignImages = [];
+      dom.passwordForm.reset();
       state.board = DEFAULT_BOARD;
       state.settings = DEFAULT_SETTINGS;
       showAdminPanel(null);
@@ -1198,6 +1230,9 @@
       resetBrandForm();
       renderBrands();
       renderGoogleReviews([]);
+      renderCampaignImages([]);
+      populateBoardForm(DEFAULT_BOARD);
+      populateContactForm(DEFAULT_SETTINGS);
     }
 
     // Removes any storefront analytics events generated by this browser before
@@ -1232,20 +1267,8 @@
         return null;
       }
 
-      return window.supabase.createClient(config.url, config.anonKey);
-    }
-
-    async function verifyAdminLogin(client, username, password) {
-      const { data, error } = await client.rpc("verify_admin_login", {
-        input_username: username,
-        input_password: password
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      return data === true;
+      state.supabaseConfig = config;
+      return validateAdminSession(config);
     }
 
     function isConfigured(config) {
@@ -1268,19 +1291,23 @@
     }
 
     async function loadCampaignImages() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         renderCampaignImages([]);
         return;
       }
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("email_campaign_images")
           .select("id,name,image_url,storage_path,created_at,updated_at")
           .order("created_at", { ascending: false });
+        if (!isCurrentAdmin(generation, client)) return;
         if (error) throw error;
         state.campaignImages = data || [];
         renderCampaignImages(state.campaignImages);
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         renderCampaignImages([]);
         setStatus(error.message || "Unable to load campaign images.", "error");
@@ -1380,16 +1407,20 @@
     }
 
     async function loadGoogleReviews() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         renderGoogleReviews([]);
         return;
       }
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("google_reviews")
           .select("id,google_review_id,author_name,rating,review_text,review_url,relative_time_description,reviewed_at,scraped_at,is_active,is_featured")
           .order("reviewed_at", { ascending: false, nullsFirst: false });
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -1398,6 +1429,7 @@
         state.googleReviews = data || [];
         renderGoogleReviews(state.googleReviews);
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         renderGoogleReviews([]);
         setStatus(error.message || "Unable to load Google reviews.", "error");
@@ -1519,7 +1551,8 @@
         const response = await fetch("/api/sync-google-reviews", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-admin-session": adminToken()
           }
         });
         const result = await response.json().catch(() => ({}));
@@ -1622,8 +1655,8 @@
       const newPassword = dom.newAdminPassword.value;
       const confirmedPassword = dom.confirmAdminPassword.value;
 
-      if (newPassword.length < 8) {
-        setStatus("New password must be at least 8 characters.", "error");
+      if (newPassword.length < 12 || new TextEncoder().encode(newPassword).length > 72) {
+        setStatus("New password must have at least 12 characters and fit within 72 UTF-8 bytes.", "error");
         return;
       }
 
@@ -1655,6 +1688,9 @@
         dom.passwordForm.reset();
         setStatus("Admin password updated.", "success");
         closeActivePanelAfterSave(closeAfterSave);
+        lockDashboard();
+        dom.authError.textContent = "Password updated. Sign in with your new password.";
+        dom.authError.classList.remove("hidden");
       } catch (error) {
         console.error(error);
         setStatus(error.message || "Unable to update admin password.", "error");
@@ -1664,17 +1700,21 @@
     }
 
     async function loadAnnouncementBoard() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         populateBoardForm(DEFAULT_BOARD);
         return;
       }
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("site_announcements")
           .select("id,eyebrow,title,message,offer_text,offer_images,cta_label,cta_url,is_active,updated_at")
           .eq("id", "homepage")
           .maybeSingle();
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -1683,6 +1723,7 @@
         state.board = data || DEFAULT_BOARD;
         populateBoardForm(state.board);
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         populateBoardForm(DEFAULT_BOARD);
         setStatus(error.message || "Unable to load announcement board.", "error");
@@ -1882,17 +1923,21 @@
     }
 
     async function loadSiteSettings() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         populateContactForm(DEFAULT_SETTINGS);
         return;
       }
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("site_settings")
           .select("id,phone_number,email_address,instagram_url,facebook_url,reviews_section_enabled,review_sort_mode,review_display_limit,updated_at")
           .eq("id", "storefront")
           .maybeSingle();
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -1901,6 +1946,7 @@
         state.settings = data || DEFAULT_SETTINGS;
         populateContactForm(state.settings);
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         populateContactForm(DEFAULT_SETTINGS);
         setStatus(error.message || "Unable to load store contact settings.", "error");
@@ -2109,16 +2155,20 @@
     }
 
     async function loadSubcategories() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         return;
       }
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("product_subcategories")
           .select("id,name,slug,description,sort_order,is_active,created_at")
           .order("sort_order", { ascending: true })
           .order("created_at", { ascending: false });
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -2128,6 +2178,7 @@
         renderSubcategories();
         renderProductSubcategoryOptions();
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         setStatus(error.message || "Unable to load product subcategories.", "error");
       }
@@ -2206,16 +2257,20 @@
     }
 
     async function loadBrands() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         return;
       }
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("brands")
           .select("id,name,logo_url,sort_order,is_active,created_at")
           .order("sort_order", { ascending: true })
           .order("created_at", { ascending: false });
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -2224,6 +2279,7 @@
         state.brands = data || [];
         renderBrands();
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         setStatus(error.message || "Unable to load brand logos.", "error");
       }
@@ -2355,7 +2411,9 @@
     }
 
     async function loadProducts() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         return;
       }
 
@@ -2363,10 +2421,12 @@
       dom.refreshProducts.disabled = true;
 
       try {
-        const { data, error } = await state.client
+        const { data, error } = await client
           .from("products")
-          .select("id,title,description,price,subcategory_id,gallery_images,is_active,created_at")
+          .select("id,title,description,price,subcategory_id,gallery_images,is_active,created_at,stock_quantity,size_options,color_options")
           .order("created_at", { ascending: false });
+
+        if (!isCurrentAdmin(generation, client)) return;
 
         if (error) {
           throw error;
@@ -2377,9 +2437,11 @@
         renderSubcategories();
         setStatus(`Inventory loaded. ${state.products.length} item${state.products.length === 1 ? "" : "s"} found.`, "success");
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         setStatus(error.message || "Unable to load inventory.", "error");
       } finally {
+        if (!isCurrentAdmin(generation, client)) return;
         dom.refreshProducts.disabled = false;
       }
     }
@@ -2455,6 +2517,14 @@
       const priceValue = dom.productPrice.value.trim();
       const price = priceValue === "" ? null : Number(priceValue);
       const subcategoryId = dom.productSubcategory.value;
+      const stockQuantity = Number(dom.productStock.value);
+      const sizeOptions = [...new Set(dom.productSizes.value.split(",").map(value => value.trim()).filter(Boolean))];
+      const colorOptions = [...new Set(dom.productColors.value.split(",").map(value => value.trim()).filter(Boolean))];
+
+      if (!Number.isInteger(stockQuantity) || stockQuantity < 0 || stockQuantity > 1000000 || [...sizeOptions, ...colorOptions].some(value => value.length > 50) || sizeOptions.length > 30 || colorOptions.length > 30) {
+        setStatus("Enter valid available stock and at most 30 size or colour choices of up to 50 characters each.", "error");
+        return null;
+      }
 
       if (!title || !description || Number.isNaN(price) || price < 0) {
         setStatus("Please enter a valid title and description. Price can be empty or zero and above.", "error");
@@ -2465,6 +2535,8 @@
         title,
         description,
         price,
+        size_options: sizeOptions,
+        color_options: colorOptions,
         subcategory_id: subcategoryId || null,
         gallery_images: []
       };
@@ -2472,6 +2544,9 @@
       if (!state.editingId) {
         payload.is_active = true;
       }
+
+      // Do not overwrite live stock reservations when an unrelated product edit is saved.
+      if (!state.editingId || stockQuantity !== state.originalStockQuantity) payload.stock_quantity = stockQuantity;
 
       return payload;
     }
@@ -2555,13 +2630,17 @@
         throw new Error("Supabase upload configuration is missing.");
       }
 
+      const { data: signedUpload, error: signError } = await state.client.storage.from(STORAGE_BUCKET).createSignedUploadUrl(path);
+      if (signError) throw signError;
+
       return new Promise((resolve, reject) => {
         const upload = new window.tus.Upload(file, {
           endpoint: `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`,
           retryDelays: [0, 3000, 5000, 10000, 20000],
           headers: {
             authorization: `Bearer ${anonKey}`,
-            apikey: anonKey
+            apikey: anonKey,
+            "x-signature": signedUpload.token
           },
           uploadDataDuringCreation: true,
           removeFingerprintOnSuccess: true,
@@ -2794,6 +2873,10 @@
       dom.cancelEdit.classList.remove("hidden");
       dom.productTitle.value = product.title || "";
       dom.productPrice.value = product.price == null ? "" : Number(product.price);
+      state.originalStockQuantity = Number(product.stock_quantity || 0);
+      dom.productStock.value = state.originalStockQuantity;
+      dom.productSizes.value = (product.size_options || []).join(", ");
+      dom.productColors.value = (product.color_options || []).join(", ");
       renderProductSubcategoryOptions(product.subcategory_id || "");
       dom.productSubcategory.value = product.subcategory_id || "";
       dom.productDescription.value = product.description || "";
@@ -3195,6 +3278,7 @@
       dom.saveProduct.textContent = "Save Product";
       dom.cancelEdit.classList.add("hidden");
       state.editingId = null;
+      state.originalStockQuantity = 0;
       state.originalGallery = [];
       state.currentGallery = [];
       clearPendingFiles();

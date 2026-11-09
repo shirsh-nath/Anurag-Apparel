@@ -4,7 +4,9 @@ export default async function handler(req, res) {
   }
 
   const cronSecret = process.env.CRON_SECRET;
-  if (req.method === "GET" && cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+  const isCron = req.method === "GET" && cronSecret && req.headers.authorization === `Bearer ${cronSecret}`;
+  const adminSession = String(req.headers["x-admin-session"] || "");
+  if ((req.method === "GET" && !isCron) || (req.method === "POST" && !/^[a-f0-9]{64}$/i.test(adminSession))) {
     return res.status(401).json({ error: "Unauthorised" });
   }
 
@@ -22,7 +24,7 @@ export default async function handler(req, res) {
         apikey: supabaseAnonKey,
         Authorization: `Bearer ${supabaseAnonKey}`,
         "Content-Type": "application/json",
-        ...(cronSecret ? { "x-cron-secret": cronSecret } : {}),
+        ...(isCron ? { "x-cron-secret": cronSecret } : { "x-admin-session": adminSession }),
       },
       body: JSON.stringify({ source: "vercel-api" }),
     });

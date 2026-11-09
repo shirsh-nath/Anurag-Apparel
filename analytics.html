@@ -309,11 +309,13 @@
 
   <script type="module">
     import { loadSupabaseConfig } from "/public-config.js";
-    const AUTH_SESSION_KEY = "anurag-apparel-admin-unlocked";
+    import { ADMIN_SESSION_KEY, adminToken, createAdminClient, signInAdmin, validateAdminSession, signOutAdmin } from "/admin-session.js";
+    const AUTH_SESSION_KEY = ADMIN_SESSION_KEY;
     const ADMIN_USERNAME = "anurag";
     const MAX_ROWS = 5000;
 
     const state = {
+      authGeneration: 0,
       client: null,
       events: [],
       period: "30",
@@ -329,7 +331,7 @@
       cacheDom();
       bindAuth();
       bindDashboard();
-      if (sessionStorage.getItem(AUTH_SESSION_KEY) === "true") {
+      if (adminToken()) {
         unlockDashboard();
       }
     }
@@ -382,17 +384,11 @@
         dom.authError.classList.add("hidden");
 
         try {
-          const client = await createSupabaseClient();
-          if (!client) {
-            throw new Error("Supabase credentials are missing.");
-          }
-          const ok = await verifyAdminLogin(client, dom.username.value.trim(), dom.password.value);
-          if (!ok) {
-            showAuthError("Invalid username or password.");
-            return;
-          }
+          const config = await loadSupabaseConfig();
+          state.supabaseConfig = config;
+          const { client } = await signInAdmin(config, dom.username.value.trim(), dom.password.value);
           state.client = client;
-          sessionStorage.setItem(AUTH_SESSION_KEY, "true");
+          dom.password.value = "";
           await unlockDashboard(client);
         } catch (error) {
           showAuthError(error.message || "Unable to verify admin access.");
@@ -422,25 +418,40 @@
       });
     }
 
+    function isCurrentAdmin(generation, client) {
+      return state.authGeneration === generation && state.client === client && Boolean(client) && Boolean(adminToken());
+    }
+
     async function unlockDashboard(existingClient = null) {
+      const generation = ++state.authGeneration;
+      const client = existingClient || await createSupabaseClient();
+      if (generation !== state.authGeneration) return;
+      if (!client) {
+        state.client = null;
+        localStorage.removeItem("anurag-apparel-is-admin");
+        dom.dashboard.classList.add("hidden");
+        dom.authGate.classList.remove("hidden");
+        showAuthError("Your admin session could not be restored. Sign in again.");
+        return;
+      }
+      state.client = client;
       localStorage.setItem("anurag-apparel-is-admin", "true");
       dom.authGate.classList.add("hidden");
       dom.dashboard.classList.remove("hidden");
-      state.client = existingClient || await createSupabaseClient();
-      if (!state.client) {
-        setStatus("Supabase credentials are missing. Check supabase-browser-config.js or /api/config.", "error");
-        return;
-      }
       await loadAnalytics();
-      startAutoRefresh();
+      if (isCurrentAdmin(generation, client)) startAutoRefresh();
     }
 
     function lockDashboard() {
+      state.authGeneration++;
+      void signOutAdmin(state.supabaseConfig);
       localStorage.removeItem("anurag-apparel-is-admin");
       stopAutoRefresh();
       sessionStorage.removeItem(AUTH_SESSION_KEY);
       state.client = null;
       state.events = [];
+      state.isLoading = false;
+      renderAnalytics();
       dom.dashboard.classList.add("hidden");
       dom.authGate.classList.remove("hidden");
       dom.password.value = "";
@@ -451,22 +462,14 @@
       if (!isConfigured(config) || !window.supabase?.createClient) {
         return null;
       }
-      return window.supabase.createClient(config.url, config.anonKey);
-    }
-
-    async function verifyAdminLogin(client, username, password) {
-      const { data, error } = await client.rpc("verify_admin_login", {
-        input_username: username || ADMIN_USERNAME,
-        input_password: password
-      });
-      if (error) {
-        throw error;
-      }
-      return data === true;
+      state.supabaseConfig = config;
+      return validateAdminSession(config);
     }
 
     async function loadAnalytics() {
-      if (!state.client) {
+      const generation = state.authGeneration;
+      const client = state.client;
+      if (!client) {
         return;
       }
       if (state.isLoading) {
@@ -483,7 +486,7 @@
         const ninetyDaysAgo = new Date();
         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-        let query = state.client
+        let query = client
           .from("website_analytics_events")
           .select("*")
           .order("created_at", { ascending: false })
@@ -497,6 +500,7 @@
 
 
         const { data, error } = await query;
+        if (!isCurrentAdmin(generation, client)) return;
         if (error) {
           throw error;
         }
@@ -505,11 +509,13 @@
         renderAnalytics();
         setStatus(`Loaded ${formatNumber(state.events.length)} analytics event${state.events.length === 1 ? "" : "s"}.`, "success");
       } catch (error) {
+        if (!isCurrentAdmin(generation, client)) return;
         console.error(error);
         state.events = [];
         renderAnalytics();
         setStatus(error.message || "Unable to load analytics. Run the updated Supabase schema first.", "error");
       } finally {
+        if (!isCurrentAdmin(generation, client)) return;
         state.isLoading = false;
         dom.refreshAnalytics.disabled = false;
       }
