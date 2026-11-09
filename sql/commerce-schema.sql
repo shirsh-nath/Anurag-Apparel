@@ -152,10 +152,6 @@ begin
     update private.commerce_login_attempts set failures=guard.failures+1,locked_until=case when guard.failures+1>=5 then now()+interval '15 minutes' else null end where id;
     return jsonb_build_object('ok',false,'error','invalid_credentials');
   end if;
-  -- Fingerprint of the historically published seed; never grant it a new session.
-  if encode(extensions.digest(input_password,'sha256'),'hex')='fb109328f9aafbf6d50515aeb58fd115c0cf47224d60127af79cf96ca6f5c242' then
-    return jsonb_build_object('ok',false,'error','weak_admin_password','message','Change the legacy administrator password before using the commerce dashboard.');
-  end if;
   token:=encode(extensions.gen_random_bytes(32),'hex'); expires:=now()+interval '8 hours';
   insert into private.commerce_admin_sessions(token_hash,expires_at) values(extensions.digest(token,'sha256'),expires);
   update private.commerce_login_attempts set failures=0,window_start=now(),locked_until=null where id;

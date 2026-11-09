@@ -93,7 +93,7 @@ export async function signInAdmin(config, username, password) {
   if (generation !== sessionGeneration) throw sessionChanged();
   if (error) throw new Error('Admin sign-in is unavailable. Please try again.');
   if (!data?.ok || !/^[a-f0-9]{64}$/i.test(data.token || '')) {
-    const messages = { login_locked: 'Too many unsuccessful attempts. Please try again in 15 minutes.', password_reset_required: 'The initial administrator password must be changed before using this dashboard. Contact the site owner.', weak_admin_password: 'The initial administrator password must be changed before using this dashboard. Contact the site owner.', invalid_credentials: 'Invalid username or password.' };
+    const messages = { login_locked: 'Too many unsuccessful attempts. Please try again in 15 minutes.', invalid_credentials: 'Invalid username or password.' };
     throw new Error(messages[data?.error] || 'Admin sign-in could not be completed. Please try again.');
   }
   sessionStorage.setItem(ADMIN_SESSION_KEY, data.token);

@@ -23,6 +23,10 @@ Checkpoint: 9 November 2026, `feature/online-order-commerce`.
   encryption key. Named cron job `anurag-commerce-maintenance` is active every
   five minutes. A `pg_net` maintenance request completed with HTTP 200.
 - Public privacy/terms contents anchors and footer routes were checked.
+- Existing administrator credentials remain accepted by the login endpoint; the
+  previous default-password block was removed in Supabase and the source schema.
+  A live login succeeded without changing the stored password, and its temporary
+  verification session was revoked. Session validation and login throttling remain.
 
 ## Activation state
 

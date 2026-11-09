@@ -181,8 +181,9 @@ production rollout.
    privately using id `dashboard`, your chosen username and a unique bcrypt hash
    generated with `extensions.crypt`/`extensions.gen_salt('bf')`. Never put the
    plaintext password in tracked SQL or documentation. Existing installations keep
-   their current credential; the historically published seed is rejected by the
-   commerce login and must be changed privately before using it.
+   their current credential. Admin sign-in checks the stored username/password
+   without blocking a particular previous password. The separate security
+   activation and password review for enabling orders still apply below.
 2. Apply `sql/commerce-schema.sql`. This is additive and idempotent. Effective
    ordering remains sealed/off, so it can coexist with the current production
    catalogue. Do not set private readiness flags by hand to bypass activation.
