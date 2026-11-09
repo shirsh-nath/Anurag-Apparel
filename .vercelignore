@@ -7,6 +7,7 @@ supabase-browser-config.js
 .account-work/
 tests/
 supabase/
+sql/
 *.sql
 docs/
 scripts/

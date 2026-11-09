@@ -27,7 +27,7 @@ Checkpoint: 9 November 2026, `feature/online-order-commerce`.
 ## Activation state
 
 The branch has not been merged into `main`, and its frontend has not replaced the
-production storefront. `commerce-security.sql` and the coordinated legacy Edge
+production storefront. `sql/commerce-security.sql` and the coordinated legacy Edge
 Function/frontend cutover remain unapplied. The security state is unsealed,
 administrator password readiness is false and ordering is effectively off. Do not
 enable ordering by changing private flags directly.

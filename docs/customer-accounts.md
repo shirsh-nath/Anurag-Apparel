@@ -76,7 +76,7 @@ Run `npm run dev`, then visit `http://localhost:5500`. The development server re
 Do not serve the repository root with a generic Live Server while secrets exist:
 removing frontend `.env` requests does not stop such a server exposing that file.
 
-Run `npm run check` and `npm test`. Run `tests/customer-profiles.sql` in the SQL
+Run `npm run check` and `npm test`. Run `sql/tests/customer-profiles.sql` in the SQL
 editor for transactional database access tests; all synthetic fixtures roll back.
 `node scripts/inspect-auth.mjs` checks whether Google is enabled without printing secrets.
 
@@ -117,8 +117,8 @@ policies, signed media writes and private marketing/analytics access. It also
 removes anonymous access to the analytics purge RPC. Customer sign-in never grants
 staff authority, and editable Google user metadata is not used for authorization.
 
-Apply `supabase/commerce-schema.sql` additively first. Ordering remains sealed/off.
-Apply `supabase/commerce-security.sql` only alongside deployment of the branch's
+Apply `sql/commerce-schema.sql` additively first. Ordering remains sealed/off.
+Apply `sql/commerce-security.sql` only alongside deployment of the branch's
 new admin frontend and updated legacy Edge Functions, then change the administrator
 password through Security and sign in again. This deliberately makes old admin
 clients stop writing. See [the coordinated rollout](online-orders.md#installation-and-coordinated-rollout)

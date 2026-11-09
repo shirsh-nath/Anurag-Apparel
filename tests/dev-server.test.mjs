@@ -18,7 +18,7 @@ test('development server serves storefront/assets and blocks credentials and sou
     const response = await fetch(base + asset);
     assert.equal(response.status, 200, asset);
   }
-  for (const secret of ['/.env', '/.env.example', '/credential.txt', '/.git/config', '/supabase-schema.sql', '/scripts/inspect-auth.mjs', '/Images/../.env']) {
+  for (const secret of ['/.env', '/.env.example', '/credential.txt', '/.git/config', '/supabase-schema.sql', '/sql/supabase-schema.sql', '/sql/commerce-schema.sql', '/sql/tests/commerce.sql', '/scripts/inspect-auth.mjs', '/Images/../.env']) {
     assert.equal((await fetch(base + secret)).status, 404, secret);
   }
   const response = await fetch(base + '/api/config');

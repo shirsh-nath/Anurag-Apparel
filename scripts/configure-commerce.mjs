@@ -57,6 +57,6 @@ if (process.argv.includes('--schedule-config')) {
   for (const [name, value] of Object.entries(vaultValues)) {
     await management('/database/query', 'POST', { query: `do $setup$ declare secret_id uuid; begin select id into secret_id from vault.secrets where name=${literal(name)}; if secret_id is null then perform vault.create_secret(${literal(value)},${literal(name)}); else perform vault.update_secret(secret_id,${literal(value)},${literal(name)}); end if; end $setup$;` });
   }
-  console.log('Maintenance-only Vault configuration saved. Apply supabase/commerce-maintenance.sql to schedule it.');
+  console.log('Maintenance-only Vault configuration saved. Apply sql/commerce-maintenance.sql to schedule it.');
 }
 console.log(JSON.stringify({ project: ref, commerceCodeKeyConfigured: secrets.some(item => item.name === names[0]), maintenanceKeyConfigured: secrets.some(item => item.name === names[1]), resendConfigured: ['RESEND_API_KEY', 'RESEND_FROM_EMAIL'].every(name => secrets.some(item => item.name === name)) }));

@@ -29,7 +29,7 @@ campaigns. Apify refreshes Google reviews through a server function.
 
 ## Database
 
-`supabase-schema.sql` contains the historical catalogue/account schema. It creates
+`sql/supabase-schema.sql` contains the historical catalogue/account schema. It creates
 products, categories, brands, announcements, store settings, reviews, marketing
 contacts/images, analytics, customer profiles and a private administrator-credential
 table. A fresh project needs a privately provisioned strong administrator
@@ -37,12 +37,12 @@ credential; there is no published default password.
 
 The commerce extension is split deliberately:
 
-1. `supabase/commerce-schema.sql` adds product inventory/options, singleton
+1. `sql/commerce-schema.sql` adds product inventory/options, singleton
    settings, orders, line-item snapshots, status events, private encrypted code
    records, email outbox, admin sessions and login throttling. Ordering stays off
    until security and password readiness flags are satisfied. Customers have
    owner-only visible-order reads. Privileged commerce RPCs are service-only.
-2. `supabase/commerce-security.sql` activates the new staff boundary alongside the
+2. `sql/commerce-security.sql` activates the new staff boundary alongside the
    branch deployment. It removes the old public verifier/write/purge permissions,
    applies session-checked catalogue policies, protects campaign/analytics data,
    and routes Storage mutations through signed capabilities. Old admin clients
@@ -80,7 +80,7 @@ retries pending notifications. The encryption master key must never be stored in
 the database; a different maintenance secret is stored in Vault for cron.
 `scripts/configure-commerce.mjs --secrets --schedule-config` provisions/checks keys
 from the ignored local environment and prepares the scoped Vault configuration.
-`supabase/commerce-maintenance.sql` installs the five-minute named cron job.
+`sql/commerce-maintenance.sql` installs the five-minute named cron job.
 
 The updated `send-email` and `sync-google-reviews` Edge Functions require validated
 staff sessions for manual actions. Scheduled reviews use `CRON_SECRET`.

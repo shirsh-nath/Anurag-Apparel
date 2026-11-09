@@ -39,7 +39,7 @@ checks the current rules on every booking.
 
 ## Data and authorization
 
-`supabase/commerce-schema.sql` is the additive commerce schema. It adds inventory
+`sql/commerce-schema.sql` is the additive commerce schema. It adds inventory
 columns to products, a settings row, orders, line items and status events. An order
 keeps a snapshot of its prices, contact/address details, delivery slot and whether
 its delivery code is required. Later catalogue edits do not rewrite past orders.
@@ -61,7 +61,7 @@ in `x-admin-session`; a browser boolean and customer-editable Google metadata do
 not grant staff permissions. Five failed admin logins trigger a 15-minute lock.
 Changing the administrator password revokes existing sessions. Catalogue/media,
 campaign and analytics protections are activated by the separate
-`supabase/commerce-security.sql` rollout.
+`sql/commerce-security.sql` rollout.
 
 ### Delivery acceptance code
 
@@ -175,7 +175,7 @@ Do not run the entire historical base schema against an existing live database
 just to add orders. Preserve existing records and take a database backup before a
 production rollout.
 
-1. For a fresh project, install `supabase-schema.sql` and the customer-profile
+1. For a fresh project, install `sql/supabase-schema.sql` and the customer-profile
    section described in the account guide. The base schema no longer creates a
    published/default administrator credential. Bootstrap `private.admin_credentials`
    privately using id `dashboard`, your chosen username and a unique bcrypt hash
@@ -183,7 +183,7 @@ production rollout.
    plaintext password in tracked SQL or documentation. Existing installations keep
    their current credential; the historically published seed is rejected by the
    commerce login and must be changed privately before using it.
-2. Apply `supabase/commerce-schema.sql`. This is additive and idempotent. Effective
+2. Apply `sql/commerce-schema.sql`. This is additive and idempotent. Effective
    ordering remains sealed/off, so it can coexist with the current production
    catalogue. Do not set private readiness flags by hand to bypass activation.
 3. Enable `pg_cron`, `pg_net` and Vault for maintenance. Save `SUPABASE_URL` and
@@ -209,7 +209,7 @@ production rollout.
    **because its handler performs explicit customer, admin or maintenance
    authentication per action**. Only public settings are intentionally anonymous.
    Include both `index.ts` and `domain.mjs`.
-5. Apply `supabase/commerce-maintenance.sql`. The helper's `--schedule-config`
+5. Apply `sql/commerce-maintenance.sql`. The helper's `--schedule-config`
    step stores `commerce_maintenance_key` and `commerce_project_url` in Vault;
    the SQL schedules named job `anurag-commerce-maintenance` at `*/5 * * * *`.
    It uses `net.http_post` with JSON `{"action":"maintenance"}` and the scoped
@@ -219,7 +219,7 @@ production rollout.
    ran. Avoid selecting/logging request authorization headers.
 6. Coordinate deployment of this branch's frontend/API routes and updated legacy
    `send-email` and `sync-google-reviews` Edge Functions with applying
-   `supabase/commerce-security.sql`. That SQL removes the legacy anonymous write
+   `sql/commerce-security.sql`. That SQL removes the legacy anonymous write
    boundary and public purge/password-verifier access, and authorizes the new
    opaque staff session on every request. Old admin clients cease working after
    activation. The new Vercel analytics purge needs `SUPABASE_SERVICE_ROLE_KEY`
@@ -247,10 +247,10 @@ npm run check
 npm test
 ```
 
-Run `tests/commerce.sql` in Supabase to exercise stock, quote/booking, idempotency,
+Run `sql/tests/commerce.sql` in Supabase to exercise stock, quote/booking, idempotency,
 slot/capacity, transitions, code attempts, owner isolation and retention rules.
 Its synthetic fixtures are wrapped in a transaction and rolled back. Run
-`tests/commerce-security.sql` after activation, or together with the security SQL
+`sql/tests/commerce-security.sql` after activation, or together with the security SQL
 inside one rollback-only validation transaction. Never remove the fixture rollback
 to test against live customer records.
 

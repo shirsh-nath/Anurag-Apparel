@@ -1,0 +1,23 @@
+# Database scripts
+
+All SQL lives here. Application Edge Functions remain in `supabase/functions/`.
+SQL files are excluded from website deployment and the local asset server.
+
+| File | Purpose | Connected Supabase status, checked 9 November 2026 |
+| --- | --- | --- |
+| `supabase-schema.sql` | Historical base schema for fresh installations | Existing database already provisioned; do not rerun the whole historical script to add commerce |
+| `commerce-schema.sql` | Additive commerce tables, inventory, settings, order operations and admin sessions | Applied, including verified rules and email snapshots |
+| `commerce-maintenance.sql` | Five-minute cleanup and email-retry job | Applied; job active and latest worker HTTP status 200 |
+| `commerce-security.sql` | Activate the new staff permissions and password-change boundary | Tested inside a rolled-back transaction; not activated |
+| `tests/customer-profiles.sql` | Customer-profile isolation checks | Rollback-only validation script |
+| `tests/commerce.sql` | Checkout, stock, slots, delivery codes, outbox and retention checks | Passed with fixtures rolled back |
+| `tests/commerce-security.sql` | Staff-session and permission checks | Passed with activation and fixtures rolled back |
+
+Ordering remains off. Apply `commerce-security.sql` only during the coordinated
+deployment of this branch's frontend and updated legacy Edge Functions. Then
+change the administrator password and configure inventory/delivery settings before
+enabling orders. This avoids breaking the current production admin pages.
+
+Moving these files does not change or rerun anything in Supabase. See the
+[rollout guide](../docs/online-orders.md#installation-and-coordinated-rollout) and
+[verification record](../docs/commerce-verification.md).

@@ -48,13 +48,17 @@ existing `products.gallery_images` column supports both images and videos.
 
 ## Database and server functions
 
-- `supabase-schema.sql`: original catalogue, staff credential, marketing,
+All SQL is grouped in [`sql/`](sql/README.md), with rollback-only validation
+scripts in `sql/tests/`. That folder also records which scripts are already
+applied on the connected Supabase project.
+
+- `sql/supabase-schema.sql`: original catalogue, staff credential, marketing,
   analytics, reviews and customer-profile schema. Existing live installations
   should apply only the relevant additions, not rerun the historical permissions.
   No shared administrator password is seeded for a new project.
-- `supabase/commerce-schema.sql`: additive order/inventory schema and private
+- `sql/commerce-schema.sql`: additive order/inventory schema and private
   business operations; customer reads use owner RLS and mutations use the server.
-- `supabase/commerce-security.sql`: coordinated activation of opaque staff
+- `sql/commerce-security.sql`: coordinated activation of opaque staff
   sessions, restricted catalogue writes, signed media uploads and private customer,
   campaign and analytics data. It deliberately replaces the legacy admin boundary.
 - `supabase/functions/commerce`: authenticated quotes, bookings, order operations,

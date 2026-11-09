@@ -1,4 +1,4 @@
--- Additive commerce extension. Apply after supabase-schema.sql.
+-- Additive commerce extension. Apply after sql/supabase-schema.sql.
 -- Legacy admin hardening is deliberately separate: commerce-security.sql.
 -- New ordering remains sealed until that hardening is activated with the branch rollout.
 -- No plaintext delivery code or admin session token is stored in the database.
