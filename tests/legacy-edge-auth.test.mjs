@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-const env = { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-server-only', RESEND_API_KEY: 'test-resend', RESEND_FROM_EMAIL: 'store@example.invalid', APIFY_API_KEY: 'test-apify', CRON_SECRET: 'test-cron' };
+const env = { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-server-only', RESEND_API_KEY: 'test-resend', RESEND_FROM_EMAIL: 'store@example.invalid', APIFY_API_KEY: 'test-apify', CRON_SECRET: 'test-cron', COMMERCE_MAINTENANCE_KEY: 'test-maintenance' };
 let captured;
 globalThis.Deno = { env: { get: name => env[name] }, serve: handler => { captured = handler; } };
 await import('../supabase/functions/send-email/index.ts');
@@ -39,4 +39,19 @@ test('campaigns: reviewed admin session reaches input validation without sending
   const calls = network({ valid: true, ready: true });
   assert.equal((await campaigns(req({ 'x-admin-session': 'a'.repeat(64) }))).status, 400);
   assert.equal(calls.length, 2);
+});
+
+test('review refresh: an incorrect maintenance token cannot bypass staff authentication', async () => {
+  const calls = network();
+  assert.equal((await reviews(req({ 'x-commerce-maintenance': 'wrong-maintenance' }))).status, 401);
+  assert.equal(calls.length, 0);
+});
+
+test('review refresh: the scoped scheduled token reaches the provider without a browser session', async () => {
+  const calls = [];
+  globalThis.fetch = async url => { calls.push(String(url)); return new Response(JSON.stringify({ error: 'synthetic provider failure' }), { status: 503 }); };
+  const response = await reviews(req({ 'x-commerce-maintenance': env.COMMERCE_MAINTENANCE_KEY }));
+  assert.equal(response.status, 500);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0], /^https:\/\/api\.apify\.com\//);
 });

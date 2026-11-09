@@ -175,6 +175,17 @@ test('public configuration never fetches .env, including endpoint failure', asyn
   assert.deepEqual(paths, ['/api/config']);
 });
 
+test('orders page loads local public configuration before its admin module', async () => {
+  const html = await readFile('orders.html', 'utf8');
+  assert.ok(html.indexOf('src="/supabase-browser-config.js"') > -1);
+  assert.ok(html.indexOf('src="/supabase-browser-config.js"') < html.indexOf('src="/orders-admin.js"'));
+  fixture();
+  window.ANURAG_SUPABASE_URL = config.url;
+  window.ANURAG_SUPABASE_ANON_KEY = config.anonKey;
+  globalThis.fetch = async () => { throw new Error('The static local server has no API endpoint'); };
+  assert.deepEqual(await loadSupabaseConfig(), config);
+});
+
 test('config API returns only allowlisted public values even when secrets exist', () => {
   const before = { ...process.env };
   Object.assign(process.env, { SUPABASE_URL: config.url, SUPABASE_ANON_KEY: config.anonKey, GOOGLE_OAUTH_CLIENT_SECRET: 'never-send-this', RESEND_API_KEY: 'private-email-key' });

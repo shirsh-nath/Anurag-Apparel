@@ -119,8 +119,9 @@ staff authority, and editable Google user metadata is not used for authorization
 
 Apply `sql/commerce-schema.sql` additively first. Ordering remains sealed/off.
 Apply `sql/commerce-security.sql` only alongside deployment of the branch's
-new admin frontend and updated legacy Edge Functions, then change the administrator
-password through Security and sign in again. This deliberately makes old admin
+new admin frontend and updated legacy Edge Functions. Activation accepts the
+configured administrator credential without requiring a password change. Later
+password changes revoke existing sessions. This deliberately makes old admin
 clients stop writing. See [the coordinated rollout](online-orders.md#installation-and-coordinated-rollout)
 before enabling ordering. Do not reapply the historical base permissions after
 commerce activation.

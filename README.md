@@ -6,12 +6,12 @@ product images/videos, categories, brands, announcements, reviews and store cont
 settings. Google sign-in identifies customers and stores their private contact
 profiles.
 
-`feature/online-order-commerce` adds a cart, cash-on-delivery checkout, customer
-order history and an admin Orders & Customers console. Ordering starts off and
-remains blocked until the coordinated security activation and administrator
-password review are complete. A branch push does not merge or publish the frontend
-to `main`. Read [the order setup and rollout guide](docs/online-orders.md) before
-enabling orders on a shared production database.
+The commerce feature provides a cart, cash-on-delivery checkout, customer order
+history and an admin Orders & Customers console. Ordering starts off and is
+controlled from Settings after the coordinated security activation. Activation
+retains the configured admin credential; password changes remain optional.
+Read [the order setup and rollout guide](docs/online-orders.md) before enabling
+orders on a shared production database.
 
 ## Local development
 
@@ -67,9 +67,12 @@ applied on the connected Supabase project.
 - `supabase/functions/send-email`: staff-authorized Resend marketing campaigns.
   Registration never adds a customer to marketing automatically.
 - `supabase/functions/sync-google-reviews`: staff/cron-authorized Apify review
-  refresh. The Vercel API route forwards staff sessions or the verified cron secret.
-- `api/purge-analytics.js`: authorized daily analytics cleanup, requiring both
-  `CRON_SECRET` and a server-side `SUPABASE_SERVICE_ROLE_KEY` in Vercel.
+  refresh. The Vercel API route forwards staff sessions; the daily Supabase cron
+  uses the scoped maintenance secret.
+- `sql/commerce-maintenance.sql`: Supabase schedules for order maintenance, daily
+  analytics cleanup and daily review refresh. The legacy manual
+  `api/purge-analytics.js` route still requires `CRON_SECRET` and a server-side
+  `SUPABASE_SERVICE_ROLE_KEY` if used.
 
 See [PROJECT.md](PROJECT.md) for the implementation map,
 [customer-accounts.md](docs/customer-accounts.md) for Google OAuth configuration,
@@ -78,4 +81,4 @@ retention, delivery-code limits and launch verification. The setup helper is
 `node scripts/configure-commerce.mjs --secrets --schedule-config`; the guide
 explains its prerequisites and refusal to replace existing keys. Recorded results
 and outstanding browser checks are in [commerce-verification.md](docs/commerce-verification.md).
-SQL test fixtures in `tests/` are transactional and roll back.
+SQL test fixtures in `sql/tests/` are transactional and roll back.

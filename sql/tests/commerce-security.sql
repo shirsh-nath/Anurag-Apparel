@@ -5,6 +5,7 @@ create or replace function pg_temp.assert_true(input_value boolean,input_message
 begin if not coalesce(input_value,false) then raise exception 'FAIL: %',input_message; end if; end; $$;
 select set_config('test.product',gen_random_uuid()::text,true);
 select set_config('test.password',encode(extensions.gen_random_bytes(24),'hex'),true);
+select pg_temp.assert_true((select sealed and admin_password_ready from private.commerce_security_state where id),'activation accepts the configured administrator credential');
 update private.admin_credentials set username='commerce-security-fixture',password_hash=extensions.crypt(current_setting('test.password'),extensions.gen_salt('bf')) where id='dashboard';
 update private.commerce_security_state set admin_password_ready=false where id;
 update private.commerce_login_attempts set failures=0,window_start=now(),locked_until=null where id;

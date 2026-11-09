@@ -1,8 +1,7 @@
 # Anurag Apparel implementation map
 
-Updated 9 November 2026 for `feature/online-order-commerce`. This document describes
-the branch, not a statement that its frontend has been deployed to the production
-domain. Production remains controlled by the deployment/merge workflow.
+Updated 9 November 2026. Deployment state and completed checks are recorded in
+[docs/commerce-verification.md](docs/commerce-verification.md).
 
 ## Architecture
 
@@ -80,10 +79,12 @@ retries pending notifications. The encryption master key must never be stored in
 the database; a different maintenance secret is stored in Vault for cron.
 `scripts/configure-commerce.mjs --secrets --schedule-config` provisions/checks keys
 from the ignored local environment and prepares the scoped Vault configuration.
-`sql/commerce-maintenance.sql` installs the five-minute named cron job.
+`sql/commerce-maintenance.sql` installs the five-minute order-maintenance job,
+daily analytics cleanup and daily review refresh.
 
 The updated `send-email` and `sync-google-reviews` Edge Functions require validated
-staff sessions for manual actions. Scheduled reviews use `CRON_SECRET`.
+staff sessions for manual actions. Scheduled reviews use the scoped maintenance
+secret from Vault.
 `api/purge-analytics.js` requires a valid cron secret and server-only service-role
 key. These legacy function changes must roll out with the secure admin frontend.
 
@@ -95,7 +96,7 @@ directory are excluded from deployment. Only public configuration may be returne
 by `/api/config`. Google OAuth client secrets belong in the Supabase provider
 configuration, not browser code.
 
-Run `npm run dev`, `npm run check` and `npm test`. SQL tests in `tests/` use
+Run `npm run dev`, `npm run check` and `npm test`. SQL tests in `sql/tests/` use
 synthetic fixtures with transaction rollback. Account/order runtime mocks do not
 replace real-account Google consent, browser/mobile visual checks or live mail
 delivery verification. Follow the coordinated rollout and launch checklist in
@@ -103,6 +104,5 @@ delivery verification. Follow the coordinated rollout and launch checklist in
 [docs/customer-accounts.md](docs/customer-accounts.md) for the exact OAuth callback
 and return URLs. [docs/commerce-verification.md](docs/commerce-verification.md)
 records the completed database/endpoint tests and the outstanding browser, Google
-consent and real-mail launch checks. The additive schema, new commerce function
-and maintenance are installed; legacy security activation and frontend cutover
-remain pending with ordering off.
+consent and real-mail launch checks. Ordering is controlled separately from schema
+activation and deployment, and remains off until enabled by the administrator.

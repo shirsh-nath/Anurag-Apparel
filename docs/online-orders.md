@@ -1,17 +1,13 @@
 # Online orders
 
-The online-ordering implementation is on `feature/online-order-commerce`. A branch
-push does not merge into `main` or deploy its frontend to the production domain.
+The online-ordering implementation is deployed through `main`. Feature branches
+can still be used for future development without enabling ordering automatically.
 The customer Google sign-in configuration is described in
 [customer-accounts.md](customer-accounts.md).
 
-As checked on 9 November 2026, the additive commerce schema and new `commerce`
-Edge Function are installed on the connected project. Server keys and the
-five-minute maintenance job are configured; a maintenance request returned HTTP
-200. The coordinated legacy security activation is **not** applied, and the
-production frontend is unchanged. `sealed`, `admin_password_ready` and effective
-`allow_orders` remain false. See [the verification record](commerce-verification.md)
-for what was tested and which browser checks still block launch.
+Deployment, schema activation and test results are recorded in
+[the verification record](commerce-verification.md). Ordering remains a separate
+administrator setting; deploying code does not enable customer bookings.
 
 ## What the feature provides
 
@@ -95,7 +91,7 @@ Settings are checked on the server before saving.
 
 | Setting | Initial value / meaning |
 | --- | --- |
-| Allow online orders | Off, also blocked until the security rollout and administrator password review are complete |
+| Allow online orders | Off, also blocked until the security rollout and configured administrator credential are ready |
 | Maximum new orders/day | 50, counted by booking date in the configured business time zone |
 | Maximum items/order | 20 cart lines |
 | Maximum quantity/product choice | 10 for the same product, size and colour, including repeated cart lines |
@@ -183,7 +179,7 @@ production rollout.
    plaintext password in tracked SQL or documentation. Existing installations keep
    their current credential. Admin sign-in checks the stored username/password
    without blocking a particular previous password. The separate security
-   activation and password review for enabling orders still apply below.
+   activation for enabling orders still applies below.
 2. Apply `sql/commerce-schema.sql`. This is additive and idempotent. Effective
    ordering remains sealed/off, so it can coexist with the current production
    catalogue. Do not set private readiness flags by hand to bypass activation.
@@ -213,24 +209,26 @@ production rollout.
 5. Apply `sql/commerce-maintenance.sql`. The helper's `--schedule-config`
    step stores `commerce_maintenance_key` and `commerce_project_url` in Vault;
    the SQL schedules named job `anurag-commerce-maintenance` at `*/5 * * * *`.
-   It uses `net.http_post` with JSON `{"action":"maintenance"}` and the scoped
-   maintenance header. Do not store the code encryption key in Vault. Check both
+   The order job uses `net.http_post` with JSON `{"action":"maintenance"}` and the
+   scoped maintenance header. Daily analytics cleanup runs at `30 20 * * *` UTC;
+   review refresh runs at `45 21 * * *` UTC using the same scoped server secret. Do not store the code encryption key in Vault. Check both
    `cron.job_run_details` and `net._http_response`: a successful cron SQL statement
    only means a request was queued, while the HTTP result confirms the handler
    ran. Avoid selecting/logging request authorization headers.
-6. Coordinate deployment of this branch's frontend/API routes and updated legacy
+6. Coordinate deployment of this frontend/API code and updated legacy
    `send-email` and `sync-google-reviews` Edge Functions with applying
-   `sql/commerce-security.sql`. That SQL removes the legacy anonymous write
-   boundary and public purge/password-verifier access, and authorizes the new
-   opaque staff session on every request. Old admin clients cease working after
-   activation. The new Vercel analytics purge needs `SUPABASE_SERVICE_ROLE_KEY`
-   and `CRON_SECRET`; review cron needs the matching `CRON_SECRET` in Vercel and
-   Supabase. No automatic production merge is required for branch review.
-7. Sign in with the new admin UI, change the password through the Security menu
-   to a unique password of at least 12 characters and at most 72 UTF-8 bytes, then
-   sign in again. The byte limit prevents bcrypt from silently ignoring a suffix;
-   multibyte characters consume more than one byte. This marks the administrator
-   password review complete and revokes the old session.
+   `sql/commerce-security.sql`. That SQL removes legacy anonymous write and
+   password-verifier access and validates the opaque staff session on each
+   request. It retains the configured administrator credential and marks setup
+   ready when that credential exists. Old admin clients cease working after
+   activation. Deploy `sync-google-reviews` with gateway JWT verification disabled
+   because its handler authenticates staff sessions or server schedule secrets.
+   Supabase now runs the order, analytics and review jobs; no Vercel cron or
+   service-role environment variable is required for these schedules. The legacy
+   manual API cron routes still require their own configured server credentials.
+7. Sign in with the configured admin username/password. No password reset is
+   required. Optional password changes through the Security menu require at least
+   12 characters and at most 72 UTF-8 bytes, and revoke existing sessions.
 8. Configure stock, size/colour choices, store coordinates, delivery area, slots,
    fees, limits and email copy. Confirm the store can deliver to every enabled
    area. Keep automatic deletion off until the chosen periods are understood.

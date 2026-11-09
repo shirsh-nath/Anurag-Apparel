@@ -1,6 +1,6 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret, x-admin-session",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-secret, x-admin-session, x-commerce-maintenance",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
@@ -19,6 +19,8 @@ Deno.serve(async (req) => {
 
   const cronSecret = Deno.env.get("CRON_SECRET");
   const isCron = Boolean(cronSecret && req.headers.get("x-cron-secret") === cronSecret);
+  const maintenanceSecret = Deno.env.get("COMMERCE_MAINTENANCE_KEY");
+  const isMaintenance = Boolean(req.method === "POST" && maintenanceSecret && req.headers.get("x-commerce-maintenance") === maintenanceSecret);
 
   const apifyToken = Deno.env.get("APIFY_API_KEY");
   const supabaseUrl = trimTrailingSlash(Deno.env.get("SUPABASE_URL"));
@@ -33,7 +35,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    if (!isCron) {
+    if (!isCron && !isMaintenance) {
       const adminToken = req.headers.get("x-admin-session") || "";
       if (!/^[a-f0-9]{64}$/i.test(adminToken)) return json({ error: "Admin sign-in is required." }, 401);
       const verification = await fetch(`${supabaseUrl}/rest/v1/rpc/commerce_validate_admin_token`, {

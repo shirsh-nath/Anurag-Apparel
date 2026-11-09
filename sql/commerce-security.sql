@@ -1,7 +1,8 @@
 -- ACTIVATE ONLY with deployment of feature/online-order-commerce.
 -- This replaces the old anonymous/boolean-based admin boundary. It deliberately
 -- breaks old admin clients: deploy the branch's server-validated admin session UI first.
--- Run after commerce-schema.sql, then change the admin password and re-login.
+-- Run after commerce-schema.sql. Keep the configured administrator credential;
+-- changing its password later is optional and revokes existing sessions.
 
 begin;
 revoke all on function public.verify_admin_login(text,text) from public,anon,authenticated;
@@ -53,5 +54,10 @@ create policy "Commerce public product images" on storage.objects for select to 
 revoke all on function public.purge_old_analytics_events() from public,anon,authenticated;
 revoke all on function public.purge_old_analytics_events_rpc() from public,anon,authenticated;
 grant execute on function public.purge_old_analytics_events(),public.purge_old_analytics_events_rpc() to service_role;
-update private.commerce_security_state set sealed=true where id;
+-- The owner has chosen to retain the configured administrator credential.
+-- Readiness requires an existing credential, not a forced password rotation.
+update private.commerce_security_state set sealed=true,admin_password_ready=exists(
+  select 1 from private.admin_credentials where id='dashboard'
+    and length(btrim(username))>0 and length(password_hash)>0
+) where id;
 commit;
