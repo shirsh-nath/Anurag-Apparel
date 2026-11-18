@@ -313,6 +313,9 @@ export async function initializeStorefrontCommerce(config, { account, getProduct
     if (['ORDERS_DISABLED', 'ORDERING_DISABLED'].includes(error.code)) { settings.allow_orders = false; invalidateQuote(); updateCartBadge(); ui.shoppingContinue.disabled = true; ui.shoppingReview.disabled = true; ui.shoppingPlace.disabled = true; if (activeActions) renderProductActions(activeActions.container, activeActions.product); onSettingsChange?.(settings); }
     if (['PRICE_CHANGED', 'SLOT_CHANGED', 'OUT_OF_STOCK', 'INSUFFICIENT_STOCK', 'ITEM_UNAVAILABLE'].includes(error.code)) { invalidateQuote(); renderReviewItems(); }
     message(error.message || 'This request could not be completed. Please try again.', true, target);
+    if (target === ui.shoppingStatus && error.message === 'This map location is outside the delivery radius') {
+      window.alert(error.message);
+    }
   }
   async function openOrders(orderId, initialFilter = 'active') {
     if (!account?.getUser()) {
