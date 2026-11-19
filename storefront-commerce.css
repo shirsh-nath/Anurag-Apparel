@@ -88,9 +88,21 @@
 @media (max-width: 900px) { .site-header .nav-link { display: none; } }
 @media (max-width: 800px) { .shop-checkout-grid { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; } .shop-review { position: static; } }
 @media (max-width: 640px) {
-  .site-header nav { flex-wrap: wrap; padding-block: .45rem; }
-  .site-header .account-nav { margin-left: auto; }
-  .site-header .shop-shopping-nav { order: 4; width: 100%; justify-content: flex-end; padding-top: .3rem; border-top: 1px solid #e7e1d8; }
+  .site-header nav { flex-wrap: nowrap; padding-block: .45rem; }
+  .site-header .brand-lockup,
+  .site-header .brand-mark { flex-shrink: 1; }
+  .site-header .brand-mark { height: auto; aspect-ratio: 8 / 3; }
+  .site-header .nav-action {
+    width: clamp(1.9rem, 9vw, 2.65rem);
+    min-height: 2.65rem;
+    padding-inline: 0;
+  }
+  .site-header #mailUsButton { display: inline-flex !important; }
+  .site-header .account-button {
+    padding-inline: clamp(.2rem, 1.3vw, .65rem);
+    font-size: clamp(.65rem, 2.8vw, .82rem);
+  }
+  .site-header .shop-shopping-nav { gap: .25rem; }
   .site-header #customerSignUp { display: none; }
   #home { padding-top: 7.5rem; }
   .shop-dialog { padding: 1.1rem; width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); }
